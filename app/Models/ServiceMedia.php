@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceMedia extends Model
 {
     use HasFactory;
+
+    public function service(){
+        return $this->belongsTo(\App\Models\Service::class);
+    }
 }

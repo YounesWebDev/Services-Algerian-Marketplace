@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     use HasFactory;
+
+    public function services(){
+        return $this->hasMany(\App\models\Service::class);
+    }
+
+    public function requests(){
+        return $this->hasMany(\App\Models\Request::class);
+    }
 }

@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class ProviderVerification extends Model
 {
     use HasFactory;
+
+    public function provider(){
+        return $this->belongsTo(\App\Models\User::class,'provider_id');
+    }
+
+    public function reviewer(){
+        return $this->belongsTo(\App\Models\User::class, 'reviewed_by');
+    }
 }
