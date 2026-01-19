@@ -5,15 +5,29 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 Route::get('/', function () {
-    return Inertia::render('welcome', [
+    return Inertia::render('Public/Home', [
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+    Route::get('/dashboard', function () {
+        $user = request()->user();
+
+        return match ($user->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'provider' => redirect()->route('provider.dashboard'),
+            default => Inertia::render('Client/Dashboard'),
+        };
     })->name('dashboard');
+
+    Route::get('/provider/dashboard', function () {
+        return Inertia::render('Provider/Dashboard');
+    })->middleware('role:provider')->name('provider.dashboard');
 });
+
+Route::get('/admin/dashboard', function () {
+    return Inertia::render('Admin/Dashboard');
+})->middleware('role:admin')->name('admin.dashboard');
 
 require __DIR__.'/settings.php';
