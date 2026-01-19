@@ -6,10 +6,10 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\FeeSetting;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+
 class InitialSeeder extends Seeder
 {
     /**
@@ -17,7 +17,6 @@ class InitialSeeder extends Seeder
      */
     public function run(): void
     {
-        //Admin User
         User::firstOrCreate(
             ['email' => 'admin@dzservices.test'],
             [
@@ -28,33 +27,30 @@ class InitialSeeder extends Seeder
             ]
         );
 
-        //Fee Setting (7%)
         FeeSetting::firstOrCreate(
             ['active' => true],
             [
-                'commission_rate'=> 0.0700 , 
+                'commission_rate' => 0.0700,
                 'fixed_fee' => null,
             ]
         );
 
-        //Sample cities 
         $cities = [
-            ['name' => 'Algiers' , 'wilaya_code' => '16'],
-            ['name' => 'Oran' , 'wilaya_code' => '31'],
-            ['name' => 'Constantine' , 'wilaya_code' => '25'],
+            ['name' => 'Algiers', 'wilaya_code' => '16'],
+            ['name' => 'Oran', 'wilaya_code' => '31'],
+            ['name' => 'Constantine', 'wilaya_code' => '25'],
         ];
 
         foreach ($cities as $c) {
-            City::firstOrCreate(['name' => $c['name']],$c);
+            City::firstOrCreate(['name' => $c['name']], $c);
         }
 
-        //Sample categories
-        $categories = ['Plumbing' , 'Electricity' , 'Cleaning' , 'Web Development' , 'Design'];
+        $categories = ['Plumbing', 'Electricity', 'Cleaning', 'Web Development', 'Design'];
 
         foreach ($categories as $name) {
             Category::firstOrCreate(
-                ['slug' =>Str::slug($name)],
-                ['name' => $name , 'parent_id' => null]
+                ['slug' => Str::slug($name)],
+                ['name' => $name, 'parent_id' => null]
             );
         }
     }
