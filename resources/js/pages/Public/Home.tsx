@@ -56,7 +56,7 @@ export default function Home({
                         )}
                     </nav>
                 </header>
-                        <section className=''>
+                        <section>
                             <h2 className="font-semibold mb-2">Categories</h2>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {featuredCategories.map((c) => (
