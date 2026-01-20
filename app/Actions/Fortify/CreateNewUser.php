@@ -3,7 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Http\Concerns\PasswordValidationRules;
-use App\Concerns\ProfileValidationRules;
+use App\Http\Concerns\ProfileValidationRules;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
