@@ -24,10 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/provider/dashboard', function () {
         return Inertia::render('Provider/Dashboard');
     })->middleware('role:provider')->name('provider.dashboard');
-
-    Route::get('/admin/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->middleware('role:admin')->name('admin.dashboard');
 });
 
 require __DIR__.'/settings.php';
+require __DIR__.'/admin.php';

@@ -9,6 +9,12 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'slug',
+        'parent_id',
+    ];
+
     public function parent(){
         return $this->belongsTo(self::class,'parent_id');
     }
