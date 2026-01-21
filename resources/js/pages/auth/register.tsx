@@ -9,7 +9,6 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
-
 export default function Register() {
     return (
         <AuthLayout
@@ -26,13 +25,77 @@ export default function Register() {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
+                            <div className="flex flex-col gap-2">
+                                {/* Client option */}
+                                <label className="cursor-pointer">
+                                    <input
+                                    className="peer sr-only"
+                                    type="radio"
+                                    name="role"
+                                    value="client"
+                                    defaultChecked
+                                    required
+                                    />
+                                    <div
+                                    className="rounded-sm border p-5 transition
+                                                peer-checked:border-primary
+                                                peer-checked:ring-2 mb-3
+                                                peer-checked:ring-primary"
+                                    >
+                                    <div className="flex items-center gap-3">
+                                        <span className="font-bold">Client</span>
+                                        <span
+                                        className="ml-auto h-4 w-4 rounded-full border
+                                                    peer-checked:border-primary
+                                                    peer-checked:bg-primary"
+                                        />
+                                    </div>
+
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        I want to post requests and hire providers
+                                    </p>
+                                    </div>
+                                </label>
+
+                                {/* Provider option */}
+                                <label className="cursor-pointer">
+                                    <input
+                                    className="peer sr-only"
+                                    type="radio"
+                                    name="role"
+                                    value="provider"
+                                    />
+                                    <div
+                                    className="rounded-sm border p-5 transition
+                                                peer-checked:border-primary
+                                                peer-checked:ring-2
+                                                peer-checked:ring-primary"
+                                    >
+                                    <div className="flex items-center gap-3">
+                                        <span className="font-bold">Provider</span>
+                                        <span
+                                        className="ml-auto h-4 w-4 rounded-full border
+                                                    peer-checked:border-primary
+                                                    peer-checked:bg-primary"
+                                        />
+                                    </div>
+
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                        I want to offer services and get clients
+                                    </p>
+                                    </div>
+                                </label>
+
+                                <InputError message={errors.role} className="mt-2" />
+                                </div>
+
+
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
                                     id="name"
                                     type="text"
                                     required
-                                    autoFocus
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
