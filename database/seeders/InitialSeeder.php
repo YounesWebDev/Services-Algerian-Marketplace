@@ -104,5 +104,52 @@ class InitialSeeder extends Seeder
                 ['name' => $name, 'parent_id' => null]
             );
         }
+
+        // ----------------------------
+        // 5) Demo services (for testing Home page)
+        // ----------------------------
+$provider = \App\Models\User::where('email', 'provider@dzservices.test')->first();
+
+if ($provider) {
+    $someCities = \App\Models\City::inRandomOrder()->take(6)->pluck('id')->toArray();
+    $someCategories = \App\Models\Category::inRandomOrder()->take(6)->pluck('id')->toArray();
+
+    $demoServices = [
+        'Plumbing repair and installation',
+        'House deep cleaning service',
+        'Electrical wiring and fixes',
+        'AC installation and maintenance',
+        'Phone screen repair',
+        'Laptop formatting and cleanup',
+        'Car diagnostics and repair',
+        'Professional wall painting',
+        'CCTV installation',
+        'Moving and transport service',
+        'Garden cleaning and trimming',
+        'Web development landing page',
+    ];
+
+    foreach ($demoServices as $i => $title) {
+        $categoryId = $someCategories[$i % count($someCategories)];
+        $cityId = $someCities[$i % count($someCities)];
+
+        $slug = \Illuminate\Support\Str::slug($title) . '-' . ($i + 1);
+
+        \App\Models\Service::updateOrCreate(
+            ['slug' => $slug],
+            [
+                'provider_id' => $provider->id,
+                'category_id' => $categoryId,
+                'city_id' => $cityId,
+                'title' => $title,
+                'description' => 'Demo service created by seeder for testing the home page.',
+                'base_price' => 1500 + ($i * 250),
+                'pricing_type' => 'fixed',
+                'status' => 'approved',
+            ]
+        );
+    }
+}
+
     }
 }

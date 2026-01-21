@@ -6,6 +6,8 @@ use Inertia\Inertia;
 
 Route::get('/',[HomeController::class , 'index'])->name('home');
 
+Route::get('/suggestions',[HomeController::class,'suggestions'])->name('home.suggestions');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user = request()->user();
