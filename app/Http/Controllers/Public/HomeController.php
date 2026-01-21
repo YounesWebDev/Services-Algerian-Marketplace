@@ -67,7 +67,7 @@ class HomeController extends Controller
     /**
      * Suggestions API (JSON):
      * - Used when user types in search input
-     * - Returns suggestions
+     * - Returns suggestions without reloading the page
      */
     public function suggestions(Request $request)
     {

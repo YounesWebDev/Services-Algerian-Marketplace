@@ -1,4 +1,4 @@
-     import { Link, router } from "@inertiajs/react";
+    import { Link, router } from "@inertiajs/react";
     import {
     Tag,
     Wrench,
@@ -16,7 +16,10 @@
     Scissors,
     AirVent,
     } from "lucide-react";
-   import React, { useEffect, useRef, useState } from "react";
+    import React, { useEffect, useRef, useState } from "react";
+    import { usePage } from "@inertiajs/react";
+    import { type SharedData } from "@/types";
+import { dashboard, login, register } from "@/routes";
 
     type Category = { id: number; name: string; slug: string };
     type City = { id: number; name: string };
@@ -146,11 +149,11 @@
         { preserveState: true, replace: true }
         );
     }
-
+    const { auth } = usePage<SharedData>().props;
     return (
         <div className="min-h-screen">
         {/* Navbar */}
-        <div className="rounded-b-4xl backdrop-blur-sm border-b border-gray-500 fixed w-full z-30 py bg-primary-foreground/30">
+        <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border-b border-gray-500 fixed w-full z-30 py bg-primary-foreground/30">
             <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
                 <Link className="hover:scale-105 duration-300" href="/">
                 <div className="font-bold text-xl  ">PROfinder</div>
@@ -170,183 +173,197 @@
             </div>
 
             <div className="flex justify-between gap-3 text-sm">
-                <a className="hover:scale-105 duration-300" href="/login">
-                Login
-                </a>
-                {canRegister && (
-                <a
-                    className="px-3 py-1 border rounded hover:bg-green-500 hover:text-white duration-300"
-                    href="/register"
-                >
-                    Register
-                </a>
+                {auth.user ? (
+                    <Link
+                        href={dashboard()}
+                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                        >
+                        Dashboard
+                    </Link>
+                ):(
+                    <>
+                        <Link
+                            href={login()}
+                            className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                        >
+                            Log in
+                        </Link>
+                            {canRegister && (
+                                <Link
+                                    href={register()}
+                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                >
+                                    Register
+                                </Link>
+                            )}
+                    </>
                 )}
             </div>
             </div>
         </div>
 
         {/* Hero (Fiverr-like) */}
-       <div
-  className="relative bg-cover bg-center bg-no-repeat"
-  style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+        <div
+    className="relative bg-cover bg-center bg-no-repeat"
+    style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
 >
   {/* Overlay Gradient */}
-  <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
+    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
 
   {/* Content */}
-  <div className="relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
+    <div className="relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
     {/* Title */}
     <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-      Hire Professionals for Any Job, Fast
+        Hire Professionals for Any Job, Fast
     </h1>
 
     {/* Subtitle */}
     <p className="text-sm md:text-base">
-      Search, chat, and hire providers — all in one place.
+        Search, chat, and hire providers — all in one place.
     </p>
 
     {/* Search Bar */}
     <div className="bg-white/90 dark:bg-black/70 border rounded-lg p-3 flex flex-col md:flex-row gap-3 md:items-center">
       {/* Search input + suggestions */}
-      <div className="relative w-full md:flex-1">
+        <div className="relative w-full md:flex-1">
         <input
-          value={query}
-          onChange={handleQueryChange}
-          onFocus={() => {
+            value={query}
+            onChange={handleQueryChange}
+            onFocus={() => {
             if (query.trim().length >= 2) setOpen(true);
-          }}
-          onBlur={() => {
+            }}
+            onBlur={() => {
             setTimeout(() => setOpen(false), 150);
-          }}
-          placeholder="Search services (e.g. plumber)"
-          className="h-10 w-full rounded-md border px-3 text-sm"
+            }}
+            placeholder="Search services (e.g. plumber)"
+            className="h-10 w-full rounded-md border px-3 text-sm"
         />
 
         {/* Suggestions dropdown */}
         {open &&
-          (suggestions.services.length > 0 ||
+            (suggestions.services.length > 0 ||
             suggestions.categories.length > 0) && (
             <div className="absolute z-50 mt-2 w-full rounded-md border bg-background shadow">
               {/* Categories */}
-              {suggestions.categories.length > 0 && (
+                {suggestions.categories.length > 0 && (
                 <div className="p-2">
-                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
                     Categories
-                  </div>
-                  {suggestions.categories.map((c) => (
+                    </div>
+                    {suggestions.categories.map((c) => (
                     <button
-                      key={c.id}
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                      onMouseDown={() => {
+                        key={c.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                        onMouseDown={() => {
                         setCategory(String(c.id));
                         setQuery("");
                         setSuggestions({ services: [], categories: [] });
                         setOpen(false);
-                      }}
+                        }}
                     >
-                      {c.name}
+                        {c.name}
                     </button>
-                  ))}
+                    ))}
                 </div>
-              )}
+                )}
 
-              {/* Services */}
-              {suggestions.services.length > 0 && (
-                <div className="p-2 border-t">
-                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                    Services
-                  </div>
-                  {suggestions.services.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                      onMouseDown={() => {
-                        setQuery(s.title);
-                        setOpen(false);
-                      }}
-                    >
-                      {s.title}
-                    </button>
-                  ))}
+                {/* Services */}
+                {suggestions.services.length > 0 && (
+                    <div className="p-2 border-t">
+                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                        Services
+                    </div>
+                    {suggestions.services.map((s) => (
+                        <button
+                        key={s.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                        onMouseDown={() => {
+                            setQuery(s.title);
+                            setOpen(false);
+                        }}
+                        >
+                        {s.title}
+                        </button>
+                    ))}
+                    </div>
+                )}
                 </div>
-              )}
-            </div>
-          )}
-      </div>
+            )}
+        </div>
 
-      {/* City */}
-      <select
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
-      >
-        <option value="">All wilayas</option>
-        {topCities.map((c) => (
-          <option key={c.id} value={String(c.id)}>
-            {c.name}
-          </option>
-        ))}
-      </select>
+        {/* City */}
+        <select
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        >
+            <option value="">All wilayas</option>
+            {topCities.map((c) => (
+            <option key={c.id} value={String(c.id)}>
+                {c.name}
+            </option>
+            ))}
+        </select>
 
-      {/* Category */}
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
-      >
-        <option value="">All categories</option>
-        {featuredCategories.map((cat) => (
-          <option key={cat.id} value={String(cat.id)}>
-            {cat.name}
-          </option>
-        ))}
-      </select>
+        {/* Category */}
+        <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        >
+            <option value="">All categories</option>
+            {featuredCategories.map((cat) => (
+            <option key={cat.id} value={String(cat.id)}>
+                {cat.name}
+            </option>
+            ))}
+        </select>
 
-      {/* Search Button */}
-      <button
-        type="button"
-        onClick={runSearch}
-        className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
-      >
-        Search
-      </button>
-    </div>
-
-    {/* Category pills with icons */}
-    <div className="flex flex-wrap gap-2 mt-4">
-      {featuredCategories.slice(0, 10).map((cat) => {
-        const Icon = categoryIcon(cat.name);
-        return (
-          <button
-            key={cat.id}
+        {/* Search Button */}
+        <button
             type="button"
-            onClick={() => {
-              setCategory(String(cat.id));
-              router.get(
-                "/",
-                { q: "", city: city || "", category: cat.id },
-                { preserveState: true, replace: true }
-              );
-            }}
-            className="px-3 py-2 border rounded-full text-sm hover:bg-muted flex items-center gap-2"
-          >
-            <Icon className="h-4 w-4" />
-            <span>{cat.name}</span>
-          </button>
-        );
-      })}
-    </div>
+            onClick={runSearch}
+            className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+        >
+            Search
+        </button>
+        </div>
 
-    {/* Badges */}
-    <div className="flex flex-wrap gap-4 text-sm mt-4">
-      <span>✅ Verified providers</span>
-      <span>💬 Realtime chat</span>
-      <span>💳 Cash or online payment</span>
-      <span>⭐ Ratings & reviews</span>
+        {/* Category pills with icons */}
+        <div className="flex flex-wrap gap-2 mt-4">
+        {featuredCategories.slice(0, 10).map((cat) => {
+            const Icon = categoryIcon(cat.name);
+            return (
+            <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                setCategory(String(cat.id));
+                router.get(
+                    "/",
+                    { q: "", city: city || "", category: cat.id },
+                    { preserveState: true, replace: true }
+                );
+                }}
+                className="px-3 py-2 border rounded-full text-sm hover:bg-muted flex items-center gap-2"
+            >
+                <Icon className="h-4 w-4" />
+                <span>{cat.name}</span>
+            </button>
+            );
+        })}
+        </div>
+
+        {/* Badges */}
+        <div className="flex flex-wrap gap-4 text-sm mt-4">
+        <span>✅ Verified providers</span>
+        <span>💬 Realtime chat</span>
+        <span>💳 Cash or online payment</span>
+        <span>⭐ Ratings & reviews</span>
+        </div>
     </div>
-  </div>
 </div>
 
 

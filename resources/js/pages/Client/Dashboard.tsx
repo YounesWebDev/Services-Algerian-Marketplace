@@ -1,7 +1,11 @@
-import React from 'react'
+import AppLayout from '@/layouts/app-layout'
 
 export default function Dashboard() {
     return (
-        <div className='p-6'>Client Dashboard</div>
+        <>
+        <AppLayout breadcrumbs={[ { title: 'Dashboard', href: '/dashboard' } ]}>
+            <div className='p-6'>Client Dashboard</div>
+        </AppLayout>
+        </>
     ) 
 }
