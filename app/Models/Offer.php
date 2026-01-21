@@ -9,6 +9,13 @@ class Offer extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'request_id',
+        'message',
+        'proposed_price',
+        'estimated_days',
+    ];
+
     public function request(){
         return $this->belongsTo(\App\Models\Request::class);
     }

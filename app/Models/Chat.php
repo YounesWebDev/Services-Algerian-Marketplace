@@ -9,6 +9,13 @@ class Chat extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'type',
+        'service_id',
+        'request_id',
+        'last_message_at',
+    ];
+
     public function client(){
         return $this->belongsTo(\App\Models\User::class,'client_id');
     }

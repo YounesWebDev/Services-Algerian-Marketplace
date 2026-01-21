@@ -1,13 +1,24 @@
 <?php
 
-test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
+use Illuminate\Support\Facades\Auth;
 
+beforeEach(function () {
+    // ✅ Make sure this file always runs as a guest
+    Auth::logout();
+    $this->flushSession();
+});
+
+test('registration screen can be rendered', function () {
+    $this->assertGuest();
+
+    $response = $this->get(route('register'));
     $response->assertOk();
 });
 
 test('new users can register', function () {
-    // ✅ Load the form first to start session + get CSRF token
+    $this->assertGuest();
+
+    // Load the form first to start session + get CSRF token
     $page = $this->get(route('register'));
     $page->assertOk();
 
@@ -20,6 +31,9 @@ test('new users can register', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
+
+    // ✅ If guest middleware blocked it, this will reveal it immediately
+    $response->assertStatus(302);
 
     $response->assertSessionHasNoErrors();
 

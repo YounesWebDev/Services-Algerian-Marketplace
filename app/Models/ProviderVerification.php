@@ -9,6 +9,12 @@ class ProviderVerification extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'doc_type',
+        'doc_number',
+        'doc_path',
+    ];
+
     public function provider(){
         return $this->belongsTo(\App\Models\User::class,'provider_id');
     }

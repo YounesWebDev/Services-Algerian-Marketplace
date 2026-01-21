@@ -9,6 +9,13 @@ class Dispute extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'booking_id',
+        'reason',
+        'description',
+    ];
+
+
     public function booking(){
         return $this->belongsTo(\App\Models\Booking::class);
     }

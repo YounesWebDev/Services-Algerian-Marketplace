@@ -9,6 +9,12 @@ class Payout extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'method',
+        'metadata',
+    ];
+
+
     public function provider(){
         return $this->belongsTo(\App\Models\User::class,'provider_id');
     }

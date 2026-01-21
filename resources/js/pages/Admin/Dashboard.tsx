@@ -1,5 +1,6 @@
-import AppLayout from '@/layouts/app-layout'
 import React from 'react'
+
+import AppLayout from '@/layouts/app-layout'
 
 export default function Dashboard() {
     return (

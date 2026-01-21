@@ -9,6 +9,18 @@ class Request extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'category_id',
+        'city_id',
+        'title',
+        'description',
+        'budget_min',
+        'budget_max',
+        'urgency',
+        'visibility',
+        'expires_at',
+    ];  
+
     public function client(){
         return $this->belongsTo(\App\Models\User::class,'client_id');
     }

@@ -9,6 +9,13 @@ class Report extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'target_type',
+        'target_id',
+        'reason',
+    ];
+
+
     public function reporter(){
         return $this->belongsTo(\App\Models\User::class,'reporter_id');
     }
