@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, router } from "@inertiajs/react";
-import {
+     import { Link, router } from "@inertiajs/react";
+    import {
     Tag,
     Wrench,
     Plug,
@@ -17,6 +16,7 @@ import {
     Scissors,
     AirVent,
     } from "lucide-react";
+   import React, { useEffect, useRef, useState } from "react";
 
     type Category = { id: number; name: string; slug: string };
     type City = { id: number; name: string };
@@ -85,16 +85,30 @@ import {
     // Cancel old fetch requests when typing fast
     const abortRef = useRef<AbortController | null>(null);
 
+    // ✅ Handler: keep "clear suggestions" here (NOT inside useEffect)
+    const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setQuery(value);
+
+        const text = value.trim();
+
+        // If less than 2 chars: close suggestions immediately
+        if (text.length < 2) {
+        // cancel any inflight request
+        abortRef.current?.abort();
+        abortRef.current = null;
+
+        setSuggestions({ services: [], categories: [] });
+        setOpen(false);
+        }
+    };
+
     // Fetch suggestions when user types (no page reload)
     useEffect(() => {
         const text = query.trim();
 
-        // If less than 2 chars: close suggestions
-        if (text.length < 2) {
-        setSuggestions({ services: [], categories: [] });
-        setOpen(false);
-        return;
-        }
+        // ✅ Do nothing when less than 2 chars (no setState here)
+        if (text.length < 2) return;
 
         const timer = setTimeout(async () => {
         try {
@@ -141,15 +155,26 @@ import {
             <div className="font-bold text-xl">DZ Services</div>
 
             <div className="flex gap-4 text-sm">
-                <Link className="hover:underline" href="/">Home</Link>
-                <Link className="hover:underline" href="/requests">Requests</Link>
-                <Link className="hover:underline" href="/services">Services</Link>
+                <Link className="hover:underline" href="/">
+                Home
+                </Link>
+                <Link className="hover:underline" href="/requests">
+                Requests
+                </Link>
+                <Link className="hover:underline" href="/services">
+                Services
+                </Link>
             </div>
 
             <div className="flex gap-3 text-sm">
-                <a className="hover:underline" href="/login">Login</a>
+                <a className="hover:underline" href="/login">
+                Login
+                </a>
                 {canRegister && (
-                <a className="px-3 py-1 border rounded hover:bg-muted" href="/register">
+                <a
+                    className="px-3 py-1 border rounded hover:bg-muted"
+                    href="/register"
+                >
                     Register
                 </a>
                 )}
@@ -173,7 +198,7 @@ import {
                 <div className="relative w-full md:flex-1">
                 <input
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={handleQueryChange}
                     onFocus={() => {
                     if (query.trim().length >= 2) setOpen(true);
                     }}
@@ -186,54 +211,63 @@ import {
                 />
 
                 {/* Suggestions dropdown (no reload) */}
-                {open && (suggestions.services.length > 0 || suggestions.categories.length > 0) && (
+                {open &&
+                    (suggestions.services.length > 0 ||
+                    suggestions.categories.length > 0) && (
                     <div className="absolute z-50 mt-2 w-full rounded-md border bg-background shadow">
-                    {/* Categories */}
-                    {suggestions.categories.length > 0 && (
+                        {/* Categories */}
+                        {suggestions.categories.length > 0 && (
                         <div className="p-2">
-                        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                            <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
                             Categories
-                        </div>
-                        {suggestions.categories.map((c) => (
+                            </div>
+                            {suggestions.categories.map((c) => (
                             <button
-                            key={c.id}
-                            type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                            onMouseDown={() => {
+                                key={c.id}
+                                type="button"
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                                onMouseDown={() => {
                                 // set category filter + clear input
                                 setCategory(String(c.id));
                                 setQuery("");
-                            }}
-                            >
-                            {c.name}
-                            </button>
-                        ))}
-                        </div>
-                    )}
 
-                    {/* Services */}
-                    {suggestions.services.length > 0 && (
-                        <div className="p-2 border-t">
-                        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                            Services
+                                // also clear suggestions immediately
+                                setSuggestions({ services: [], categories: [] });
+                                setOpen(false);
+                                }}
+                            >
+                                {c.name}
+                            </button>
+                            ))}
                         </div>
-                        {suggestions.services.map((s) => (
+                        )}
+
+                        {/* Services */}
+                        {suggestions.services.length > 0 && (
+                        <div className="p-2 border-t">
+                            <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                            Services
+                            </div>
+                            {suggestions.services.map((s) => (
                             <button
-                            key={s.id}
-                            type="button"
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                            onMouseDown={() => {
+                                key={s.id}
+                                type="button"
+                                className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                                onMouseDown={() => {
                                 // fill query
                                 setQuery(s.title);
-                            }}
+
+                                // keep suggestions closed after choosing
+                                setOpen(false);
+                                }}
                             >
-                            {s.title}
+                                {s.title}
                             </button>
-                        ))}
+                            ))}
                         </div>
-                    )}
+                        )}
                     </div>
-                )}
+                    )}
                 </div>
 
                 {/* City */}
@@ -284,7 +318,11 @@ import {
                     type="button"
                     onClick={() => {
                         setCategory(String(cat.id));
-                        router.get("/", { q: "", city: city || "", category: cat.id }, { preserveState: true, replace: true });
+                        router.get(
+                        "/",
+                        { q: "", city: city || "", category: cat.id },
+                        { preserveState: true, replace: true }
+                        );
                     }}
                     className="px-3 py-2 border rounded-full text-sm hover:bg-muted flex items-center gap-2"
                     >
@@ -316,6 +354,8 @@ import {
                 setQuery("");
                 setCity("");
                 setCategory("");
+                setSuggestions({ services: [], categories: [] });
+                setOpen(false);
                 router.get("/", {}, { preserveState: true, replace: true });
                 }}
             >
@@ -330,7 +370,11 @@ import {
                 type="button"
                 onClick={() => {
                     setQuery(s.title);
-                    router.get("/", { q: s.title, city: city || "", category: category || "" }, { preserveState: true, replace: true });
+                    router.get(
+                    "/",
+                    { q: s.title, city: city || "", category: category || "" },
+                    { preserveState: true, replace: true }
+                    );
                 }}
                 className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
                 title="Click to search similar services"
@@ -359,9 +403,15 @@ import {
             <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
             <div>© {new Date().getFullYear()} DZ Services</div>
             <div className="flex gap-4">
-                <a className="hover:underline" href="/about">About</a>
-                <a className="hover:underline" href="/contact">Contact</a>
-                <a className="hover:underline" href="/terms">Terms</a>
+                <a className="hover:underline" href="/about">
+                About
+                </a>
+                <a className="hover:underline" href="/contact">
+                Contact
+                </a>
+                <a className="hover:underline" href="/terms">
+                Terms
+                </a>
             </div>
             </div>
         </div>
