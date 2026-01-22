@@ -15,6 +15,8 @@
     Languages,
     Scissors,
     AirVent,
+    ChevronLeft,
+    ChevronRight,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
     import { usePage } from "@inertiajs/react";
@@ -31,6 +33,8 @@ import { dashboard, login, register } from "@/routes";
     pricing_type: string;
     city_id: number;
     category_id: number;
+    images?: string[];
+    currentImage?: number;
     };
 
     type Suggestions = {
@@ -88,6 +92,41 @@ import { dashboard, login, register } from "@/routes";
     // Cancel old fetch requests when typing fast
     const abortRef = useRef<AbortController | null>(null);
 
+    // Loader ref for auto-scrolling categories
+    const loaderRef = useRef<HTMLDivElement>(null);
+
+    // Slider state
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [services, setServices] = useState<Service[]>(popularServices);
+
+    // Auto-rotate slides every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % 4);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // Auto-rotate images inside each service card
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setServices((prevServices) =>
+                prevServices.map((service) => {
+                    if (!service.images || service.images.length <= 1) {
+                        return service;
+                    }
+                    return {
+                        ...service,
+                        currentImage: ((service.currentImage || 0) + 1) % service.images.length,
+                    };
+                })
+            );
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     // ✅ Handler: keep "clear suggestions" here (NOT inside useEffect)
     const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -144,7 +183,7 @@ import { dashboard, login, register } from "@/routes";
     // Run search WITHOUT full page reload (Inertia request)
     function runSearch() {
         router.get(
-        "/",
+        "/services",
         { q: query, city: city || "", category: category || "" },
         { preserveState: true, replace: true }
         );
@@ -202,136 +241,158 @@ import { dashboard, login, register } from "@/routes";
             </div>
         </div>
 
-        {/* Hero (Fiverr-like) */}
-        <div
-    className="relative bg-cover bg-center bg-no-repeat"
-    style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
->
+       {/* Hero (Fiverr-like) */}
+<div className="relative overflow-hidden h-screen">
+  {/* Background slider with 4 local images */}
+  {[
+    "./hero/njar.jpg",   // Developer on laptop
+    "./hero/mason.jpg",      // Worker / handyman
+    "./hero/laptop.jpg",     // Plumber / technician
+    "./hero/coding.jpg" // Mason / construction
+  ].map((img: string, index: number) => (
+    <div
+      key={img}
+      className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+        index === currentSlide ? "opacity-100" : "opacity-0"
+      }`}
+      style={{ backgroundImage: `url('${img}')` }}
+    />
+  ))}
+
   {/* Overlay Gradient */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
+  <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
 
   {/* Content */}
-    <div className="relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
+  <div className="flex place-items-start flex-col justify-center relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
     {/* Title */}
     <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-        Hire Professionals for Any Job, Fast
+      Hire Professionals for Any Job, Fast
     </h1>
 
     {/* Subtitle */}
     <p className="text-sm md:text-base">
-        Search, chat, and hire providers — all in one place.
+      Search, chat, and hire providers — all in one place.
     </p>
 
     {/* Search Bar */}
-    <div className="bg-white/90 dark:bg-black/70 border rounded-lg p-3 flex flex-col md:flex-row gap-3 md:items-center">
+    <div className="bg-white/20 backdrop-blur-3xl dark:bg-black/70 border-1 border-gray-300 rounded-4xl p-3 flex flex-col md:flex-row gap-3 md:items-center">
       {/* Search input + suggestions */}
-        <div className="relative w-full md:flex-1">
+      <div className="relative w-full md:flex-1">
         <input
-            value={query}
-            onChange={handleQueryChange}
-            onFocus={() => {
+          value={query}
+          onChange={handleQueryChange}
+          onFocus={() => {
             if (query.trim().length >= 2) setOpen(true);
-            }}
-            onBlur={() => {
+          }}
+          onBlur={() => {
             setTimeout(() => setOpen(false), 150);
-            }}
-            placeholder="Search services (e.g. plumber)"
-            className="h-10 w-full rounded-md border px-3 text-sm"
+          }}
+          placeholder="Search services (e.g. plumber)"
+          className="h-10 w-full rounded-full border px-3 text-sm"
         />
 
         {/* Suggestions dropdown */}
         {open &&
-            (suggestions.services.length > 0 ||
+          (suggestions.services.length > 0 ||
             suggestions.categories.length > 0) && (
             <div className="absolute z-50 mt-2 w-full rounded-md border bg-background shadow">
               {/* Categories */}
-                {suggestions.categories.length > 0 && (
+              {suggestions.categories.length > 0 && (
                 <div className="p-2">
-                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
                     Categories
-                    </div>
-                    {suggestions.categories.map((c) => (
+                  </div>
+                  {suggestions.categories.map((c) => (
                     <button
-                        key={c.id}
-                        type="button"
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                        onMouseDown={() => {
-                        setCategory(String(c.id));
-                        setQuery("");
-                        setSuggestions({ services: [], categories: [] });
+                      key={c.id}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                      onMouseDown={() => {
                         setOpen(false);
-                        }}
+                        setCategory(c.slug);
+                        router.get(
+                          "/services",
+                          {  category: c.slug || "",city: city || ""},
+                          { preserveState: true }
+                        );
+
+                      }}
                     >
-                        {c.name}
+                      {c.name}
                     </button>
-                    ))}
+                  ))}
                 </div>
-                )}
+              )}
 
-                {/* Services */}
-                {suggestions.services.length > 0 && (
-                    <div className="p-2 border-t">
-                    <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                        Services
-                    </div>
-                    {suggestions.services.map((s) => (
-                        <button
-                        key={s.id}
-                        type="button"
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
-                        onMouseDown={() => {
-                            setQuery(s.title);
-                            setOpen(false);
-                        }}
-                        >
-                        {s.title}
-                        </button>
-                    ))}
-                    </div>
-                )}
+              {/* Services */}
+              {suggestions.services.length > 0 && (
+                <div className="p-2 border-t">
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
+                    Services
+                  </div>
+                  {suggestions.services.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                      onMouseDown={() => {
+                        setOpen(false);
+                        router.get(`/services/${s.slug}`);
+                      }}
+                    >
+                      {s.title}
+                    </button>
+                  ))}
                 </div>
-            )}
-        </div>
+              )}
+            </div>
+          )}
+      </div>
 
-        {/* City */}
-        <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
-        >
-            <option value="">All wilayas</option>
-            {topCities.map((c) => (
-            <option key={c.id} value={String(c.id)}>
-                {c.name}
-            </option>
-            ))}
-        </select>
+      {/* City */}
+      <select
+        value={city}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          setCity(e.target.value)
+        }
+        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+      >
+        <option value="">All wilayas</option>
+        {topCities.map((c) => (
+          <option key={c.id} value={String(c.id)}>
+            {c.name}
+          </option>
+        ))}
+      </select>
 
-        {/* Category */}
-        <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
-        >
-            <option value="">All categories</option>
-            {featuredCategories.map((cat) => (
-            <option key={cat.id} value={String(cat.id)}>
-                {cat.name}
-            </option>
-            ))}
-        </select>
+      {/* Category */}
+      <select
+        value={category}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          setCategory(e.target.value)
+        }
+        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+      >
+        <option value="">All categories</option>
+        {featuredCategories.map((cat) => (
+          <option key={cat.id} value={String(cat.slug)}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
 
-        {/* Search Button */}
-        <button
-            type="button"
-            onClick={runSearch}
-            className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
-        >
-            Search
-        </button>
-        </div>
+      {/* Search Button */}
+      <button
+        type="button"
+        onClick={runSearch}
+        className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+      >
+        Search
+      </button>
+    </div>
 
-        {/* Category pills with icons */}
+
+    {/* Category pills with icons */}
         <div className="flex flex-wrap gap-2 mt-4">
         {featuredCategories.slice(0, 10).map((cat) => {
             const Icon = categoryIcon(cat.name);
@@ -342,9 +403,9 @@ import { dashboard, login, register } from "@/routes";
                 onClick={() => {
                 setCategory(String(cat.id));
                 router.get(
-                    "/",
-                    { q: "", city: city || "", category: cat.id },
-                    { preserveState: true, replace: true }
+                    "/services",
+                    { q: "", city: city || "", category: cat.slug },
+                    { preserveState: true }
                 );
                 }}
                 className="px-3 py-2 border rounded-full text-sm hover:bg-muted flex items-center gap-2"
@@ -356,35 +417,37 @@ import { dashboard, login, register } from "@/routes";
         })}
         </div>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-4 text-sm mt-4">
-        <span>✅ Verified providers</span>
-        <span>💬 Realtime chat</span>
-        <span>💳 Cash or online payment</span>
-        <span>⭐ Ratings & reviews</span>
-        </div>
+    {/* Badges */}
+    <div className="flex flex-wrap gap-4 text-sm mt-4">
+      <span>✅ Verified providers</span>
+      <span>💬 Realtime chat</span>
+      <span>💳 Cash or online payment</span>
+      <span>⭐ Ratings & reviews</span>
     </div>
+  </div>
+</div>
+ {/* Auto-scrolling category squares */}
+<div className="overflow-hidden mt-4">
+  <div className="flex gap-4 whitespace-nowrap animate-scroll">
+    {featuredCategories.concat(featuredCategories).map((cat, index) => {
+      const Icon = categoryIcon(cat.name);
+      return (
+        <div
+          key={index}
+          className="min-w-[100px] h-24 border rounded-lg p-4 text-center flex flex-col items-center justify-center gap-2 shrink-0"
+        >
+          <Icon className="h-6 w-6" />
+          <span className="text-sm font-medium">{cat.name}</span>
+        </div>
+      );
+    })}
+  </div>
 </div>
 
-
-        {/* Popular services */}
+{/* Popular services */}
         <div className="mx-auto max-w-6xl px-6 py-10 space-y-4">
             <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Popular services</h2>
-            <button
-                type="button"
-                className="text-sm underline"
-                onClick={() => {
-                setQuery("");
-                setCity("");
-                setCategory("");
-                setSuggestions({ services: [], categories: [] });
-                setOpen(false);
-                router.get("/", {}, { preserveState: true, replace: true });
-                }}
-            >
-                Clear
-            </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -393,12 +456,7 @@ import { dashboard, login, register } from "@/routes";
                 key={s.id}
                 type="button"
                 onClick={() => {
-                    setQuery(s.title);
-                    router.get(
-                    "/",
-                    { q: s.title, city: city || "", category: category || "" },
-                    { preserveState: true, replace: true }
-                    );
+                    router.get(`/services/${s.slug}`);
                 }}
                 className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
                 title="Click to search similar services"
