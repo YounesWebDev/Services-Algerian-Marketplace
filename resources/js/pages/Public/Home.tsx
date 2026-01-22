@@ -1,4 +1,5 @@
     import { Link, router } from "@inertiajs/react";
+    import { usePage } from "@inertiajs/react";
     import {
     Tag,
     Wrench,
@@ -17,9 +18,9 @@
     AirVent,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
-    import { usePage } from "@inertiajs/react";
-    import { type SharedData } from "@/types";
+
 import { dashboard, login, register } from "@/routes";
+    import { type SharedData } from "@/types";
 
     type Category = { id: number; name: string; slug: string };
     type City = { id: number; name: string };
@@ -143,8 +144,11 @@ import { dashboard, login, register } from "@/routes";
 
     // Run search WITHOUT full page reload (Inertia request)
     function runSearch() {
+        if(query.length < 2 && city === "" && category === "") {
+            return;
+        }
         router.get(
-        "/",
+        "/services",
         { q: query, city: city || "", category: category || "" },
         { preserveState: true, replace: true }
         );
@@ -202,7 +206,7 @@ import { dashboard, login, register } from "@/routes";
             </div>
         </div>
 
-        {/* Hero (Fiverr-like) */}
+        {/* Hero */}
         <div
     className="relative bg-cover bg-center bg-no-repeat"
     style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
@@ -256,10 +260,13 @@ import { dashboard, login, register } from "@/routes";
                         type="button"
                         className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
                         onMouseDown={() => {
-                        setCategory(String(c.id));
-                        setQuery("");
-                        setSuggestions({ services: [], categories: [] });
-                        setOpen(false);
+                            setOpen(false);
+                            setCategory(c.slug);
+                            router.get(
+                            "/services",
+                            {category: c.slug || "", city: city || "" },
+                            { preserveState: false }
+                            );
                         }}
                     >
                         {c.name}
@@ -280,8 +287,8 @@ import { dashboard, login, register } from "@/routes";
                         type="button"
                         className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
                         onMouseDown={() => {
-                            setQuery(s.title);
                             setOpen(false);
+                            router.get(`/services/${s.slug}`);
                         }}
                         >
                         {s.title}
@@ -315,7 +322,7 @@ import { dashboard, login, register } from "@/routes";
         >
             <option value="">All categories</option>
             {featuredCategories.map((cat) => (
-            <option key={cat.id} value={String(cat.id)}>
+            <option key={cat.id} value={String(cat.slug)}>
                 {cat.name}
             </option>
             ))}
@@ -342,9 +349,9 @@ import { dashboard, login, register } from "@/routes";
                 onClick={() => {
                 setCategory(String(cat.id));
                 router.get(
-                    "/",
-                    { q: "", city: city || "", category: cat.id },
-                    { preserveState: true, replace: true }
+                    "/services",
+                    { q: "", city: city || "", category: cat.slug },
+                    { preserveState: true }
                 );
                 }}
                 className="px-3 py-2 border rounded-full text-sm hover:bg-muted flex items-center gap-2"
@@ -371,20 +378,6 @@ import { dashboard, login, register } from "@/routes";
         <div className="mx-auto max-w-6xl px-6 py-10 space-y-4">
             <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Popular services</h2>
-            <button
-                type="button"
-                className="text-sm underline"
-                onClick={() => {
-                setQuery("");
-                setCity("");
-                setCategory("");
-                setSuggestions({ services: [], categories: [] });
-                setOpen(false);
-                router.get("/", {}, { preserveState: true, replace: true });
-                }}
-            >
-                Clear
-            </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -393,12 +386,7 @@ import { dashboard, login, register } from "@/routes";
                 key={s.id}
                 type="button"
                 onClick={() => {
-                    setQuery(s.title);
-                    router.get(
-                    "/",
-                    { q: s.title, city: city || "", category: category || "" },
-                    { preserveState: true, replace: true }
-                    );
+                    router.get(`/services/${s.slug}`);
                 }}
                 className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
                 title="Click to search similar services"
