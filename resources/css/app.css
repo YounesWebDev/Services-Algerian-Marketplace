@@ -18,6 +18,19 @@
     }
 }
 
+@keyframes horizontal-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: horizontal-scroll 18s linear infinite;
+}
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;

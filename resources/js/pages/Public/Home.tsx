@@ -1,4 +1,5 @@
-    import { Link, router } from "@inertiajs/react";
+ import { Button } from "@headlessui/react";
+   import { Link, router } from "@inertiajs/react";
     import { usePage } from "@inertiajs/react";
     import {
     Tag,
@@ -16,6 +17,8 @@
     Languages,
     Scissors,
     AirVent,
+    Menu,
+    X,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
 
@@ -32,6 +35,8 @@ import { dashboard, login, register } from "@/routes";
     pricing_type: string;
     city_id: number;
     category_id: number;
+    images?: string[];
+    currentImage?: number;
     };
 
     type Suggestions = {
@@ -78,6 +83,7 @@ import { dashboard, login, register } from "@/routes";
     const [query, setQuery] = useState(filters?.q ?? "");
     const [city, setCity] = useState(filters?.city ?? "");
     const [category, setCategory] = useState(filters?.category ?? "");
+    const [openMenu, setOpenMenu] = useState(false);
 
     // Suggestions dropdown
     const [suggestions, setSuggestions] = useState<Suggestions>({
@@ -88,6 +94,41 @@ import { dashboard, login, register } from "@/routes";
 
     // Cancel old fetch requests when typing fast
     const abortRef = useRef<AbortController | null>(null);
+
+    // Loader ref for auto-scrolling categories
+    const loaderRef = useRef<HTMLDivElement>(null);
+
+    // Slider state
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [services, setServices] = useState<Service[]>(popularServices);
+
+    // Auto-rotate slides every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % 4);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // Auto-rotate images inside each service card
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setServices((prevServices) =>
+                prevServices.map((service) => {
+                    if (!service.images || service.images.length <= 1) {
+                        return service;
+                    }
+                    return {
+                        ...service,
+                        currentImage: ((service.currentImage || 0) + 1) % service.images.length,
+                    };
+                })
+            );
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     // ✅ Handler: keep "clear suggestions" here (NOT inside useEffect)
     const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,65 +198,145 @@ import { dashboard, login, register } from "@/routes";
     return (
         <div className="min-h-screen">
         {/* Navbar */}
-        <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border-b border-gray-500 fixed w-full z-30 py bg-primary-foreground/30">
+        <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border border-gray-200 fixed w-full z-30 bg-primary-foreground/30">
             <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-                <Link className="hover:scale-105 duration-300" href="/">
+                <Link className="hover:text-primary transition" href="/">
                 <div className="font-bold text-xl  ">PROfinder</div>
                 </Link>
-            
 
-            <div className="hidden md:flex justify-between gap-15 ">
-                <Link className="hover:scale-105 duration-300" href="/">
-                Home
-                </Link>
-                <Link className="hover:scale-105 duration-300" href="/requests">
-                Requests
-                </Link>
-                <Link className="hover:scale-105 duration-300" href="/services">
-                Services
-                </Link>
-            </div>
-
-            <div className="flex justify-between gap-3 text-sm">
-                {auth.user ? (
-                    <Link
-                        href={dashboard()}
-                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                        >
-                        Dashboard
+                <div className="hidden md:flex justify-between gap-15 ">
+                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/">
+                    Home
                     </Link>
-                ):(
-                    <>
-                        <Link
-                            href={login()}
-                            className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                        >
-                            Log in
-                        </Link>
-                            {canRegister && (
+                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
+                    Requests
+                    </Link>
+                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/services">
+                    Services
+                    </Link>
+                </div>
+
+                <div>
+                    <Button
+                        onClick={() => {
+                            setOpenMenu(!openMenu);
+                        }
+                    }>
+                        {openMenu ? (
+                            <X
+                                size={28}
+                                className="md:hidden text-black dark:text-white"
+                            />
+                        ) : (
+                            <Menu
+                                size={28}
+                                className="md:hidden text-black dark:text-white"
+                            />
+                        )}
+                    </Button>
+
+                    {openMenu && (
+                    <div className="flex flex-col">
+                        <div className="absolute top-18 right-4 border z-40 bg-white border-gray-200 rounded-xl p-5 flex gap-2 flex-col md:hidden w-[75%]">
+                            {auth.user ? (
                                 <Link
-                                    href={register()}
-                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                href={dashboard()}
+                                className="inline-block rounded-sm border font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                                 >
-                                    Register
+                                    Dashboard
                                 </Link>
+                            ):(
+                                <>
+                                    <Link
+                                        href={login()}
+                                        className="inline-block font-bold rounded-sm border border-transparent transition-all hover:backdrop-blur-sm px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                    >
+                                        Log in
+                                    </Link>
+                                        {canRegister && (
+                                            <Link
+                                            href={register()}
+                                            className="inline-block font-bold rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal transition-all hover:backdrop-blur-sm text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                            >
+                                                Register
+                                            </Link>
+                                        )}
+                                </>
                             )}
-                    </>
-                )}
-            </div>
-            </div>
+                        <div>
+                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/">
+                            Home
+                            </Link>
+                        </div>
+                        <div>
+                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
+                            Requests
+                            </Link>
+                        </div>
+                        <div>
+                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/services">
+                            Services
+                            </Link>
+                        </div>
+                        </div>
+                    </div>
+            )}
+
+                </div>
+
+                <div className="hidden md:flex justify-between gap-3 text-sm">
+                    {auth.user ? (
+                        <Link
+                            href={dashboard()}
+                            className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                            >
+                            Dashboard
+                        </Link>
+                    ):(
+                        <>
+                            <Link
+                                href={login()}
+                                className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                            >
+                                Log in
+                            </Link>
+                                {canRegister && (
+                                    <Link
+                                        href={register()}
+                                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                    >
+                                        Register
+                                    </Link>
+                                )}
+                        </>
+                    )}
+                </div>
+                </div>
         </div>
 
-        {/* Hero */}
-        <div
-    className="relative bg-cover bg-center bg-no-repeat"
-    style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
->
+       {/* Hero */}
+<div className="relative overflow-hidden h-screen">
+  {/* Background slider with 4 local images */}
+    {[
+    "./hero/njar.jpg",   // Developer on laptop
+    "./hero/mason.jpg",      // Worker / handyman
+    "./hero/laptop.jpg",     // Plumber / technician
+    "./hero/coding.jpg" // Mason / construction
+    ].map((img: string, index: number) => (
+    <div
+        key={img}
+        className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+        index === currentSlide ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ backgroundImage: `url('${img}')` }}
+    />
+    ))}
+
   {/* Overlay Gradient */}
     <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
 
   {/* Content */}
-    <div className="relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
+    <div className="w-full md:flex items-start flex-col justify-center relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
     {/* Title */}
     <h1 className="text-3xl md:text-5xl font-bold leading-tight">
         Hire Professionals for Any Job, Fast
@@ -227,7 +348,7 @@ import { dashboard, login, register } from "@/routes";
     </p>
 
     {/* Search Bar */}
-    <div className="bg-white/90 dark:bg-black/70 border rounded-lg p-3 flex flex-col md:flex-row gap-3 md:items-center">
+    <div className="bg-white/20 backdrop-blur-3xl dark:bg-black/70 border border-gray-300 rounded-4xl p-3 flex flex-col md:flex-row gap-3 md:items-center">
       {/* Search input + suggestions */}
         <div className="relative w-full md:flex-1">
         <input
@@ -240,7 +361,7 @@ import { dashboard, login, register } from "@/routes";
             setTimeout(() => setOpen(false), 150);
             }}
             placeholder="Search services (e.g. plumber)"
-            className="h-10 w-full rounded-md border px-3 text-sm"
+            className="h-10 w-full rounded-full border px-3 text-sm"
         />
 
         {/* Suggestions dropdown */}
@@ -258,15 +379,16 @@ import { dashboard, login, register } from "@/routes";
                     <button
                         key={c.id}
                         type="button"
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                        className="w-full text-left px-3 py-2 text-black text-sm hover:bg-muted"
                         onMouseDown={() => {
-                            setOpen(false);
-                            setCategory(c.slug);
-                            router.get(
+                        setOpen(false);
+                        setCategory(c.slug);
+                        router.get(
                             "/services",
-                            {category: c.slug || "", city: city || "" },
-                            { preserveState: false }
-                            );
+                            {  category: c.slug || "",city: city || ""},
+                            { preserveState: true }
+                        );
+
                         }}
                     >
                         {c.name}
@@ -275,70 +397,75 @@ import { dashboard, login, register } from "@/routes";
                 </div>
                 )}
 
-                {/* Services */}
+              {/* Services */}
                 {suggestions.services.length > 0 && (
-                    <div className="p-2 border-t">
+                <div className="p-2 border-t">
                     <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                        Services
+                    Services
                     </div>
                     {suggestions.services.map((s) => (
-                        <button
+                    <button
                         key={s.id}
                         type="button"
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-muted"
+                        className="w-full text-left px-3 py-2 text-black text-sm hover:bg-muted"
                         onMouseDown={() => {
-                            setOpen(false);
-                            router.get(`/services/${s.slug}`);
+                        setOpen(false);
+                        router.get(`/services/${s.slug}`);
                         }}
-                        >
+                    >
                         {s.title}
-                        </button>
+                    </button>
                     ))}
-                    </div>
-                )}
                 </div>
+                )}
+            </div>
             )}
         </div>
 
-        {/* City */}
+      {/* City */}
         <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        value={city}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setCity(e.target.value)
+        }
+        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
         >
-            <option value="">All wilayas</option>
-            {topCities.map((c) => (
+        <option value="">All wilayas</option>
+        {topCities.map((c) => (
             <option key={c.id} value={String(c.id)}>
-                {c.name}
+            {c.name}
             </option>
-            ))}
+        ))}
         </select>
 
-        {/* Category */}
+      {/* Category */}
         <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        value={category}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setCategory(e.target.value)
+        }
+        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
         >
-            <option value="">All categories</option>
-            {featuredCategories.map((cat) => (
+        <option value="">All categories</option>
+        {featuredCategories.map((cat) => (
             <option key={cat.id} value={String(cat.slug)}>
-                {cat.name}
+            {cat.name}
             </option>
-            ))}
+        ))}
         </select>
 
-        {/* Search Button */}
+      {/* Search Button */}
         <button
-            type="button"
-            onClick={runSearch}
-            className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+        type="button"
+        onClick={runSearch}
+        className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
         >
-            Search
+        Search
         </button>
-        </div>
+    </div>
 
-        {/* Category pills with icons */}
+
+    {/* Category pills with icons */}
         <div className="flex flex-wrap gap-2 mt-4">
         {featuredCategories.slice(0, 10).map((cat) => {
             const Icon = categoryIcon(cat.name);
@@ -363,25 +490,41 @@ import { dashboard, login, register } from "@/routes";
         })}
         </div>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-4 text-sm mt-4">
+    {/* Badges */}
+    <div className="flex flex-wrap gap-4 text-sm mt-4">
         <span>✅ Verified providers</span>
         <span>💬 Realtime chat</span>
         <span>💳 Cash or online payment</span>
         <span>⭐ Ratings & reviews</span>
+    </div>
+    </div>
+</div>
+ {/* Auto-scrolling category squares */}
+<div className="overflow-hidden mt-4">
+    <div ref={loaderRef} className="flex gap-4 whitespace-nowrap animate-scroll">
+    {featuredCategories.concat(featuredCategories).map((cat, index) => {
+        const Icon = categoryIcon(cat.name);
+        return (
+        <div
+            key={index}
+            className="min-w-[100px] h-24 border rounded-lg p-4 text-center flex flex-col items-center justify-center gap-2 shrink-0"
+        >
+            <Icon className="h-6 w-6 hover:text-primary" />
+            <span className="text-sm font-medium hover:text-primary">{cat.name}</span>
         </div>
+        );
+    })}
     </div>
 </div>
 
-
-        {/* Popular services */}
+{/* Popular services */}
         <div className="mx-auto max-w-6xl px-6 py-10 space-y-4">
             <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Popular services</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {popularServices.map((s) => (
+            {services.map((s) => (
                 <button
                 key={s.id}
                 type="button"
@@ -402,7 +545,7 @@ import { dashboard, login, register } from "@/routes";
                 </button>
             ))}
 
-            {popularServices.length === 0 && (
+            {services.length === 0 && (
                 <div className="text-sm text-muted-foreground">
                 No services found yet. (Seeder will add demo services)
                 </div>
