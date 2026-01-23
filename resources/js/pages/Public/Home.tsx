@@ -205,13 +205,13 @@ import { dashboard, login, register } from "@/routes";
                 </Link>
 
                 <div className="hidden md:flex justify-between gap-15 ">
-                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/">
+                    <Link className="hover:text-primary    p-1 transition" href="/">
                     Home
                     </Link>
-                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
+                    <Link className="hover:text-primary    p-1 transition" href="/requests">
                     Requests
                     </Link>
-                    <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/services">
+                    <Link className="hover:text-primary     p-1 transition" href="/services">
                     Services
                     </Link>
                 </div>
@@ -428,7 +428,7 @@ import { dashboard, login, register } from "@/routes";
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setCity(e.target.value)
         }
-        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        className="h-10 w-full md:w-56 rounded-4xl  border px-3 text-sm"
         >
         <option value="">All wilayas</option>
         {topCities.map((c) => (
@@ -444,7 +444,7 @@ import { dashboard, login, register } from "@/routes";
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setCategory(e.target.value)
         }
-        className="h-10 w-full md:w-56 rounded-md border px-3 text-sm"
+        className="h-10 w-full md:w-56 rounded-4xl border px-3 text-sm"
         >
         <option value="">All categories</option>
         {featuredCategories.map((cat) => (
@@ -458,7 +458,7 @@ import { dashboard, login, register } from "@/routes";
         <button
         type="button"
         onClick={runSearch}
-        className="h-10 w-full md:w-32 rounded-md bg-primary text-primary-foreground text-sm font-medium"
+        className="h-10 w-full md:w-32 rounded-4xl bg-primary text-primary-foreground text-sm font-medium  hover:bg-white duration-300  transition hover:text-black"
         >
         Search
         </button>
@@ -507,7 +507,7 @@ import { dashboard, login, register } from "@/routes";
         return (
         <div
             key={index}
-            className="min-w-[100px] h-24 border rounded-lg p-4 text-center flex flex-col items-center justify-center gap-2 shrink-0"
+            className="min-w-[100px] h-24 border rounded-lg p-4 text-center flex flex-col items-center justify-center gap-2 shrink-0  hover:px-9  hover:shadow-sm hover:bg-muted transition-all duration-500 cursor-pointer hover:text-primary "
         >
             <Icon className="h-6 w-6 hover:text-primary" />
             <span className="text-sm font-medium hover:text-primary">{cat.name}</span>
@@ -518,40 +518,64 @@ import { dashboard, login, register } from "@/routes";
 </div>
 
 {/* Popular services */}
-        <div className="mx-auto max-w-6xl px-6 py-10 space-y-4">
-            <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Popular services</h2>
-            </div>
+<div className="mx-auto h- max-w-6xl px-6 py-10 space-y-4">
+  <div className="flex items-center justify-between">
+    <h2 className="text-xl font-bold ">Popular services</h2>
+  </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {services.map((s) => (
-                <button
-                key={s.id}
-                type="button"
-                onClick={() => {
-                    router.get(`/services/${s.slug}`);
-                }}
-                className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
-                title="Click to search similar services"
-                >
-                <div className="font-semibold line-clamp-2">{s.title}</div>
-                <div className="mt-2 text-sm text-muted-foreground">
-                    {s.pricing_type}
-                    {s.base_price ? ` • ${s.base_price} DZD` : ""}
-                </div>
-                <div className="mt-3 text-xs text-muted-foreground">
-                    Click to see similar
-                </div>
-                </button>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {services.map((s) => (
+      <button
+        key={s.id}
+        type="button"
+        onClick={() => router.get(`/services/${s.slug}`)}
+        className="flex flex-col group text-left border rounded-3xl h-70  overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-forground"
+      >
+        {/* CASE 1: With images → Slider */}
+        {s.images && s.images.length > 0 && (
+          <div className="relative h-44 overflow-hidden rounded-t-3xl">
+            {s.images.slice(0, 4).map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={s.title}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                  index === (s.currentImage ?? 0)
+                    ? "opacity-100"
+                    : "opacity-0"
+                }`}
+              />
             ))}
+          </div>
+        )}
 
-            {services.length === 0 && (
-                <div className="text-sm text-muted-foreground">
-                No services found yet. (Seeder will add demo services)
-                </div>
-            )}
-            </div>
+        {/* Content */}
+        <div className="p-4">
+          <div className="font-semibold line-clamp-2">{s.title}</div>
+
+          
+
+          <div className="flex justify-between">
+            <div className="mt-2 text-sm text-muted-foreground border border-gray-200 rounded-full w-max p-2 bg-white/20  backdrop-blur-sm  hover:text-black hover:bg-white transitio duration-300 ">
+            {s.pricing_type}
+            {s.base_price ? ` • ${s.base_price} DZD` : ""}
+          </div>
+
+            <div className="border text-primary-foreground border-gray-200 rounded-full w-max p-2 bg-white/20  backdrop-blur-sm mt-3 text-xs hover:text-black hover:bg-white transition duration-300 ">
+            more
+          </div>
+          </div>
         </div>
+      </button>
+    ))}
+
+    {services.length === 0 && (
+      <div className="text-sm text-muted-foreground">
+        No services found yet. (Seeder will add demo services)
+      </div>
+    )}
+  </div>
+</div>
 
         {/* Footer */}
         <div className="border-t">
