@@ -12,4 +12,5 @@ Route::middleware(['auth','verified','role:admin'])
             return Inertia::render('Admin/Dashboard');
         })->name('dashboard');
         
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
     });

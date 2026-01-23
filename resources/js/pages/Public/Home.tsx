@@ -323,10 +323,10 @@ import { dashboard, login, register } from "@/routes";
 <div className="relative overflow-hidden h-screen">
   {/* Background slider with 4 local images */}
     {[
-    "./hero/njar.jpg",   // Developer on laptop
-    "./hero/mason.jpg",      // Worker / handyman
-    "./hero/laptop.jpg",     // Plumber / technician
-    "./hero/coding.jpg" // Mason / construction
+    "/hero/njar.jpg",   // Developer on laptop
+    "/hero/mason.jpg",      // Worker / handyman
+    "/hero/laptop.jpg",     // Plumber / technician
+    "/hero/coding.jpg" // Mason / construction
     ].map((img: string, index: number) => (
     <div
         key={img}
@@ -338,7 +338,7 @@ import { dashboard, login, register } from "@/routes";
     ))}
 
   {/* Overlay Gradient */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/50"></div>
+    <div className="absolute inset-0 bg-linear-to-b from-black/30 to-black/50"></div>
 
   {/* Content */}
     <div className="w-full md:flex items-start flex-col justify-center relative mx-auto max-w-6xl px-6 py-28 space-y-6 text-white">
