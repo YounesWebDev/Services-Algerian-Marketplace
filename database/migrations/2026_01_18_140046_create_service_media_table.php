@@ -12,16 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('service_media', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('service_id')->constrained()->cascadeOnDelete();
-    $table->string('path');
-    $table->string('type')->default('image');
-    $table->unsignedInteger('position')->default(0);
-    $table->timestamps();
-});
+            $table->id();
+            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
+            $table->string('path');
+            $table->string('type')->default('image');
+            $table->unsignedInteger('position')->default(0);
+            $table->timestamps();
+        });
 
     }
-
     /**
      * Reverse the migrations.
      */

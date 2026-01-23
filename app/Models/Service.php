@@ -36,6 +36,10 @@ class Service extends Model
         return $this->belongsTo(\App\Models\ServiceMedia::class);
     }
 
+    public function coverMedia(){
+        return $this->hasOne(\App\Models\ServiceMedia::class)->orderBy('position');
+    }
+
     public function booking(){
         return $this->hasMany(\App\Models\Booking::class);
     }
