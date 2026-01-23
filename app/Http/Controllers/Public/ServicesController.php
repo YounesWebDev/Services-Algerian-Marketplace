@@ -51,7 +51,7 @@ class ServicesController extends Controller
 
         //Paginated results
         $services = $servicesQuery
-                    ->select(['id','provider_id','category_id','city_id','title','slug','base_price','pricing_type'])
+                    ->select(['id','provider_id','category_id','city_id','title','slug','base_price','pricing_type','payment_type'])
                     ->paginate(12)
                     ->withQueryString(); //keep filters in pagination links
 

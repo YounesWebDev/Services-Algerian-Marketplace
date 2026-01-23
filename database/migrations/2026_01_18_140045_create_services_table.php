@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('base_price', 10, 2)->nullable();
             $table->string('pricing_type'); // fixed|hourly|quote
+            $table->string('payment_type')->default('cash'); // cash | online | both
             $table->string('status')->default('pending'); // pending|approved|rejected|hidden
             $table->timestamp('featured_until')->nullable();
             $table->timestamps();

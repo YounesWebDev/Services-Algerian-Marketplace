@@ -157,6 +157,7 @@ class InitialSeeder extends Seeder
                         'description' => 'Demo service created by seeder for testing the home page and services pages.',
                         'base_price' => 1500 + ($i * 250),
                         'pricing_type' => 'fixed',
+                        'payment_type' => 'online',
                         'status' => 'approved',
                     ]
                 );
