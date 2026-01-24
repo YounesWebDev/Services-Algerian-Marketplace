@@ -200,6 +200,7 @@ import { dashboard, login, register } from "@/routes";
         );
     }
     const { auth } = usePage<SharedData>().props;
+    console.log(auth);
     return (
         <div className="min-h-screen">
         {/* Navbar */}

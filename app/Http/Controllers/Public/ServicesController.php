@@ -11,83 +11,104 @@ use Inertia\Inertia;
 
 class ServicesController extends Controller
 {
+    /**
+     * GET /services
+     * List approved services with filters + media + pagination
+     */
     public function index(Request $request)
     {
-        //Read filters from query
-        $q = trim((string) $request->query('q' , ''));
-        $cityId = (string) $request->query('city' , '');
-        $categorySlug = (string) $request->query('category' , '');
+        // Read filters from URL: /services?q=&city=&category=
+        $q = (string) $request->query('q', '');
+        $city = (string) $request->query('city', '');
+        $category = (string) $request->query('category', '');
 
-        //Resolve category slug -> category id (only if provided)
-        $categoryId = null;
-        if($categorySlug !== ''){
-            $category = \App\Models\Category::where('slug' , $categorySlug)->first();
-            if($categorySlug){
-                $categoryId = Category::where('slug' , $categorySlug)->value('id');
+        // Dropdown data (for UI filters)
+        $categories = Category::orderBy('name')->get(['id', 'name', 'slug']);
+        $cities = City::orderBy('name')->get(['id', 'name']);
+
+        // Base query (only approved)
+        $servicesQuery = Service::query()
+            ->where('status', 'approved')
+            ->with([
+                // Load media (ordered)
+                'media' => fn ($q) => $q->orderBy('position'),
+            ]);
+
+        // Filter: q (title search)
+        if ($q !== '') {
+            $servicesQuery->where('title', 'like', "%{$q}%");
+        }
+
+        // Filter: city (expects city_id)
+        if ($city !== '' && is_numeric($city)) {
+            $servicesQuery->where('city_id', (int) $city);
+        }
+
+        // Filter: category
+        // Your UI sometimes sends category slug, sometimes id
+        if ($category !== '') {
+            if (is_numeric($category)) {
+                $servicesQuery->where('category_id', (int) $category);
+            } else {
+                // slug -> find category id
+                $catId = Category::where('slug', $category)->value('id');
+                if ($catId) {
+                    $servicesQuery->where('category_id', $catId);
+                }
             }
         }
 
-        //Base query (Public only)
-        $servicesQuery = Service::query()->where('status' , 'approved')->with([
-            'city:id,name',
-            'category:id,name,slug',
-            //media ordered use the first as cover in UI
-            'media' => fn($q) => $q->orderBy('position'),
-        ])->orderByDesc('id');
-
-        //Apply filters
-        if($q !== ''){
-            $servicesQuery->where(function ($sub) use ($q){
-                $sub->where('title' , 'like' , "%${q}%")
-                    ->orWhere('description' , 'like' , "%${q}%");
-            });
-        }
-        if($cityId !== ''){
-            $servicesQuery->where('city_id' , $cityId);
-        }
-        if($categoryId !== null){
-            $servicesQuery->where('category_id' , $categoryId);
-        }
-
-        //Paginated results
+        // Paginate (withQueryString keeps filters when switchin1g pages)
         $services = $servicesQuery
-                    ->select(['id','provider_id','category_id','city_id','title','slug','base_price','pricing_type','payment_type'])
-                    ->paginate(12)
-                    ->withQueryString(); //keep filters in pagination links
+            ->latest()
+            ->select([
+                'id',
+                'provider_id',
+                'category_id',
+                'city_id',
+                'title',
+                'slug',
+                'description',
+                'base_price',
+                'pricing_type',
+                'payment_type',
+                'status',
+                'featured_until',
+                'created_at',
+            ])
+            ->paginate(12)
+            ->withQueryString();
 
-        //Filters  dropdown data
-        $cities = City::orderBy('name')->get(['id','name']);
-        $categories = Category::orderBy('name')->get(['id','name','slug']);
+            $services->getCollection()->load('provider:id,name,avatar_path');
 
-        return Inertia::render('Public/Services/Index' , [
+
+        return Inertia::render('Public/Services/Index', [
             'services' => $services,
-            'cities' => $cities,
             'categories' => $categories,
-
-            //keep the filters in UI inputs
+            'cities' => $cities,
             'filters' => [
-                'q'=>$q,
-                'city'=>$cityId,
-                'category'=>$categorySlug,
-            ]
+                'q' => $q,
+                'city' => $city,
+                'category' => $category,
+            ],
         ]);
     }
 
+    /**
+     * GET /services/{service:slug}
+     * Show one service details + media gallery
+     */
     public function show(Service $service)
     {
-        //Only approved services can be shown publicly
-        if($service->status !=='approved'){
-            abort(404);
-        }
-
+        // Make sure we load relations we need for the show page
         $service->load([
-            'city:id,name',
+            'media' => fn ($q) => $q->orderBy('position'),
             'category:id,name,slug',
-            //full media gallery
-            'media'=> fn ($q) => $q->orderBy('position'),
+            'city:id,name',
+            'provider:id,name',
         ]);
 
-        return Inertia::render('Public/Services/Show' , [
+        return Inertia::render('Public/Services/Show', [
             'service' => $service,
         ]);
     }

@@ -26,7 +26,7 @@ class Service extends Model
 
 
     public function provider(){
-        return $this->belogsTo(\App\Models\User::class,'provder_id');
+        return $this->belongsTo(\App\Models\User::class,'provider_id');
     }
 
     public function category(){
