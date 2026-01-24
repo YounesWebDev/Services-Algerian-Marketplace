@@ -29,6 +29,12 @@
 .animate-scroll:hover {
   animation-play-state: paused;
 }
+.animate-scroll2 {
+  animation: horizontal-scroll 5s linear infinite;
+}
+.animate-scroll2:hover {
+  animation-play-state: paused;
+}
 
 
 :root {
