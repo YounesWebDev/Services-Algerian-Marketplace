@@ -1,4 +1,4 @@
- import { Button } from "@headlessui/react";
+import { Button } from "@headlessui/react";
    import { Link, router } from "@inertiajs/react";
     import { usePage } from "@inertiajs/react";
     import {
@@ -552,7 +552,6 @@ import { dashboard, login, register } from "@/routes";
         {/* Content */}
         <div className="p-4">
           <div className="font-semibold line-clamp-2">{s.title}</div>
-          
 
           
 
@@ -562,7 +561,7 @@ import { dashboard, login, register } from "@/routes";
             {s.base_price ? ` • ${s.base_price} DZD` : ""}
           </div>
 
-            <div className="border text-primary border-gray-200 rounded-full w-max p-2 bg-white/20  backdrop-blur-sm mt-3 text-xs hover:text-black hover:bg-white transition duration-300 ">
+            <div className="border text-primary-foreground border-gray-200 rounded-full w-max p-2 bg-white/20  backdrop-blur-sm mt-3 text-xs hover:text-black hover:bg-white transition duration-300 ">
             more
           </div>
           </div>

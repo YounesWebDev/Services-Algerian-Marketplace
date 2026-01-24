@@ -23,7 +23,7 @@ class HomeController extends Controller
         // Read filters from the URL: /?q=...&city=...&category=...
         $q = $request->query('q', '');
         $cityId = $request->query('city', '');
-        $categoryId = $request->query('category', '');
+        $categorySlug = $request->query('category', '');
 
         // Data for dropdowns + clickable categories
         $categories = Category::orderBy('name')->take(12)->get(['id', 'name', 'slug']);
@@ -39,15 +39,21 @@ class HomeController extends Controller
         if ($cityId !== '') {
             $servicesQuery->where('city_id', $cityId);
         }
-        if ($categoryId !== '') {
-            $servicesQuery->where('category_id', $categoryId);
+        if ($categorySlug !== '') {
+            $categoryId = Category::where('slug', $categorySlug)->value('id');
+            if ($categoryId) {
+                $servicesQuery->where('category_id', $categoryId);
+            }
         }
 
         // Get results to show on the home page
         $popularServices = $servicesQuery
             ->latest()
             ->take(8)
-            ->get(['id', 'title', 'slug', 'base_price', 'pricing_type', 'city_id', 'category_id']);
+            ->with([
+                'media' => fn ($q) => $q->orderBy('position'),
+            ])
+            ->get(['id', 'title', 'slug', 'base_price', 'pricing_type', 'payment_type', 'city_id', 'category_id']);
 
         return Inertia::render('Public/Home', [
             'canRegister' => Features::enabled(Features::registration()),
@@ -59,7 +65,7 @@ class HomeController extends Controller
             'filters' => [
                 'q' => $q,
                 'city' => $cityId,
-                'category' => $categoryId,
+                'category' => $categorySlug,
             ],
         ]);
     }
@@ -100,3 +106,5 @@ class HomeController extends Controller
         ]);
     }
 }
+
+

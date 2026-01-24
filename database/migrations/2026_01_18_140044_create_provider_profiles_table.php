@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('provider_profiles', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-    $table->text('bio')->nullable();
-    $table->string('address')->nullable();
-    $table->string('company_name')->nullable();
-    $table->timestamp('verified_at')->nullable();
-    $table->decimal('rating_avg', 3, 2)->default(0);
-    $table->unsignedInteger('rating_count')->default(0);
-    $table->timestamps();
-    });
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->text('bio')->nullable();
+            $table->string('address')->nullable();
+            $table->string('company_name')->nullable();
+            $table->timestamp('verified_at')->nullable();
+            $table->decimal('rating_avg', 3, 2)->default(0);
+            $table->unsignedInteger('rating_count')->default(0);
+            $table->timestamps();
+        });
 
     }
 

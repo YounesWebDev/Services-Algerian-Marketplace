@@ -10,14 +10,19 @@ class Service extends Model
     use HasFactory;
 
     protected $fillable = [
-    'category_id',
-    'city_id',
-    'title',
-    'slug',
-    'description',
-    'base_price',
-    'pricing_type',
+        'provider_id',
+        'category_id',
+        'city_id',
+        'title',
+        'slug',
+        'description',
+        'base_price',
+        'pricing_type',
+        'payment_type',
+        'status',
+        'featured_until',
     ];
+
 
 
     public function provider(){
@@ -33,7 +38,11 @@ class Service extends Model
     }
 
     public function media(){
-        return $this->belongsTo(\App\Models\ServiceMedia::class);
+        return $this->hasMany(\App\Models\ServiceMedia::class,'service_id');
+    }
+
+    public function coverMedia(){
+        return $this->hasOne(\App\Models\ServiceMedia::class)->orderBy('position');
     }
 
     public function booking(){
