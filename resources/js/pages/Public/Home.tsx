@@ -323,6 +323,7 @@ import { dashboard, login, register } from "@/routes";
 <div className="relative overflow-hidden h-screen">
   {/* Background slider with 4 local images */}
     {[
+        
     "/hero/njar.jpg",   // Developer on laptop
     "/hero/mason.jpg",      // Worker / handyman
     "/hero/laptop.jpg",     // Plumber / technician
@@ -433,7 +434,7 @@ import { dashboard, login, register } from "@/routes";
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setCity(e.target.value)
         }
-        className="h-10 w-full text-black md:w-56 rounded-4xl hover:text-primary transition border px-3 text-sm"
+        className="h-10 w-full text-forground md:w-56 rounded-4xl hover:text-primary transition border px-3 text-sm"
         >
         <option value="">All wilayas</option>
         {topCities.map((c) => (
@@ -449,7 +450,7 @@ import { dashboard, login, register } from "@/routes";
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setCategory(e.target.value)
         }
-        className="h-10 w-full md:w-56 rounded-4xl border px-3 hover:text-primary transition text-black text-sm"
+        className="h-10 w-full md:w-56 rounded-4xl border px-3 hover:text-primary transition text-muted-forground text-sm"
         >
         <option value="">All categories</option>
         {featuredCategories.map((cat) => (
@@ -495,16 +496,12 @@ import { dashboard, login, register } from "@/routes";
         })}
         </div>
 
-    {/* Badges */}
-    <div className="flex flex-wrap gap-4 text-sm mt-4">
-        <span>✅ Verified providers</span>
-        <span>💬 Realtime chat</span>
-        <span>💳 Cash or online payment</span>
-        <span>⭐ Ratings & reviews</span>
-    </div>
+    
     </div>
 </div>
+
  {/* Auto-scrolling category squares */}
+ <h2 className="text-4xl font-bold mb-5 flex justify-center mt-5">Popular categories</h2>
 <div className="overflow-hidden mt-4">
     <div ref={loaderRef} className="flex gap-4 whitespace-nowrap animate-scroll">
     {featuredCategories.concat(featuredCategories).map((cat, index) => {
@@ -522,6 +519,7 @@ import { dashboard, login, register } from "@/routes";
     </div>
 </div>
 
+
         {/* Popular services */}
         <div className="mx-auto h- max-w-6xl px-6 py-10 space-y-4">
             <div className="flex items-center justify-center">
@@ -537,15 +535,15 @@ import { dashboard, login, register } from "@/routes";
                             key={s.id}
                             type="button"
                             onClick={() => router.get(`/services/${s.slug}`)}
-                            className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-foreground"
+                            className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-background/20"
                         >
                             {/* cover Image only if exists */}
                             {cover ? (
-                                <div className="w-full h-44 overflow-hidden rounded-t-3xl">
+                                <div className="w-full h-44 overflow-hidden rounded-t-3xl ">
                                     <img
                                         src={cover}
                                         alt={s.title}
-                                        className="block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        className=" block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                         loading="lazy"
                                     />
                                 </div>
@@ -577,11 +575,23 @@ import { dashboard, login, register } from "@/routes";
                 )}
             </div>
         </div>
+        {/* Badges */}
+        <div className="border-t border-gray-forground">
+            <h1 className="flex justify-center text-xl font-bold mt-10  ">why profinder ?</h1>
+            <div className="flex flex-wrap gap-20 text-sm mt-4 justify-center whitespace-nowrap  mx-auto max-w-6xl px-6 py-10 ">
+             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 hover:mb-10 "><img src="/hero/providers.jpg"   loading="lazy" className=" block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl " /></div>
+             <div className="flex justify-center items-center  h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/payment.jpg" alt="cash and online payments" loading="lazy"  className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/chat.jpg" alt="real-time chat" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/rate.jpg" alt="Ratings & reviews" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+            </div>
+        </div>
+        
+    
 
             {/* Footer */}
-            <div className="border-t">
+            <div className="border-t ">
                 <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
-                <div>© {new Date().getFullYear()} DZ Services</div>
+                <div>© {new Date().getFullYear()} profinder</div>
                 <div className="flex gap-4">
                     <a className="hover:underline" href="/about">
                     About
