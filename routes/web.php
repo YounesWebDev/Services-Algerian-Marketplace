@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Controllers\Public\HomeController;
-use App\Http\Controllers\Public\ServicesController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/',[HomeController::class , 'index'])->name('home');
-Route::get('/suggestions',[HomeController::class,'suggestions'])->name('home.suggestions');
-Route::get('/services',[ServicesController::class,'index'])->name('services.index');
-Route::get('/services/{service:slug}',[ServicesController::class,'show'])->name('services.show');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/suggestions', [HomeController::class, 'suggestions'])->name('home.suggestions');
+Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
+Route::get('/services/{service:slug}', [ServicesController::class, 'show'])->name('services.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

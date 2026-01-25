@@ -135,7 +135,7 @@ import { dashboard, login, register } from "@/routes";
         return () => clearInterval(interval);
     }, []);
 
-    // ✅ Handler: keep "clear suggestions" 
+    // OK: keep "clear suggestions" behavior
     const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setQuery(value);
@@ -157,7 +157,7 @@ import { dashboard, login, register } from "@/routes";
     useEffect(() => {
         const text = query.trim();
 
-        // ✅ Do nothing when less than 2 chars 
+        // OK: do nothing when less than 2 chars
         if (text.length < 2) return;
 
         const timer = setTimeout(async () => {
@@ -200,6 +200,7 @@ import { dashboard, login, register } from "@/routes";
         );
     }
     const { auth } = usePage<SharedData>().props;
+    const user = auth?.user ?? null;
     return (
         <div className="min-h-screen">
         {/* Navbar */}
@@ -211,14 +212,21 @@ import { dashboard, login, register } from "@/routes";
 
                 <div className="hidden md:flex justify-between gap-15 ">
                     <Link className="hover:text-primary    p-1 transition" href="/">
-                    Home
+                        Home
                     </Link>
                     <Link className="hover:text-primary    p-1 transition" href="/requests">
                     Requests
                     </Link>
-                    <Link className="hover:text-primary     p-1 transition" href="/services">
-                    Services
-                    </Link>
+                    {user?.role === "provider" ? (
+                        <Link className="hover:text-primary    p-1 transition" href="/provider/services">
+                            My Services
+                        </Link>
+                    ) : (
+                        <Link className="hover:text-primary     p-1 transition" href="/services">
+                            Services
+                        </Link>
+                    )}
+                    
                 </div>
 
                 <div>
@@ -243,7 +251,7 @@ import { dashboard, login, register } from "@/routes";
                     {openMenu && (
                     <div className="flex flex-col">
                         <div className="absolute top-18 right-4 border z-40 bg-white border-gray-200 rounded-xl p-5 flex gap-2 flex-col md:hidden w-[75%]">
-                            {auth.user ? (
+                            {user ? (
                                 <Link
                                 href={dashboard()}
                                 className="inline-block rounded-sm border font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
@@ -290,7 +298,7 @@ import { dashboard, login, register } from "@/routes";
                 </div>
 
                 <div className="hidden md:flex justify-between gap-3 text-sm">
-                    {auth.user ? (
+                    {user ? (
                         <Link
                             href={dashboard()}
                             className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
@@ -350,7 +358,7 @@ import { dashboard, login, register } from "@/routes";
 
     {/* Subtitle */}
     <p className="text-sm md:text-base">
-        Search, chat, and hire providers — all in one place.
+        Search, chat, and hire providers - all in one place.
     </p>
 
     {/* Search Bar */}
@@ -501,7 +509,7 @@ import { dashboard, login, register } from "@/routes";
 </div>
 
  {/* Auto-scrolling category squares */}
- <h2 className="text-4xl font-bold mb-5 flex justify-center mt-5">Popular categories</h2>
+    <h2 className="text-4xl font-bold mb-5 flex justify-center mt-5">Popular categories</h2>
 <div className="overflow-hidden mt-4">
     <div ref={loaderRef} className="flex gap-4 whitespace-nowrap animate-scroll">
     {featuredCategories.concat(featuredCategories).map((cat, index) => {
@@ -534,8 +542,11 @@ import { dashboard, login, register } from "@/routes";
                         <Button
                             key={s.id}
                             type="button"
-                            onClick={() => router.get(`/services/${s.slug}`)}
-                            className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-background/20"
+                            onClick={() =>{
+                                if(user?.role === "provider") return;
+                                router.get(`/services/${s.slug}`)
+                            }}
+                                className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-background/20"
                         >
                             {/* cover Image only if exists */}
                             {cover ? (
@@ -560,7 +571,7 @@ import { dashboard, login, register } from "@/routes";
                                 <div className="flex justify-between items-center">
                                     <div className="mt-3 text-sm text-muted-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
                                         {s.pricing_type}
-                                        {s.base_price ? ` • ${s.base_price} DZD ` : ""}
+                                        {s.base_price ? ` - ${s.base_price} DZD ` : ""}
                                     </div>
                                 </div>
                             </div>
@@ -577,12 +588,12 @@ import { dashboard, login, register } from "@/routes";
         </div>
         {/* Badges */}
         <div className="border-t border-gray-forground">
-            <h1 className="flex justify-center text-xl font-bold mt-10  ">why profinder ?</h1>
+            <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
             <div className="flex flex-wrap gap-20 text-sm mt-4 justify-center whitespace-nowrap  mx-auto max-w-6xl px-6 py-10 ">
-             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 hover:mb-10 "><img src="/hero/providers.jpg"   loading="lazy" className=" block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl " /></div>
-             <div className="flex justify-center items-center  h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/payment.jpg" alt="cash and online payments" loading="lazy"  className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
-             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/chat.jpg" alt="real-time chat" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
-             <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/rate.jpg" alt="Ratings & reviews" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 hover:mb-10 "><img src="/hero/providers.jpg"   loading="lazy" className=" block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl " /></div>
+                <div className="flex justify-center items-center  h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/payment.jpg" alt="cash and online payments" loading="lazy"  className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/chat.jpg" alt="real-time chat" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/rate.jpg" alt="Ratings & reviews" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
             </div>
         </div>
         
@@ -591,7 +602,7 @@ import { dashboard, login, register } from "@/routes";
             {/* Footer */}
             <div className="border-t ">
                 <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
-                <div>© {new Date().getFullYear()} profinder</div>
+                <div>(c) {new Date().getFullYear()} profinder</div>
                 <div className="flex gap-4">
                     <a className="hover:underline" href="/about">
                     About

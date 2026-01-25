@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Public;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Service;
@@ -106,5 +105,3 @@ class HomeController extends Controller
         ]);
     }
 }
-
-

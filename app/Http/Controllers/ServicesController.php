@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Public;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -17,6 +17,10 @@ class ServicesController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->user() && $request->user()->role !== 'client') {
+            abort(403);
+        }
+
         // Read filters from URL: /services?q=&city=&category=
         $q = (string) $request->query('q', '');
         $city = (string) $request->query('city', '');
