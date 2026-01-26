@@ -97,7 +97,7 @@ export default function Index({ categories, parents }: Props) {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-md border px-3 py-1 text-sm"
+                className="rounded-md border px-3 py-1 text-sm transition duration-700 font-samibold hover:bg-red-500 hover:text-white"
               >
                 Cancel Edit
               </button>
@@ -144,7 +144,7 @@ export default function Index({ categories, parents }: Props) {
             </div>
 
             <div className="md:col-span-1 flex items-end gap-2">
-              <button className="w-full rounded-md border px-4 py-2">
+              <button className="w-full rounded-md border px-4 py-2 transition duration-700 hover:bg-primary ">
                 {editingId === null ? "Create" : "Update"}
               </button>
             </div>
@@ -175,20 +175,25 @@ export default function Index({ categories, parents }: Props) {
                     <td className="p-3">{c.name}</td>
                     <td className="p-3 text-muted-foreground">{c.slug}</td>
                     <td className="p-3 text-muted-foreground">
-                      {c.parent ? c.parent.name: "—"}
+                      {c.parent ? c.parent.name: "None"}
                     </td>
                     <td className="p-3 text-right space-x-2">
                       <button
                         onClick={() => startEdit(c)}
-                        className="rounded-md border px-3 py-1"
+                        className="rounded-4xl border px-3 py-1 transition duration-700 hover:text-white hover:bg-green-500"
                       >
-                        <Pencil/>
+                        <Pencil
+                          size={18}
+                          className="transition duration-700 hover:text-white "
+                         />
                       </button>
                       <button
                         onClick={() => remove(c.id)}
-                        className="rounded-md border px-3 py-1"
+                        className="rounded-4xl border px-3 py-1 transition duration-700 hover:text-white hover:bg-red-500"
                       >
-                        <Trash2/>
+                        <Trash2
+                          size={18}
+                        />
                       </button>
                     </td>
                   </tr>

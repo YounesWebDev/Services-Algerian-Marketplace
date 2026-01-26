@@ -51,8 +51,9 @@ class HomeController extends Controller
             ->take(8)
             ->with([
                 'media' => fn ($q) => $q->orderBy('position'),
+                'provider:id,name,avatar_path',
             ])
-            ->get(['id', 'title', 'slug', 'base_price', 'pricing_type', 'payment_type', 'city_id', 'category_id']);
+            ->get(['id','provider_id', 'title', 'slug', 'base_price', 'pricing_type', 'payment_type', 'city_id', 'category_id']);
 
         return Inertia::render('Public/Home', [
             'canRegister' => Features::enabled(Features::registration()),

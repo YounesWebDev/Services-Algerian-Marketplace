@@ -61,10 +61,13 @@ export default function Dashboard({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Provider Verifications */}
-        <Card>
+        <Card className="transition duration-800 hover:bg-black hover:text-white hover: ">
             <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Pending Verifications</CardTitle>
-            <Badge variant="secondary">{actionRequired.verifications.length}</Badge>
+             {actionRequired.verifications.length > 0 && (
+                    <Badge variant="secondary" className="text-bold rounded-full text-white bg-red-700 ">{actionRequired.verifications.length}</Badge>
+                )}
+            
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
             {actionRequired.verifications.length === 0 ? (
@@ -86,19 +89,23 @@ export default function Dashboard({
         </Card>
 
         {/* Reports */}
-        <Card>
+        <Card className="transition duration-800 hover:bg-black hover:text-white hover">
             <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Open Reports</CardTitle>
-            <Badge variant="secondary">{actionRequired.reports.length}</Badge>
+             {actionRequired.reports.length > 0 && (
+                    <Badge variant="secondary" className="text-bold rounded-full text-white bg-red-700 ">{actionRequired.reports.length}</Badge>
+                )}
+           
             </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+            <CardContent className="space-y-2 text-sm ">
             {actionRequired.reports.length === 0 ? (
                 <div className="text-muted-foreground">No open reports.</div>
             ) : (
                 actionRequired.reports.map((r) => (
                     <div key={r.id} className="border rounded-md px-3 py-2">
                     <div className="font-medium">
-                    {r.target_type} #{r.target_id}
+                    {r.target_type} <span className="font-bold"> reporter:#{r.reporter_id}</span>
+
                     </div>
                     <div className="text-xs text-muted-foreground">{r.reason}</div>
                 </div>
@@ -111,10 +118,13 @@ export default function Dashboard({
         </Card>
 
         {/* Disputes */}
-        <Card>
+        <Card className="transition duration-800 hover:bg-black hover:text-white hover">
             <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Open Disputes</CardTitle>
-            <Badge variant="secondary">{actionRequired.disputes.length}</Badge>
+            {actionRequired.disputes.length > 0 && (
+                    <Badge variant="secondary" className="text-bold rounded-full text-white bg-red-700 ">{actionRequired.disputes.length}</Badge>
+                )}
+            
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
             {actionRequired.disputes.length === 0 ? (
@@ -131,13 +141,15 @@ export default function Dashboard({
             {/* Later */}
             {/* <Link href="/admin/disputes" className="underline text-sm">View all</Link> */}
             </CardContent>
-        </Card>
+        </Card >
 
         {/* Payouts */}
-        <Card>
+        <Card className="md:w-120 transition duration-800  hover:bg-black hover:text-white hover">
             <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Pending Payouts</CardTitle>
-            <Badge variant="secondary">{actionRequired.payouts.length}</Badge>
+                {actionRequired.payouts.length > 0 && (
+                    <Badge variant="secondary" className="text-bold rounded-full text-white bg-red-400 ">{actionRequired.payouts.length}</Badge>
+                )}
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
             {actionRequired.payouts.length === 0 ? (

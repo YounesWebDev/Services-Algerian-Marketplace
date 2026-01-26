@@ -19,12 +19,24 @@
     AirVent,
     Menu,
     X,
+    BadgeCheck,
+    CreditCard,
+    Star,
+    MessageCircleMore,
+    Flag,
+    ShieldHalf,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
 
+    import GlassIcons from "@/components/GlassIcons";
 import { dashboard, login, register } from "@/routes";
     import { type SharedData } from "@/types";
 
+    type Provider = {
+        id: number;
+        name: string;
+        avatar_path?: string | null;
+    };
     type ServiceMedia = {
         id: number;
         path: string;
@@ -43,6 +55,7 @@ import { dashboard, login, register } from "@/routes";
         city_id: number;
         category_id: number;
         media?: ServiceMedia[];
+        provider?:Provider;
     };
 
 
@@ -103,6 +116,7 @@ import { dashboard, login, register } from "@/routes";
     popularServices: Service[];
     filters: { q: string; city: string; category: string };
     }) {
+       
     // Controlled inputs (so we can update without reloading)
     const [query, setQuery] = useState(filters?.q ?? "");
     const [city, setCity] = useState(filters?.city ?? "");
@@ -201,6 +215,14 @@ import { dashboard, login, register } from "@/routes";
     }
     const { auth } = usePage<SharedData>().props;
     const user = auth?.user ?? null;
+    const items = [
+        { icon: <BadgeCheck />, color: 'green', label: 'Verified Providers' },
+        { icon: <CreditCard />, color: 'green', label: 'Online Payment' },
+        { icon: <Star />, color: 'green', label: 'Health' },
+        { icon: <MessageCircleMore />, color: 'green', label: 'live chat' },
+        { icon: <Flag />, color: 'green', label: 'Reports' },
+        { icon: <ShieldHalf />, color: 'green', label: 'safety' },
+    ];
     return (
         <div className="min-h-screen">
         {/* Navbar */}
@@ -211,15 +233,30 @@ import { dashboard, login, register } from "@/routes";
                 </Link>
 
                 <div className="hidden md:flex justify-between gap-15 ">
+
                     <Link className="hover:text-primary    p-1 transition" href="/">
                         Home
                     </Link>
-                    <Link className="hover:text-primary    p-1 transition" href="/requests">
-                    Requests
-                    </Link>
+                    {user?.role === "provider" || auth?.user=== null ? (
+                        <Link className="hover:text-primary    p-1 transition" href="/requests">
+                            Requests
+                        </Link>
+                    ) : user?.role ==="admin" ? (
+                        <Link className="hover:text-primary    p-1 transition" href="/admin/reports">
+                            Reports
+                        </Link>
+                    ) : (
+                        <Link className="hover:text-primary    p-1 transition" href="/bookings">
+                            My Bookings
+                        </Link>
+                    )}
                     {user?.role === "provider" ? (
-                        <Link className="hover:text-primary    p-1 transition" href="/provider/services">
+                        <Link className="hover:text-primary    p-1 transition" href="/services/my">
                             My Services
+                        </Link>
+                    ) : user?.role ==="admin" ? (
+                        <Link className="hover:text-primary    p-1 transition" href="/admin/users">
+                            Users
                         </Link>
                     ) : (
                         <Link className="hover:text-primary     p-1 transition" href="/services">
@@ -254,7 +291,7 @@ import { dashboard, login, register } from "@/routes";
                             {user ? (
                                 <Link
                                 href={dashboard()}
-                                className="inline-block rounded-sm border font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                className="inline-block rounded-full border font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
                                 >
                                     Dashboard
                                 </Link>
@@ -301,7 +338,7 @@ import { dashboard, login, register } from "@/routes";
                     {user ? (
                         <Link
                             href={dashboard()}
-                            className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                            className="inline-block rounded-full border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] transition duration-300 hover:bg-green-400"
                             >
                             Dashboard
                         </Link>
@@ -362,7 +399,7 @@ import { dashboard, login, register } from "@/routes";
     </p>
 
     {/* Search Bar */}
-    <div className="bg-white/20 backdrop-blur-3xl dark:bg-black/70 border border-gray-300 rounded-4xl p-3 flex flex-col md:flex-row gap-3 md:items-center">
+    <div className="bg-white/20 backdrop-blur-3xl  border border-gray-300 rounded-4xl p-3 flex flex-col md:flex-row gap-3 md:items-center">
       {/* Search input + suggestions */}
         <div className="relative w-full md:flex-1">
         <input
@@ -529,12 +566,12 @@ import { dashboard, login, register } from "@/routes";
 
 
         {/* Popular services */}
-        <div className="mx-auto h- max-w-6xl px-6 py-10 space-y-4">
+        <div className="mx-auto h- max-w-7xl px-6 py-10 space-y-4">
             <div className="flex items-center justify-center">
                 <h2 className="text-4xl font-bold mb-5">Popular Services</h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {services.map((s)=>{
                     const cover = getCoverImage(s);
 
@@ -543,7 +580,8 @@ import { dashboard, login, register } from "@/routes";
                             key={s.id}
                             type="button"
                             onClick={() =>{
-                                if(user?.role === "provider") return;
+
+                                if(user?.role === "provider" || user?.role === "admin") return;
                                 router.get(`/services/${s.slug}`)
                             }}
                                 className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-background/20"
@@ -564,9 +602,18 @@ import { dashboard, login, register } from "@/routes";
                             <div className="p-4">
                                 <div className="font-semibold line-clamp-2">{s.title}</div>
 
-                                <div className="mt-2 text-xs text-muted-foreground">
+                               <div className="flex justify-between">
+                                 <div className="flex justify-between gap-2 items-center mt-2">
+                                     {s.provider?.avatar_path && (
+                                         <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                     )}
+                                     <div >{s.provider?.name}</div>
+                                 </div>
+                                 <div className="mt-2 text-xs text-muted-foreground">
                                     Payment: {s.payment_type}
                                 </div>
+
+                               </div>
 
                                 <div className="flex justify-between items-center">
                                     <div className="mt-3 text-sm text-muted-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
@@ -589,15 +636,11 @@ import { dashboard, login, register } from "@/routes";
         {/* Badges */}
         <div className="border-t border-gray-forground">
             <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
-            <div className="flex flex-wrap gap-20 text-sm mt-4 justify-center whitespace-nowrap  mx-auto max-w-6xl px-6 py-10 ">
-                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 hover:mb-10 "><img src="/hero/providers.jpg"   loading="lazy" className=" block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl " /></div>
-                <div className="flex justify-center items-center  h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/payment.jpg" alt="cash and online payments" loading="lazy"  className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
-                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/chat.jpg" alt="real-time chat" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
-                <div className="flex justify-center items-center h-70 rounded-3xl border border-gray-200 transition duration-500 "><img src="/hero/rate.jpg" alt="Ratings & reviews" loading="lazy" className="block w-full h-full object-cover hover:scale-101 transition-transform duration-300 rounded-3xl" /></div>
+            <div className="flex items-center">
+               <GlassIcons items={items} className=""
+                />
             </div>
         </div>
-        
-    
 
             {/* Footer */}
             <div className="border-t ">
