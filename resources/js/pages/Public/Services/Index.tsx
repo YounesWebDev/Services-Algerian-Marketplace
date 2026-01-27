@@ -7,6 +7,19 @@ import { Input } from "@/components/ui/input";
 import AppLayout from "@/layouts/app-layout";
 import { SharedData } from "@/types";
 
+// Utility to convert storage paths to accessible URLs
+function toStorageUrl(path: string): string {
+  if (!path) return "";
+  return `/storage/${path}`;
+}
+function getCoverImage(service: Service){
+        if (!service.media || service.media.length === 0) return "";
+
+        const first = service.media[0];
+
+        return toStorageUrl(first.path);
+    }
+
 type ServiceMedia = {
   id: number;
   path: string;
@@ -87,6 +100,13 @@ export default function Index({ services, categories, cities, filters }: Props) 
       { preserveState: true, replace: true }
     );
   }
+  function getCoverImage(service: Service){
+        if (!service.media || service.media.length === 0) return "";
+
+        const first = service.media[0];
+
+        return toStorageUrl(first.path);
+    }
 
   function clearFilters() {
     setQ("");
@@ -118,12 +138,13 @@ export default function Index({ services, categories, cities, filters }: Props) 
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search (e.g. plumber)"
+          className="rounded-4xl"
         />
 
         <select
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="h-10 w-full rounded-md border px-3 text-sm"
+          className="h-10 w-full rounded-4xl border px-3 text-sm"
         >
           <option value="">All wilayas</option>
           {cities.map((c) => (
@@ -137,7 +158,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="h-10 w-full rounded-md border px-3 text-sm"
+          className="h-10 w-full rounded-4xl border px-3 text-sm"
         >
           <option value="">All categories</option>
           {categories.map((cat) => (
@@ -147,11 +168,11 @@ export default function Index({ services, categories, cities, filters }: Props) 
           ))}
         </select>
 
-        <Button onClick={runSearch}>Search</Button>
+        <Button onClick={runSearch} className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">Search</Button>
       </div>
 
       {/* Results */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {services.data.map((s) => {
           const cover = s.media?.[0]?.path ?? "/images/service-placeholder.jpg";
 
@@ -160,7 +181,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
               key={s.id}
               type="button"
               onClick={() => router.get(`/services/${s.slug}`)}
-              className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
+              className=" text-left border rounded-lg p-4 hover:bg-muted/40 transition"
               title="Open service details"
               >
               <img
@@ -225,7 +246,9 @@ export default function Index({ services, categories, cities, filters }: Props) 
           </p>
         </div>
 
-        <Button variant="outline" onClick={clearFilters}>
+        <Button variant="outline" onClick={clearFilters}
+        className="border border-gray-200 rounded-4xl transition duration-700 hover:bg-red-600 hover:text-white hover:border-red-700"
+        >
           Clear
         </Button>
       </div>
@@ -236,12 +259,13 @@ export default function Index({ services, categories, cities, filters }: Props) 
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search (e.g. plumber)"
+          className="rounded-4xl"
         />
 
         <select
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="h-10 w-full rounded-md border px-3 text-sm"
+          className="h-10 w-full rounded-4xl border px-3 text-sm "
         >
           <option value="">All wilayas</option>
           {cities.map((c) => (
@@ -255,7 +279,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="h-10 w-full rounded-md border px-3 text-sm"
+          className="h-10 w-full rounded-4xl border px-3 text-sm"
         >
           <option value="">All categories</option>
           {categories.map((cat) => (
@@ -265,46 +289,71 @@ export default function Index({ services, categories, cities, filters }: Props) 
           ))}
         </select>
 
-        <Button onClick={runSearch}>Search</Button>
+        <Button onClick={runSearch} className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">Search</Button>
       </div>
 
       {/* Results */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {services.data.map((s) => {
-          const cover = s.media?.[0]?.path ?? "/images/service-placeholder.jpg";
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  {services.data.map((s) => {
+    const cover = getCoverImage(s);
 
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => router.get(`/services/${s.slug}`)}
-              className="text-left border rounded-lg p-4 hover:bg-muted/40 transition"
-              title="Open service details"
-              >
-              <img
-                src={cover}
-                alt={s.title}
-                className="h-32 w-full rounded-md object-cover border mb-3"
-              />
+    return (
+      <Button
+        key={s.id}
+        type="button"
+        onClick={() => {
+          if (user?.role === "provider" || user?.role === "admin") return;
+          router.get(`/services/${s.slug}`);
+        }}
+        className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden 
+             hover:shadow-xl transition-all duration-300 bg-primary-background/20 
+             hover:bg-primary-background/20 text-foreground"
+      >
+        {/* cover Image only if exists */}
+       {cover ? (
+                                       <div className="w-full h-44 overflow-hidden rounded-t-3xl ">
+                                           <img
+                                               src={cover}
+                                               alt={s.title}
+                                               className=" block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                               loading="lazy"
+                                           />
+                                       </div>
+                                   ): null}
+                                   
+                                   {/* content */}
+                                   <div className="flex flex-col flex-1 p-4 gap-3 w-full">
+                                       <p className="font-semibold line-clamp-2 leading-tight">{s.title}</p>
+       
+                                       <div className="flex justify-between items-center">
+                                           <div className="flex gap-2 items-center">
+                                               {s.provider?.avatar_path && (
+                                                   <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                               )}
+                                               <div className="text-sm">{s.provider?.name}</div>
+                                           </div>
+                                           <span className="text-xs text-muted-foreground">Payment: {s.payment_type}</span>
+                                       </div>
+       
+                                       <div className="mt-auto">
+                                           <span className="text-sm text-muted-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
+                                               {s.pricing_type}{s.base_price ? ` - ${s.base_price} DZD` : ""}
+                                           </span>
+                                       </div>
+                                   </div>
+                               </Button>
+                           
+    );
+  })}
 
-              <div className="font-semibold line-clamp-2">{s.title}</div>
+  {services.data.length === 0 && (
+    <div className="text-sm text-muted-foreground">
+      No services found yet.
+    </div>
+  )}
+</div>
 
-              <div className="mt-2 text-sm text-muted-foreground">
-                Pricing: {s.pricing_type}
-                {s.base_price ? ` - ${s.base_price} DZD` : ""}
-                {" - "}
-                Payment: {s.payment_type}
-              </div>
-            </button>
-          );
-        })}
 
-        {services.data.length === 0 && (
-          <div className="text-sm text-muted-foreground">
-            No services found with these filters.
-          </div>
-        )}
-      </div>
 
       {/* Pagination */}
       {services.links?.length > 0 && (
