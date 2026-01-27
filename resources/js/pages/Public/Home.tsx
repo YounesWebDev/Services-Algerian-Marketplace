@@ -116,7 +116,7 @@ import { dashboard, login, register } from "@/routes";
     popularServices: Service[];
     filters: { q: string; city: string; category: string };
     }) {
-       
+        
     // Controlled inputs (so we can update without reloading)
     const [query, setQuery] = useState(filters?.q ?? "");
     const [city, setCity] = useState(filters?.city ?? "");

@@ -10,15 +10,20 @@ import { SharedData } from "@/types";
 // Utility to convert storage paths to accessible URLs
 function toStorageUrl(path: string): string {
   if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/")) return path;
+  if (path.startsWith("storage/")) return `/${path}`;
+
   return `/storage/${path}`;
 }
-function getCoverImage(service: Service){
-        if (!service.media || service.media.length === 0) return "";
 
-        const first = service.media[0];
+function getCoverImage(service: Service): string {
+  if (!service.media || service.media.length === 0) return "";
 
-        return toStorageUrl(first.path);
-    }
+  const first = service.media[0];
+
+  return toStorageUrl(first.path);
+}
 
 type ServiceMedia = {
   id: number;
@@ -100,14 +105,6 @@ export default function Index({ services, categories, cities, filters }: Props) 
       { preserveState: true, replace: true }
     );
   }
-  function getCoverImage(service: Service){
-        if (!service.media || service.media.length === 0) return "";
-
-        const first = service.media[0];
-
-        return toStorageUrl(first.path);
-    }
-
   function clearFilters() {
     setQ("");
     setCity("");
@@ -174,7 +171,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
       {/* Results */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {services.data.map((s) => {
-          const cover = s.media?.[0]?.path ?? "/images/service-placeholder.jpg";
+          const cover = getCoverImage(s) || "/images/service-placeholder.jpg";
 
           return (
             <button
@@ -328,7 +325,11 @@ export default function Index({ services, categories, cities, filters }: Props) 
                                        <div className="flex justify-between items-center">
                                            <div className="flex gap-2 items-center">
                                                {s.provider?.avatar_path && (
-                                                   <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                                   <img
+                                                       src={toStorageUrl(s.provider.avatar_path)}
+                                                       alt={s.provider?.name}
+                                                       className="w-8 h-8 rounded-full object-cover"
+                                                   />
                                                )}
                                                <div className="text-sm">{s.provider?.name}</div>
                                            </div>
