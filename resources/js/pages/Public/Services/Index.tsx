@@ -122,7 +122,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Services</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground">
             Browse approved services. Use filters to narrow results.
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
 
               <div className="font-semibold line-clamp-2">{s.title}</div>
 
-              <div className="mt-2 text-sm text-muted-foreground">
+              <div className="mt-2 text-sm text-foreground">
                 Pricing: {s.pricing_type}
                 {s.base_price ? ` - ${s.base_price} DZD` : ""}
                 {" - "}
@@ -203,7 +203,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
         })}
 
         {services.data.length === 0 && (
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-foreground">
             No services found with these filters.
           </div>
         )}
@@ -241,7 +241,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Services</h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-foreground">
             Browse approved services. Use filters to narrow results.
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
           ))}
         </select>
 
-        <Button onClick={runSearch} className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">Search</Button>
+        <Button onClick={runSearch} className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background">Search</Button>
       </div>
 
       {/* Results */}
@@ -306,8 +306,8 @@ export default function Index({ services, categories, cities, filters }: Props) 
           router.get(`/services/${s.slug}`);
         }}
         className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden 
-             hover:shadow-xl transition-all duration-300 bg-primary-background/20 
-             hover:bg-primary-background/20 text-foreground"
+             hover:shadow-xl transition-all duration-300 bg-primary-foreground/30 
+             hover:bg-primary-foreground/40 text-foreground"
       >
         {/* cover Image only if exists */}
        {cover ? (
@@ -332,11 +332,11 @@ export default function Index({ services, categories, cities, filters }: Props) 
                                                )}
                                                <div className="text-sm">{s.provider?.name}</div>
                                            </div>
-                                           <span className="text-xs text-muted-foreground">Payment: {s.payment_type}</span>
+                                           <span className="text-xs text-foreground">Payment: {s.payment_type}</span>
                                        </div>
        
                                        <div className="mt-auto">
-                                           <span className="text-sm text-muted-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
+                                           <span className="text-sm text-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
                                                {s.pricing_type}{s.base_price ? ` - ${s.base_price} DZD` : ""}
                                            </span>
                                        </div>

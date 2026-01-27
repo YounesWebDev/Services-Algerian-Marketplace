@@ -1,5 +1,5 @@
 import { router } from "@inertiajs/react";
-import { CreditCard } from "lucide-react";
+import { Clock, CreditCard, Handshake, Pin } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ type Service = {
 
   category?: { id: number; name: string; slug: string };
   city?: { id: number; name: string };
-  provider?: { id: number; name: string };
+  provider?: { id: number; name: string; avatar_path?: string };
 };
 
 export default function Show({ service }: { service: Service }) {
@@ -38,12 +38,20 @@ export default function Show({ service }: { service: Service }) {
   return (
     <div className="mx-auto max-w-4xl px-6 py-10 space-y-6">
       {/* Back */}
-      <Button variant="outline" onClick={() => router.get("/services")} className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
+      <Button variant="outline" onClick={() => router.get("/services")} className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
         ← Back to Services
       </Button>
 
       {/* Title */}
       <div className="space-y-2">
+        {service.provider?.name && (
+            <span className="text-4xl px-2 py-1">
+              {service.provider?.avatar_path && (
+                                         <img src={service.provider.avatar_path} alt={service.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                     )}
+               {service.provider.name}
+            </span>
+          )}
         <h1 className="text-2xl font-bold">{service.title}</h1>
 
         <div className="text-sm text-muted-foreground flex flex-wrap gap-2">
@@ -57,21 +65,41 @@ export default function Show({ service }: { service: Service }) {
               {service.city.name}
             </span>
           )}
-          {service.provider?.name && (
-            <span className="border rounded-full border-gray-200  px-2 py-1">
-              Provider: {service.provider.name}
-            </span>
-          )}
+          
         </div>
 
         <div className="flex gap-4  ">
           <div className=" flex justify-between gap-2 text-sm text-muted-foreground rounded-4xl px-2 py-1 w-max border border-gray-200">
-           <div className="border border-gray-200 rounded-4xl px-2 py-1">{service.pricing_type}</div>
+           <div className="border border-gray-200 rounded-4xl px-2 py-1">
+            {service.pricing_type === "fixed" ? (
+              <span className="flex items-center gap-1 text-red-600">
+                <Pin />
+                <span>fixed</span>
+              </span>
+            ) : service.pricing_type === "hourly" ? (
+              <span className="flex items-center gap-1 text-yellow-400">
+                <Clock />
+                <span>hourly</span>
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-primary">
+                <Handshake />
+                <span>quote</span>
+              </span>
+            )}
+
+
+
+
+
+
+
+           </div>
           {service.base_price ? <div className="flex items-center font-bold text-primary">{service.base_price} DZD</div> : ""}
           
           
         </div>
-        <div className="flex justify-between border border-gray-200 rounded-4xl px-2 py-1 w-max "><CreditCard className="mr-5"/> <div className="text-primary">{service.payment_type}</div></div>
+        <div className="flex justify-center items-center border border-gray-200 rounded-4xl px-2 py-1 w-max "><CreditCard className="mr-2"/> <div className="text-primary">{service.payment_type}</div></div>
         </div>
       </div>
 
@@ -119,11 +147,11 @@ export default function Show({ service }: { service: Service }) {
       <div className="flex gap-3">
         <Button
           onClick={() => alert("Later: create/open chat with provider")}
-          className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
+          className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
           Contact provider
         </Button>
 
-        <Button variant="outline" onClick={() => router.get("/services")}  className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
+        <Button variant="outline" onClick={() => router.get("/services")}  className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl">
           Browse more
         </Button>
       </div>

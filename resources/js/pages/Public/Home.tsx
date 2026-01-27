@@ -293,20 +293,20 @@ import { dashboard, login, register } from "@/routes";
                                 href={dashboard()}
                                 className="inline-block rounded-full border text-black font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal  hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
                                 >
-                                    <p className="font-bold text-black">Dashboard</p>
+                                    <p className="font-bold text-white">Dashboard</p>
                                 </Link>
                             ):(
                                 <>
                                     <Link
                                         href={login()}
-                                        className="inline-block font-bold rounded-sm border border-[#19140035]  transition-all w-max hover:backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-black hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                        className="inline-block font-bold rounded-sm border border-[#19140035]  transition-all w-max hover:backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-white hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                                     >
                                         <p className="font-bold ">Log in</p>
                                     </Link>
                                         {canRegister && (
                                             <Link
                                             href={register()}
-                                            className="inline-block font-bold rounded-sm border border-[#19140035] p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm text-black hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                            className="inline-block font-bold rounded-sm border border-[#19140035] p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm text-white hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                                             >
                                                <p className="font-bold ">Register</p>
                                             </Link>
@@ -592,7 +592,7 @@ import { dashboard, login, register } from "@/routes";
                                 if(user?.role === "provider" || user?.role === "admin") return;
                                 router.get(`/services/${s.slug}`)
                             }}
-                                className="flex m-5 flex-col text-left border rounded-3xl h-70 overflow-hidden hover:shadow-xl transition-all duration-300 bg-primary-background/20"
+                                className="flex m-5 flex-col text-left border rounded-4xl h-70 overflow-hidden hover:shadow-xl transition-all duration-700 bg-primary-foreground/30  hover:bg-primary-foreground/40"
                         >
                             {/* cover Image only if exists */}
                             {cover ? (
@@ -617,14 +617,14 @@ import { dashboard, login, register } from "@/routes";
                                      )}
                                      <div >{s.provider?.name}</div>
                                  </div>
-                                 <div className="mt-2 text-xs text-muted-foreground">
+                                 <div className="mt-2 text-xs text-foreground">
                                     Payment: {s.payment_type}
                                 </div>
 
                                </div>
 
                                 <div className="flex justify-between items-center">
-                                    <div className="mt-3 text-sm text-muted-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
+                                    <div className="mt-3 text-sm text-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
                                         {s.pricing_type}
                                         {s.base_price ? ` - ${s.base_price} DZD ` : ""}
                                     </div>
@@ -635,7 +635,7 @@ import { dashboard, login, register } from "@/routes";
                 })}
 
                 {services.length === 0 && (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-foreground">
                         No services found yet .
                     </div>
                 )}
