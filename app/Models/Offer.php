@@ -14,17 +14,21 @@ class Offer extends Model
         'message',
         'proposed_price',
         'estimated_days',
+        'status',
     ];
 
-    public function request(){
+    public function request()
+    {
         return $this->belongsTo(\App\Models\Request::class);
     }
 
-    public function provider(){
-        return $this->belongsTo(\App\Models\User::class,'provider_id');
+    public function provider()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'provider_id');
     }
 
-    public function booking(){
+    public function booking()
+    {
         return $this->hasOne(\App\Models\Booking::class);
     }
 }

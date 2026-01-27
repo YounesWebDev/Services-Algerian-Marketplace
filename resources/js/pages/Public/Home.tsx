@@ -602,19 +602,17 @@ import { dashboard, login, register } from "@/routes";
                             <div className="p-4">
                                 <div className="font-semibold line-clamp-2">{s.title}</div>
 
-                               <div className="flex justify-between">
-                                 <div className="flex justify-between gap-2 items-center mt-2">
-                                     {s.provider?.avatar_path && (
-                                         <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
-                                     )}
-                                     <div >{s.provider?.name}</div>
-                                 </div>
-                                 <div className="mt-2 text-xs text-muted-foreground">
+                                <div className="flex justify-between">
+                                    <div className="flex justify-between gap-2 items-center mt-2">
+                                        {s.provider?.avatar_path && (
+                                            <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                        )}
+                                        <div >{s.provider?.name}</div>
+                                    </div>
+                                    <div className="mt-2 text-xs text-muted-foreground">
                                     Payment: {s.payment_type}
                                 </div>
-
-                               </div>
-
+                                </div>
                                 <div className="flex justify-between items-center">
                                     <div className="mt-3 text-sm text-muted-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
                                         {s.pricing_type}

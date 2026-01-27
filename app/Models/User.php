@@ -50,51 +50,53 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin() : bool {
-        return $this->role === "admin" ;
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 
-    public function isProvider() : bool {
-        return $this->role === "provider" ;
+    public function isProvider(): bool
+    {
+        return $this->role === 'provider';
     }
 
-    public function isClient() : bool {
-        return $this->role === "client" ;
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
     }
 
-    public function providerProfile(){
-        return $this->haOne(\App\Models\ProviderProfile::class);
+    public function providerProfile()
+    {
+        return $this->hasOne(\App\Models\ProviderProfile::class);
     }
 
-    public function providerVerifications(){
-        return $this->hasMany(\App\models\ProviderVerification::class , 'provider_id');
+    public function providerVerifications()
+    {
+        return $this->hasMany(\App\Models\ProviderVerification::class, 'provider_id');
     }
 
-    public function services(){
-        return $this->hasMany(\app\models\Service::class,'provider_id');
+    public function services()
+    {
+        return $this->hasMany(\App\Models\Service::class, 'provider_id');
     }
 
-    public function clientRequests(){
-        return $this->hasMany(\App\Models\Request::class , 'client_id');
+    public function clientBookings()
+    {
+        return $this->hasMany(\App\Models\Booking::class, 'client_id');
     }
 
-    public function offers(){
-        return $this->hasMany(\App\Models\Offer::class,'provider_id');
+    public function providerBookings()
+    {
+        return $this->hasMany(\App\Models\Booking::class, 'provider_id');
     }
 
-    public function clientBookings(){
-        return $this->hasMany(\App\models\Booking::class,'client_id');
+    public function clientChats()
+    {
+        return $this->hasMany(\App\Models\Chat::class, 'client_id');
     }
 
-    public function providerBookings(){
-        return $this->hasMany(\App\models\Booking::class,'provider_id');
-    }
-
-    public function clientChats(){
-        return $this->hasMany(\App\models\Chat::class,'client_id');
-    }
-
-    public function providerChats(){
-        return $this->hasMany(\App\models\Chat::class,'provider_id');
+    public function providerChats()
+    {
+        return $this->hasMany(\App\Models\Chat::class, 'provider_id');
     }
 }
