@@ -64,7 +64,7 @@ const clientNavItems: NavItem[] = [
 // ----------------------------
 const providerNavItems: NavItem[] = [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
-    { title: "My Services", href: "/services", icon: Wrench },
+    { title: "My Services", href: "/services", icon: Wrench  },
     { title: "Requests", href: "/requests", icon: ClipboardList },
     { title: "Chats", href: "/chats", icon: MessageSquare },
     { title: "Payouts", href: "/payouts", icon: Wallet },

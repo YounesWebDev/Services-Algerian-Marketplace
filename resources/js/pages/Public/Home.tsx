@@ -218,7 +218,7 @@ import { dashboard, login, register } from "@/routes";
     const items = [
         { icon: <BadgeCheck />, color: 'green', label: 'Verified Providers' },
         { icon: <CreditCard />, color: 'green', label: 'Online Payment' },
-        { icon: <Star />, color: 'green', label: 'Health' },
+        { icon: <Star />, color: 'green', label: 'rating & reviews' },
         { icon: <MessageCircleMore />, color: 'green', label: 'live chat' },
         { icon: <Flag />, color: 'green', label: 'Reports' },
         { icon: <ShieldHalf />, color: 'green', label: 'safety' },
@@ -286,45 +286,45 @@ import { dashboard, login, register } from "@/routes";
                     </Button>
 
                     {openMenu && (
-                    <div className="flex flex-col">
-                        <div className="absolute top-18 right-4 border z-40 bg-white border-gray-200 rounded-xl p-5 flex gap-2 flex-col md:hidden w-[75%]">
+                    <div className="flex flex-col ">
+                        <div className="absolute top-18 right-4 border z-40 bg-black text-white border-gray-200 rounded-l-3xl p-5 flex gap-10 flex-col md:hidden w-[75%]">
                             {user ? (
                                 <Link
                                 href={dashboard()}
-                                className="inline-block rounded-full border font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
+                                className="inline-block rounded-full border text-black font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal  hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
                                 >
-                                    Dashboard
+                                    <p className="font-bold text-black">Dashboard</p>
                                 </Link>
                             ):(
                                 <>
                                     <Link
                                         href={login()}
-                                        className="inline-block font-bold rounded-sm border border-transparent transition-all hover:backdrop-blur-sm px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                        className="inline-block font-bold rounded-sm border border-[#19140035]  transition-all w-max hover:backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-black hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                                     >
-                                        Log in
+                                        <p className="font-bold ">Log in</p>
                                     </Link>
                                         {canRegister && (
                                             <Link
                                             href={register()}
-                                            className="inline-block font-bold rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal transition-all hover:backdrop-blur-sm text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                            className="inline-block font-bold rounded-sm border border-[#19140035] p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm text-black hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                                             >
-                                                Register
+                                               <p className="font-bold ">Register</p>
                                             </Link>
                                         )}
                                 </>
                             )}
                         <div>
-                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/">
-                            Home
+                            <Link className="hover:text-primary hover:border hover:border-primary  hover:rounded-full p-1 transition" href="/">
+                            <span className="font-bold ">Home</span>
                             </Link>
                         </div>
                         <div>
-                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
+                            <Link className="hover:text-white hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
                             Requests
                             </Link>
                         </div>
                         <div>
-                            <Link className="hover:text-primary hover:border hover:border-primary hover:rounded-full p-1 transition" href="/services">
+                            <Link className="hover:text-primary text-white hover:border hover:border-primary  hover:rounded-full p-1 transition" href="/services">
                             Services
                             </Link>
                         </div>
@@ -563,6 +563,14 @@ import { dashboard, login, register } from "@/routes";
     })}
     </div>
 </div>
+ {/* Badges */}
+        <div className="border-t border-gray-forground">
+            <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
+            <div className="flex items-center">
+               <GlassIcons items={items} className=""
+                />
+            </div>
+        </div>
 
 
         {/* Popular services */}
@@ -633,14 +641,7 @@ import { dashboard, login, register } from "@/routes";
                 )}
             </div>
         </div>
-        {/* Badges */}
-        <div className="border-t border-gray-forground">
-            <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
-            <div className="flex items-center">
-               <GlassIcons items={items} className=""
-                />
-            </div>
-        </div>
+       
 
             {/* Footer */}
             <div className="border-t ">

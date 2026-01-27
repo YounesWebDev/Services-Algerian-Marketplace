@@ -1,4 +1,5 @@
 import { router } from "@inertiajs/react";
+import { CreditCard } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ export default function Show({ service }: { service: Service }) {
   return (
     <div className="mx-auto max-w-4xl px-6 py-10 space-y-6">
       {/* Back */}
-      <Button variant="outline" onClick={() => router.get("/services")}>
+      <Button variant="outline" onClick={() => router.get("/services")} className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
         ← Back to Services
       </Button>
 
@@ -47,27 +48,30 @@ export default function Show({ service }: { service: Service }) {
 
         <div className="text-sm text-muted-foreground flex flex-wrap gap-2">
           {service.category?.name && (
-            <span className="border rounded-full px-2 py-1">
+            <span className="border rounded-full px-2 py-1 border-gray-200">
               {service.category.name}
             </span>
           )}
           {service.city?.name && (
-            <span className="border rounded-full px-2 py-1">
+            <span className="border rounded-full px-2 py-1 border-gray-200 ">
               {service.city.name}
             </span>
           )}
           {service.provider?.name && (
-            <span className="border rounded-full px-2 py-1">
+            <span className="border rounded-full border-gray-200  px-2 py-1">
               Provider: {service.provider.name}
             </span>
           )}
         </div>
 
-        <div className="text-sm text-muted-foreground">
-          Pricing: {service.pricing_type}
-          {service.base_price ? ` • ${service.base_price} DZD` : ""}
-          {" • "}
-          Payment: {service.payment_type}
+        <div className="flex gap-4  ">
+          <div className=" flex justify-between gap-2 text-sm text-muted-foreground rounded-4xl px-2 py-1 w-max border border-gray-200">
+           <div className="border border-gray-200 rounded-4xl px-2 py-1">{service.pricing_type}</div>
+          {service.base_price ? <div className="flex items-center font-bold text-primary">{service.base_price} DZD</div> : ""}
+          
+          
+        </div>
+        <div className="flex justify-between border border-gray-200 rounded-4xl px-2 py-1 w-max "><CreditCard className="mr-5"/> <div className="text-primary">{service.payment_type}</div></div>
         </div>
       </div>
 
@@ -76,7 +80,7 @@ export default function Show({ service }: { service: Service }) {
         <img
           src={cover}
           alt={service.title}
-          className="w-full h-80 rounded-lg object-cover border"
+          className="w-full h-80 rounded-4xl object-cover border"
         />
 
         {images.length > 1 && (
@@ -104,9 +108,9 @@ export default function Show({ service }: { service: Service }) {
       </div>
 
       {/* Description */}
-      <div className="space-y-2">
+      <div className="space-y-2 border border-gray-200 rounded-4xl p-4 bg-primary-foreground/30">
         <h2 className="text-lg font-semibold">Description</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-line">
+        <p className="text-sm leading-relaxed text-foreground whitespace-pre-line">
           {service.description}
         </p>
       </div>
@@ -115,11 +119,11 @@ export default function Show({ service }: { service: Service }) {
       <div className="flex gap-3">
         <Button
           onClick={() => alert("Later: create/open chat with provider")}
-        >
+          className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
           Contact provider
         </Button>
 
-        <Button variant="outline" onClick={() => router.get("/services")}>
+        <Button variant="outline" onClick={() => router.get("/services")}  className="rounded-4xl transition duration-700 hover:bg-white hover:text-black">
           Browse more
         </Button>
       </div>

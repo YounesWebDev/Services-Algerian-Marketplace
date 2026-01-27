@@ -1,5 +1,6 @@
-import AppLogoIcon from './app-logo-icon';
 import React from 'react';
+
+import AppLogoIcon from './app-logo-icon';
 
 export default function AppLogo() {
     return (
