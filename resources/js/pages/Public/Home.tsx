@@ -1,4 +1,3 @@
-    import { Button } from "@headlessui/react";
     import { Link, router } from "@inertiajs/react";
     import { usePage } from "@inertiajs/react";
     import {
@@ -31,6 +30,7 @@
     import GlassIcons from "@/components/GlassIcons";
 import { dashboard, login, register } from "@/routes";
     import { type SharedData } from "@/types";
+import { Button } from "@/components/ui/button";
 
     type Provider = {
         id: number;
@@ -116,7 +116,7 @@ import { dashboard, login, register } from "@/routes";
     popularServices: Service[];
     filters: { q: string; city: string; category: string };
     }) {
-       
+        
     // Controlled inputs (so we can update without reloading)
     const [query, setQuery] = useState(filters?.q ?? "");
     const [city, setCity] = useState(filters?.city ?? "");
@@ -620,9 +620,7 @@ import { dashboard, login, register } from "@/routes";
                                  <div className="mt-2 text-xs text-foreground">
                                     Payment: {s.payment_type}
                                 </div>
-
-                               </div>
-
+                                </div>
                                 <div className="flex justify-between items-center">
                                     <div className="mt-3 text-sm text-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
                                         {s.pricing_type}

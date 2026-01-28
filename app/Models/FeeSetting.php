@@ -11,7 +11,7 @@ class FeeSetting extends Model
 
     protected $casts = [
         'active' => 'boolean',
-        'comission_rate' => 'decimal:4',
+        'commission_rate' => 'decimal:4',
         'fixed_fee' => 'decimal:2',
     ];
 }

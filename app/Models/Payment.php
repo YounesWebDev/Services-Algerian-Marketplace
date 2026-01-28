@@ -11,16 +11,29 @@ class Payment extends Model
 
     protected $fillable = [
         'booking_id',
+        'payer_id',
         'payment_type',
         'online_provider',
+        'amount',
+        'platform_fee',
+        'provider_amount',
+        'status',
+        'paid_at',
         'metadata',
     ];
 
-    public function booking(){
-        return $this->belongsTo(\App\Models\Booking::class);
+    protected $casts = [
+        'metadata' => 'array',
+        'paid_at' => 'datetime',
+    ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
     }
 
-    public function payer(){
-        return $this->belongsTo(\App\Models\User::class, 'payer_id');
+    public function payer()
+    {
+        return $this->belongsTo(User::class, 'payer_id');
     }
 }

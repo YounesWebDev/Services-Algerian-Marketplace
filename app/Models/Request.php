@@ -19,29 +19,36 @@ class Request extends Model
         'urgency',
         'visibility',
         'expires_at',
-    ];  
+        'status',
+    ];
 
-    public function client(){
-        return $this->belongsTo(\App\Models\User::class,'client_id');
+    public function client()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'client_id');
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(\App\Models\Category::class);
     }
 
-    public function city(){
+    public function city()
+    {
         return $this->belongsTo(\App\Models\City::class);
     }
 
-    public function media(){
+    public function media()
+    {
         return $this->hasMany(\App\Models\RequestMedia::class);
     }
 
-    public function offers(){
+    public function offers()
+    {
         return $this->hasMany(\App\Models\Offer::class);
     }
 
-    public function chats(){
+    public function chats()
+    {
         return $this->hasMany(\App\Models\Chat::class);
     }
 }

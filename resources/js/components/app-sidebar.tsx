@@ -3,15 +3,10 @@ import {
     BookOpen,
     Folder,
     LayoutGrid,
-    Wrench,
-    ClipboardList,
-    MessageSquare,
-    Wallet,
     User,
     Tags,
-    MapPin,
-    Users,
     Briefcase,
+    BadgePercent,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -27,6 +22,10 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
+import { index as clientBookingsIndex } from "@/routes/client/bookings";
+import { index as clientOffersIndex } from "@/routes/client/offers";
+import { edit as editProfile } from "@/routes/profile";
+import { index as servicesIndex } from "@/routes/services";
 import { type NavItem, type SharedData } from "@/types";
 
 import AppLogo from "./app-logo";
@@ -52,33 +51,27 @@ const footerNavItems: NavItem[] = [
 // ----------------------------
 const clientNavItems: NavItem[] = [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
-    { title: "Browse Services", href: "/services", icon: Briefcase },
-    { title: "My Requests", href: "/requests", icon: ClipboardList },
-    { title: "Chats", href: "/chats", icon: MessageSquare },
-    { title: "Bookings", href: "/bookings", icon: ClipboardList },
-    { title: "Profile", href: "/profile", icon: User },
+    { title: "Browse Services", href: servicesIndex.url(), icon: Briefcase },
+    { title: "Offers", href: clientOffersIndex.url(), icon: BadgePercent },
+    { title: "Bookings", href: clientBookingsIndex.url(), icon: BookOpen },
+    { title: "Profile", href: editProfile(), icon: User },
 ];
 
 // ----------------------------
 // Provider nav
 // ----------------------------
 const providerNavItems: NavItem[] = [
-    { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
-    { title: "My Services", href: "/services", icon: Wrench  },
-    { title: "Requests", href: "/requests", icon: ClipboardList },
-    { title: "Chats", href: "/chats", icon: MessageSquare },
-    { title: "Payouts", href: "/payouts", icon: Wallet },
-    { title: "Profile", href: "/profile", icon: User },
+    { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+    { title: "Browse Requests", href: "/requests", icon: Briefcase },
+    { title: "Profile", href: editProfile(), icon: User },
 ];
 
 // ----------------------------
 // Admin nav
 // ----------------------------
 const adminNavItems: NavItem[] = [
-    { title: "Dashboard", href: "/admin/dashboard", icon: LayoutGrid },
+    { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
     { title: "Categories", href: "/admin/categories", icon: Tags },
-    { title: "Cities", href: "/admin/cities", icon: MapPin },
-    { title: "Users", href: "/admin/users", icon: Users },
 ];
 
 // ----------------------------
@@ -101,11 +94,7 @@ export function AppSidebar() {
 
     const mainNavItems = getNavItems(user?.role);
 
-  // logo link: admin goes to /admin/dashboard, others to dashboard()
-    const logoHref =
-    typeof user?.role === "string" && user.role === "admin"
-        ? "/admin/dashboard"
-        : dashboard();
+    const logoHref = dashboard();
 
     return (
     <Sidebar collapsible="icon" variant="inset">
