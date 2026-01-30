@@ -1,3 +1,4 @@
+    import { Button } from "@headlessui/react";
     import { Link, router } from "@inertiajs/react";
     import { usePage } from "@inertiajs/react";
     import {
@@ -30,7 +31,6 @@
     import GlassIcons from "@/components/GlassIcons";
 import { dashboard, login, register } from "@/routes";
     import { type SharedData } from "@/types";
-import { Button } from "@/components/ui/button";
 
     type Provider = {
         id: number;
@@ -291,7 +291,7 @@ import { Button } from "@/components/ui/button";
                             {user ? (
                                 <Link
                                 href={dashboard()}
-                                className="inline-block rounded-full border text-black font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal  hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
+                                className="inline-block rounded-full border text-white font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal  hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
                                 >
                                     <p className="font-bold text-white">Dashboard</p>
                                 </Link>
@@ -564,7 +564,7 @@ import { Button } from "@/components/ui/button";
     </div>
 </div>
  {/* Badges */}
-        <div className="border-t border-gray-forground">
+        <div className="giborder-t border-gray-forground">
             <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
             <div className="flex items-center">
                <GlassIcons items={items} className=""
@@ -592,7 +592,7 @@ import { Button } from "@/components/ui/button";
                                 if(user?.role === "provider" || user?.role === "admin") return;
                                 router.get(`/services/${s.slug}`)
                             }}
-                                className="flex m-5 flex-col text-left border rounded-4xl h-70 overflow-hidden hover:shadow-xl transition-all duration-700 bg-primary-foreground/30  hover:bg-primary-foreground/40"
+                                className="flex m-5 flex-col text-left border rounded-3xl h-70  bg-primary-foreground/30  overflow-hidden hover:shadow-xl transition-all duration-300 hover:bg-primary-foreground/40"
                         >
                             {/* cover Image only if exists */}
                             {cover ? (
@@ -610,19 +610,19 @@ import { Button } from "@/components/ui/button";
                             <div className="p-4">
                                 <div className="font-semibold line-clamp-2">{s.title}</div>
 
-                               <div className="flex justify-between">
-                                 <div className="flex justify-between gap-2 items-center mt-2">
-                                     {s.provider?.avatar_path && (
-                                         <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
-                                     )}
-                                     <div >{s.provider?.name}</div>
-                                 </div>
-                                 <div className="mt-2 text-xs text-foreground">
+                                <div className="flex justify-between">
+                                    <div className="flex justify-between gap-2 items-center mt-2">
+                                        {s.provider?.avatar_path && (
+                                            <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
+                                        )}
+                                        <div >{s.provider?.name}</div>
+                                    </div>
+                                    <div className="mt-2 text-xs text-muted-foreground">
                                     Payment: {s.payment_type}
                                 </div>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <div className="mt-3 text-sm text-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
+                                    <div className="mt-3 text-sm text-muted-foreground border border-gray-200 rounded-full w-max px-3 py-2 bg-white/20 backdrop-blur-sm hover:text-black hover:bg-white transition duration-300">
                                         {s.pricing_type}
                                         {s.base_price ? ` - ${s.base_price} DZD ` : ""}
                                     </div>
@@ -633,7 +633,7 @@ import { Button } from "@/components/ui/button";
                 })}
 
                 {services.length === 0 && (
-                    <div className="text-sm text-foreground">
+                    <div className="text-sm text-muted-foreground">
                         No services found yet .
                     </div>
                 )}

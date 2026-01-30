@@ -43,18 +43,18 @@ export default function Index() {
 
   return (
     <AppLayout>
-      <div style={{ padding: 16, maxWidth: 1000, margin: "0 auto" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>Offers</h1>
+      <div className="p-4 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-primary">Offers</h1>
 
         {flash?.success && (
-          <div style={{ marginTop: 12, padding: 10, border: "1px solid #cfc" }}>
+          <div className="mt-3 p-2.5 border border-green-300 bg-green-50 rounded">
             {flash.success}
           </div>
         )}
 
-        <div style={{ marginTop: 12 }}>
-          <label style={{ marginRight: 8 }}>Filter by status:</label>
-          <select value={filters.status} onChange={onStatusChange}>
+        <div className="mt-3 p-2 border border-gray-200 bg-background  rounded-3xl w-max flex items-center">
+          <label className="mr-2">Filter by status:</label>
+          <select value={filters.status} onChange={onStatusChange} className="border border-gray-300 rounded-3xl bg-background text-foreground px-2 py-1">
             <option value="">All</option>
             <option value="sent">Sent</option>
             <option value="assigned">Assigned</option>
@@ -62,79 +62,78 @@ export default function Index() {
           </select>
         </div>
 
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           {offers.data.length === 0 ? (
             <p>No offers found.</p>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>ID</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Provider</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Request</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Price</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Days</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Status</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Action</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {offers.data.map((o) => (
-                  <tr key={o.id}>
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>#{o.id}</td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                      {o.provider?.name ?? "-"}
-                    </td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                      {o.request?.title ?? "-"}
-                    </td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                      {o.proposed_price} DZD
-                    </td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                      {o.estimated_days ?? "-"}
-                    </td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>{o.status}</td>
-
-                    <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                      {o.status === "sent" ? (
-                        <button
-                          onClick={() => acceptOffer(o.id)}
-                          style={{ padding: "6px 10px" }}
-                        >
-                          Accept
-                        </button>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
+            <div className="overflow-x-auto bg-foreground/30 rounded-4xl p-4 border border-gray-200">
+              <table className="w-full border-collapse  ">
+                <thead>
+                  <tr>
+                    <th className="text-left border-b border-gray-300 p-2">ID</th>
+                    <th className="text-left border-b border-gray-300 p-2">Provider</th>
+                    <th className="text-left border-b border-gray-300 p-2">Request</th>
+                    <th className="text-left border-b border-gray-300 p-2">Price</th>
+                    <th className="text-left border-b border-gray-300 p-2">Days</th>
+                    <th className="text-left border-b border-gray-300 p-2">Status</th>
+                    <th className="text-left border-b border-gray-300 p-2">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {offers.data.map((o) => (
+                    <tr key={o.id}>
+                      <td className="border-b border-gray-200 p-2">#{o.id}</td>
+
+                      <td className="border-b border-gray-200 p-2">
+                        {o.provider?.name ?? "-"}
+                      </td>
+
+                      <td className="border-b border-gray-200 p-2">
+                        {o.request?.title ?? "-"}
+                      </td>
+
+                      <td className="border-b border-gray-200 p-2">
+                        {o.proposed_price} DZD
+                      </td>
+
+                      <td className="border-b border-gray-200 p-2">
+                        {o.estimated_days ?? "-"}
+                      </td>
+
+                      <td className="border-b border-gray-200 p-2">{o.status}</td>
+
+                      <td className="border-b border-gray-200 p-2">
+                        {o.status === "sent" ? (
+                          <button
+                            onClick={() => acceptOffer(o.id)}
+                            className="px-2.5 py-1.5 bg-primary text-white rounded-3xl hover:bg-foreground transition duration-700 hover:text-background"
+                          >
+                            Accept
+                          </button>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {/* Pagination */}
         {offers.links && offers.links.length > 0 && (
-          <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="mt-4 flex gap-2 flex-wrap">
             {offers.links.map((l, idx) => (
               <button
                 key={idx}
                 disabled={!l.url}
                 onClick={() => l.url && router.visit(l.url)}
-                style={{
-                  padding: "6px 10px",
-                  border: "1px solid #ddd",
-                  background: l.active ? "#eee" : "white",
-                  cursor: l.url ? "pointer" : "not-allowed",
-                }}
+                className={`px-2.5 py-1.5 border border-gray-300 rounded-3xl bg-foreground text-background transition ${
+                  l.active ? "bg-gray-200" : "bg-primary"
+                } ${l.url ? "cursor-pointer hover:bg-gray-100" : "cursor-not-allowed opacity-50"}`}
                 dangerouslySetInnerHTML={{ __html: l.label }}
               />
             ))}

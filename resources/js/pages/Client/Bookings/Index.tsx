@@ -1,4 +1,5 @@
 import { Link, router, usePage } from "@inertiajs/react";
+import { CreditCard, Eye } from "lucide-react";
 import React from "react";
 
 import AppLayout from "@/layouts/app-layout";
@@ -51,12 +52,12 @@ export default function Index() {
 
   return (
     <AppLayout>
-      <div style={{ padding: 16, maxWidth: 1000, margin: "0 auto" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>My Bookings</h1>
+      <div className="p-4 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-primary">My Bookings</h1>
 
-        <div style={{ marginTop: 12 }}>
-          <label style={{ marginRight: 8 }}>Filter by status:</label>
-          <select value={filters.status} onChange={onStatusChange}>
+        <div className="mt-3 p-2 border border-gray-200 rounded-3xl w-max flex items-center">
+          <label className="mr-2">Filter by status:</label>
+          <select value={filters.status} onChange={onStatusChange} className="border border-gray-300 rounded-3xl px-2 py-1 bg-background text-foreground">
             <option value="">All</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
@@ -64,80 +65,81 @@ export default function Index() {
           </select>
         </div>
 
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           {bookings.data.length === 0 ? (
             <p>No bookings found.</p>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>ID</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Provider</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Title</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Amount</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Booking</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Payment</th>
-                  <th style={{ textAlign: "left", borderBottom: "1px solid #ddd", padding: 8 }}>Action</th>
-                </tr>
-              </thead>
+            <div className="overflow-x-auto bg-foreground/30 rounded-4xl p-4 border border-gray-200">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="text-left border-b border-gray-300 p-2">ID</th>
+                    <th className="text-left border-b border-gray-300 p-2">Provider</th>
+                    <th className="text-left border-b border-gray-300 p-2">Title</th>
+                    <th className="text-left border-b border-gray-300 p-2">Amount</th>
+                    <th className="text-left border-b border-gray-300 p-2">Booking</th>
+                    <th className="text-left border-b border-gray-300 p-2">Payment</th>
+                    <th className="text-left border-b border-gray-300 p-2">Action</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {bookings.data.map((b) => {
-                  const title = b.offer?.request?.title || b.service?.title || "Booking";
-                  const payStatus = b.payment?.status;
-                  const showPay = b.status === "pending" && payStatus !== "paid";
+                <tbody>
+                  {bookings.data.map((b) => {
+                    const title = b.offer?.request?.title || b.service?.title || "Booking";
+                    const payStatus = b.payment?.status;
+                    const showPay = b.status === "pending" && payStatus !== "paid";
 
-                  return (
-                    <tr key={b.id}>
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>#{b.id}</td>
+                    return (
+                      <tr key={b.id}>
+                        <td className="border-b border-gray-200 p-2">#{b.id}</td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                        {b.provider?.name ?? "-"}
-                      </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {b.provider?.name ?? "-"}
+                        </td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>{title}</td>
+                        <td className="border-b border-gray-200 p-2">{title}</td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                        {b.total_amount} {b.currency}
-                      </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {b.total_amount} {b.currency}
+                        </td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>{b.status}</td>
+                        <td className="border-b border-gray-200 p-2">{b.status}</td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                        {paymentLabel(payStatus)}
-                      </td>
+                        <td className="border-b border-gray-200 p-2">
+                          {paymentLabel(payStatus)}
+                        </td>
 
-                      <td style={{ borderBottom: "1px solid #eee", padding: 8 }}>
-                        <Link href={clientBookingsShow.url(b.id)}>View</Link>
+                        <td className="border-b border-gray-200 w-max space-x-2 flex justify-center p-1 rounded-3xl">
+                          <Link href={clientBookingsShow.url(b.id)} className="text-primary hover:underline">
+                            <Eye/>
+                          </Link>
 
-                        {showPay && (
-                          <span style={{ marginLeft: 10 }}>
-                            <Link href={clientBookingsShow.url(b.id)}>Pay</Link>
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          {showPay && (
+                            <Link href={clientBookingsShow.url(b.id)} className="text-primary hover:underline">
+                              <CreditCard/>
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {/* Pagination */}
         {bookings.links && bookings.links.length > 0 && (
-          <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="mt-4 flex gap-2 flex-wrap">
             {bookings.links.map((l, idx) => (
               <button
                 key={idx}
                 disabled={!l.url}
                 onClick={() => l.url && router.visit(l.url)}
-                style={{
-                  padding: "6px 10px",
-                  border: "1px solid #ddd",
-                  background: l.active ? "#eee" : "white",
-                  cursor: l.url ? "pointer" : "not-allowed",
-                }}
+                className={`px-2.5 py-1.5 border border-gray-300 bg-foreground rounded-3xl transition ${
+                  l.active ? "bg-foreground text-background" : "bg-white text-foreground"
+                } ${l.url ? "cursor-pointer bg-primary hover:bg-foreground hover:text-background" : "cursor-not-allowed opacity-50"}`}
                 dangerouslySetInnerHTML={{ __html: l.label }}
               />
             ))}
