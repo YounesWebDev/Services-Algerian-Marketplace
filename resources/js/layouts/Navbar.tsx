@@ -1,5 +1,9 @@
 import { Link } from "@inertiajs/react";
 
+import { home as homeRoute, login, register } from "@/routes";
+import { index as providerRequestsIndex } from "@/routes/provider/requests";
+import { index as servicesIndex } from "@/routes/services";
+
 type NavbarProps = {
   canRegister: boolean;
 };
@@ -10,36 +14,36 @@ export default function Navbar({ canRegister }: NavbarProps) {
       <nav className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="hover:scale-105 duration-300">
+        <Link href={homeRoute.url()} className="hover:scale-105 duration-300">
           <div className="font-bold text-xl">PROfinder</div>
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex gap-10 text-sm">
-          <Link href="/" className="hover:scale-105 duration-300">
+          <Link href={homeRoute.url()} className="hover:scale-105 duration-300">
             Home
           </Link>
-          <Link href="/requests" className="hover:scale-105 duration-300">
+          <Link href={providerRequestsIndex.url()} className="hover:scale-105 duration-300">
             Requests
           </Link>
-          <Link href="/services" className="hover:scale-105 duration-300">
+          <Link href={servicesIndex.url()} className="hover:scale-105 duration-300">
             Services
           </Link>
         </div>
 
         {/* Auth */}
         <div className="flex gap-3 text-sm">
-          <a href="/login" className="hover:scale-105 duration-300">
+          <Link href={login()} className="hover:scale-105 duration-300">
             Login
-          </a>
+          </Link>
 
           {canRegister && (
-            <a
-              href="/register"
+            <Link
+              href={register()}
               className="px-3 py-1 border rounded hover:bg-green-500 hover:text-white duration-300"
             >
               Register
-            </a>
+            </Link>
           )}
         </div>
       </nav>

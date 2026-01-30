@@ -21,7 +21,9 @@ class OfferController extends Controller
             })
             ->with([
                 'provider:id,name,avatar_path',
-                'request:id,title,status,client_id',
+                'request:id,title,status,client_id,city_id,category_id',
+                'request.city:id,name',
+                'request.category:id,name,slug',
             ])
             ->latest();
 

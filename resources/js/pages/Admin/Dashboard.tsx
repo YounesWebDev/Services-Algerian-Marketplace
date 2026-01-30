@@ -92,10 +92,10 @@ export default function Dashboard({
         <Card className="transition duration-800 hover:bg-black hover:text-white hover">
             <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Open Reports</CardTitle>
-             {actionRequired.reports.length > 0 && (
+            {actionRequired.reports.length > 0 && (
                     <Badge variant="secondary" className="text-bold rounded-full text-white bg-red-700 ">{actionRequired.reports.length}</Badge>
                 )}
-           
+            
             </CardHeader>
             <CardContent className="space-y-2 text-sm ">
             {actionRequired.reports.length === 0 ? (

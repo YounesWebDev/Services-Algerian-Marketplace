@@ -23,7 +23,6 @@ return new class extends Migration
             $table->decimal('budget_max', 10, 2)->nullable();
             $table->string('urgency')->nullable(); // low|medium|high
             $table->string('status')->default('open'); // open|in_discussion|assigned|closed|cancelled
-            $table->string('visibility')->default('providers_only'); // public|providers_only
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });

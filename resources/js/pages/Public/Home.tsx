@@ -34,7 +34,12 @@
     import React, { useEffect, useRef, useState } from "react";
 
     import GlassIcons from "@/components/GlassIcons";
-import { dashboard, login, register } from "@/routes";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { dashboard, home as homeRoute, login, register } from "@/routes";
+import { suggestions as homeSuggestions } from "@/routes/home";
+import { index as providerServicesIndex } from "@/routes/provider/my/services";
+import { index as providerRequestsIndex } from "@/routes/provider/requests";
+import { index as servicesIndex, show as servicesShow } from "@/routes/services";
     import { type SharedData } from "@/types";
 
     type Provider = {
@@ -107,6 +112,14 @@ import { dashboard, login, register } from "@/routes";
         const first = service.media[0];
 
         return toStorageUrl(first.path);
+    }
+
+    function getInitials(name?: string | null) {
+        if (!name) return "U";
+        const parts = name.trim().split(/\s+/);
+        const first = parts[0]?.[0] ?? "";
+        const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+        return (first + last).toUpperCase() || "U";
     }
     export default function Home({
     canRegister,
@@ -187,9 +200,12 @@ import { dashboard, login, register } from "@/routes";
             const controller = new AbortController();
             abortRef.current = controller;
 
-            const res = await fetch(`/suggestions?q=${encodeURIComponent(text)}`, {
-            signal: controller.signal,
-            });
+            const res = await fetch(
+            homeSuggestions.url({ query: { q: text } }),
+            {
+                signal: controller.signal,
+            },
+            );
 
             const data = await res.json();
 
@@ -213,8 +229,10 @@ import { dashboard, login, register } from "@/routes";
             return;
         }
         router.get(
-        "/services",
-        { q: query, city: city || "", category: category || "" },
+        servicesIndex.url({
+            query: { q: query, city: city || "", category: category || "" },
+        }),
+        {},
         { preserveState: true, replace: true }
         );
     }
@@ -233,17 +251,17 @@ import { dashboard, login, register } from "@/routes";
         {/* Navbar */}
         <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border border-gray-200 fixed w-full z-30 bg-primary-foreground/30">
             <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-                <Link className="hover:text-primary transition" href="/">
+                <Link className="hover:text-primary transition" href={homeRoute.url()}>
                 <div className="font-bold text-xl  ">PROfinder</div>
                 </Link>
 
                 <div className="hidden md:flex justify-between gap-15 ">
 
-                    <Link className="hover:text-primary    p-1 transition" href="/">
+                    <Link className="hover:text-primary    p-1 transition" href={homeRoute.url()}>
                         Home
                     </Link>
                     {user?.role === "provider"  ? (
-                        <Link className="hover:text-primary    p-1 transition" href="/requests">
+                        <Link className="hover:text-primary    p-1 transition" href={providerRequestsIndex.url()}>
                             Requests
                         </Link>
                     ) : user?.role === "admin" ? (
@@ -252,7 +270,7 @@ import { dashboard, login, register } from "@/routes";
                         </Link>
                     ) : null}
                     {user?.role === "provider" ? (
-                        <Link className="hover:text-primary    p-1 transition" href="/services/my">
+                        <Link className="hover:text-primary    p-1 transition" href={providerServicesIndex.url()}>
                             My Services
                         </Link>
                     ) : user?.role ==="admin" ? (
@@ -260,7 +278,7 @@ import { dashboard, login, register } from "@/routes";
                             Users
                         </Link>
                     ) : (
-                        <Link className="hover:text-primary     p-1 transition" href="/services">
+                        <Link className="hover:text-primary     p-1 transition" href={servicesIndex.url()}>
                             Services
                         </Link>
                     )}
@@ -319,11 +337,11 @@ import { dashboard, login, register } from "@/routes";
                                         
                                 </>
                             )}
-                            <Link className=" flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 " href="/">
+                            <Link className=" flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 " href={homeRoute.url()}>
                           <House/> Home
                     </Link>
                     {user?.role === "provider"  ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/requests">
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={providerRequestsIndex.url()}>
                           <GitPullRequest/>  Requests
                         </Link>
                     ) : user?.role === "admin" ? (
@@ -332,7 +350,7 @@ import { dashboard, login, register } from "@/routes";
                         </Link>
                     ) : null}
                     {user?.role === "provider" ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/services/my">
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={providerServicesIndex.url()}>
                            <SquareAsterisk/> My Services
                         </Link>
                     ) : user?.role ==="admin" ? (
@@ -340,7 +358,7 @@ import { dashboard, login, register } from "@/routes";
                             <UsersRound/> Users
                         </Link>
                     ) : (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/services">
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={servicesIndex.url()}>
                            <SquareAsterisk/> Services
                         </Link>
                     )}
@@ -457,8 +475,10 @@ import { dashboard, login, register } from "@/routes";
                         setOpen(false);
                         setCategory(c.slug);
                         router.get(
-                            "/services",
-                            {  category: c.slug || "",city: city || ""},
+                            servicesIndex.url({
+                            query: { category: c.slug || "", city: city || "" },
+                            }),
+                            {},
                             { preserveState: true }
                         );
 
@@ -483,7 +503,7 @@ import { dashboard, login, register } from "@/routes";
                         className="w-full text-left px-3 py-2 text-black text-sm hover:bg-muted"
                         onMouseDown={() => {
                         setOpen(false);
-                        router.get(`/services/${s.slug}`);
+                        router.get(servicesShow.url(s.slug));
                         }}
                     >
                         {s.title}
@@ -549,8 +569,10 @@ import { dashboard, login, register } from "@/routes";
                 onClick={() => {
                 setCategory(String(cat.id));
                 router.get(
-                    "/services",
-                    { q: "", city: city || "", category: cat.slug },
+                    servicesIndex.url({
+                    query: { q: "", city: city || "", category: cat.slug },
+                    }),
+                    {},
                     { preserveState: true }
                 );
                 }}
@@ -612,7 +634,7 @@ import { dashboard, login, register } from "@/routes";
                             onClick={() =>{
 
                                 if(user?.role === "provider" || user?.role === "admin") return;
-                                router.get(`/services/${s.slug}`)
+                                router.get(servicesShow.url(s.slug))
                             }}
                                 className="flex m-5 flex-col text-left border rounded-3xl h-70  bg-primary-foreground/30  overflow-hidden hover:shadow-xl transition-all duration-300 hover:bg-primary-foreground/40"
                         >
@@ -634,9 +656,15 @@ import { dashboard, login, register } from "@/routes";
 
                                 <div className="flex justify-between">
                                     <div className="flex justify-between gap-2 items-center mt-2">
-                                        {s.provider?.avatar_path && (
-                                            <img src={s.provider.avatar_path} alt={s.provider?.name} className="w-8 h-8 rounded-full object-cover" />
-                                        )}
+                                        <Avatar className="size-8">
+                                            <AvatarImage
+                                                src={s.provider?.avatar_path ? toStorageUrl(s.provider.avatar_path) : ""}
+                                                alt={s.provider?.name ?? "Provider"}
+                                            />
+                                            <AvatarFallback>
+                                                {getInitials(s.provider?.name)}
+                                            </AvatarFallback>
+                                        </Avatar>
                                         <div >{s.provider?.name}</div>
                                     </div>
                                     <div className="mt-2 text-xs text-muted-foreground">

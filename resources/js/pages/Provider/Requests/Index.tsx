@@ -1,143 +1,293 @@
-import { Link, router, usePage } from "@inertiajs/react";
-import React from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
 
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import AppLayout from "@/layouts/app-layout";
+import { cn } from "@/lib/utils";
 import { index as providerRequestsIndex, show as providerRequestsShow } from "@/routes/provider/requests";
 
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
+type Client = { id: number; name: string; avatar_path: string | null };
+type Media = { id: number; request_id: number; path: string; type: string; position: number };
 
 type RequestItem = {
   id: number;
   title: string;
   description: string;
   status: string;
-  budget_min?: string | number | null;
-  budget_max?: string | number | null;
-  urgency?: string | null;
-
-  category?: { id: number; name: string; slug: string };
-  city?: { id: number; name: string };
-  client?: { id: number; name: string };
-
-  media?: Array<{ id: number; path: string; type: string; position: number }>;
+  budget_min: string | null;
+  budget_max: string | null;
+  urgency: string | null;
+  created_at: string;
+  category: Category;
+  city: City;
+  client: Client;
+  media: Media[];
 };
 
 type PaginationLink = { url: string | null; label: string; active: boolean };
-type Paginated<T> = { data: T[]; links: PaginationLink[] };
 
-type PageProps = {
-  requests: Paginated<RequestItem>;
-  categories: Category[];
-  cities: City[];
-  filters: { q: string; city: string; category: string };
+const publicImagePath = (path?: string | null) => {
+  if (!path) return "";
+  if (path.startsWith("http") || path.startsWith("/")) return path;
+  return `/storage/${path}`;
 };
 
-export default function Index() {
-  const { requests, categories, cities, filters } = usePage<PageProps>().props;
+function renderPagination(links: PaginationLink[]) {
+  if (!links?.length) {
+    return null;
+  }
 
-  const setFilter = (next: Partial<PageProps["filters"]>) => {
-    router.get(
-      providerRequestsIndex.url(),
-      { ...filters, ...next },
-      { preserveState: true, replace: true }
-    );
-  };
+  return (
+    <Pagination>
+      <PaginationContent>
+        {links.map((link, idx) => {
+          const labelText = link.label
+            .replace(/&laquo;|&raquo;/g, "")
+            .replace(/&hellip;/g, "...")
+            .replace(/&nbsp;/g, " ")
+            .trim();
+
+          const lowerLabel = labelText.toLowerCase();
+          const isPrev = lowerLabel.includes("previous");
+          const isNext = lowerLabel.includes("next");
+          const isEllipsis = labelText === "..." || labelText === "…";
+
+          if (isEllipsis) {
+            return (
+              <PaginationItem key={`ellipsis-${idx}`}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            );
+          }
+
+          if (!link.url) {
+            return (
+              <PaginationItem key={`disabled-${idx}`}>
+                <span
+                  className={cn(
+                    buttonVariants({
+                      variant: "outline",
+                      size: isPrev || isNext ? "default" : "icon",
+                    }),
+                    "pointer-events-none opacity-50",
+                  )}
+                >
+                  {isPrev ? "Previous" : isNext ? "Next" : labelText}
+                </span>
+              </PaginationItem>
+            );
+          }
+
+          if (isPrev) {
+            return (
+              <PaginationItem key={`prev-${idx}`}>
+                <PaginationPrevious href={link.url} preserveScroll />
+              </PaginationItem>
+            );
+          }
+
+          if (isNext) {
+            return (
+              <PaginationItem key={`next-${idx}`}>
+                <PaginationNext href={link.url} preserveScroll />
+              </PaginationItem>
+            );
+          }
+
+          return (
+            <PaginationItem key={`${link.url}-${idx}`}>
+              <PaginationLink href={link.url} preserveScroll isActive={link.active}>
+                {labelText}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        })}
+      </PaginationContent>
+    </Pagination>
+  );
+}
+
+export default function ProviderRequestsIndex() {
+  const { props } = usePage<{
+    requests: { data: RequestItem[]; links: PaginationLink[] };
+    categories: Category[];
+    cities: City[];
+    filters: { q: string; city: string; category: string };
+  }>();
+
+  const { requests, categories, cities, filters } = props;
 
   return (
     <AppLayout>
-      <div style={{ padding: 16, maxWidth: 1100, margin: "0 auto" }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>Open Requests</h1>
+      <Head title="Requests" />
 
-        {/* Filters */}
-        <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <input
-            value={filters.q}
-            onChange={(e) => setFilter({ q: e.target.value })}
-            placeholder="Search by title..."
-            style={{ padding: 8, minWidth: 240 }}
-          />
+      <div className="p-6 space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold">Open Requests</h1>
+          <p className="text-sm text-gray-600">
+            These are requests posted by clients. You can open one and send an offer.
+          </p>
+        </div>
 
-          <select
-            value={filters.city}
-            onChange={(e) => setFilter({ city: e.target.value })}
-            style={{ padding: 8 }}
-          >
-            <option value="">All Cities</option>
-            {cities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+        {/* Filters (simple beginner-friendly) */}
+        <div className="rounded-md border p-4 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-sm font-medium">Search</label>
+              <input
+                defaultValue={filters.q}
+                id="q"
+                className="mt-1 w-full rounded-md border p-2"
+                placeholder="Search by title..."
+              />
+            </div>
 
-          <select
-            value={filters.category}
-            onChange={(e) => setFilter({ category: e.target.value })}
-            style={{ padding: 8 }}
-          >
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            <div>
+              <label className="block text-sm font-medium">City</label>
+              <select defaultValue={filters.city} id="city" className="mt-1 w-full rounded-md border p-2">
+                <option value="">All cities</option>
+                {cities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Category</label>
+              <select
+                defaultValue={filters.category}
+                id="category"
+                className="mt-1 w-full rounded-md border p-2"
+              >
+                <option value="">All categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="rounded-md bg-black px-3 py-2 text-white text-sm"
+              onClick={() => {
+                const q = (document.getElementById("q") as HTMLInputElement)?.value ?? "";
+                const city = (document.getElementById("city") as HTMLSelectElement)?.value ?? "";
+                const category = (document.getElementById("category") as HTMLSelectElement)?.value ?? "";
+                window.location.href = providerRequestsIndex.url({ query: { q, city, category } });
+              }}
+            >
+              Apply
+            </button>
+
+            <Link
+              href={providerRequestsIndex.url()}
+              className="rounded-md border px-3 py-2 text-sm"
+            >
+              Reset
+            </Link>
+          </div>
         </div>
 
         {/* List */}
-        <div style={{ marginTop: 16 }}>
+        <div className="space-y-3">
           {requests.data.length === 0 ? (
-            <p>No requests found.</p>
+            <div className="rounded-md border p-4 text-sm text-gray-600">
+              No open requests found.
+            </div>
           ) : (
-            <div style={{ display: "grid", gap: 12 }}>
-              {requests.data.map((r) => (
-                <div key={r.id} style={{ border: "1px solid #ddd", padding: 12 }}>
-                  <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
-                    {r.title}
-                  </h2>
+            requests.data.map((r) => {
+              const cover = r.media?.slice().sort((a, b) => a.position - b.position)[0]?.path;
+              const coverUrl = publicImagePath(cover);
 
-                  <div style={{ fontSize: 14, color: "#444" }}>
-                    <span><b>City:</b> {r.city?.name ?? "-"}</span>
-                    <span style={{ marginLeft: 12 }}><b>Category:</b> {r.category?.name ?? "-"}</span>
-                  </div>
+              return (
+                <div key={r.id} className="rounded-md border p-4">
+                  <div className="flex gap-4">
+                    {/* cover image */}
+                    <div className="w-24 h-24 shrink-0 rounded-md overflow-hidden border bg-gray-50">
+                      {coverUrl ? (
+                        <img src={coverUrl} alt={r.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                          No image
+                        </div>
+                      )}
+                    </div>
 
-                  <div style={{ marginTop: 8, fontSize: 14 }}>
-                    {r.description.length > 160 ? r.description.slice(0, 160) + "..." : r.description}
-                  </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-medium">{r.title}</div>
+                          <div className="text-sm text-gray-600 mt-1">
+                            {r.category?.name} • {r.city?.name}
+                          </div>
 
-                  <div style={{ marginTop: 8, fontSize: 14 }}>
-                    <b>Budget:</b> {r.budget_min ?? "-"} / {r.budget_max ?? "-"} DZD
-                  </div>
+                          <div className="text-sm text-gray-600 mt-1">
+                            Budget:{" "}
+                            <span className="font-medium">
+                              {r.budget_min ?? "—"} - {r.budget_max ?? "—"} DZD
+                            </span>
+                            {r.urgency ? (
+                              <>
+                                {" "}
+                                • Urgency: <span className="font-medium">{r.urgency}</span>
+                              </>
+                            ) : null}
+                          </div>
 
-                  <div style={{ marginTop: 10 }}>
-                    <Link href={providerRequestsShow.url(r.id)}>View Details</Link>
+                          <div className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                            <span>Client:</span>
+                            <span className="inline-flex items-center gap-2">
+                              {r.client?.avatar_path ? (
+                                <img
+                                  src={r.client.avatar_path}
+                                  alt={r.client.name}
+                                  className="w-6 h-6 rounded-full object-cover border"
+                                />
+                              ) : (
+                                <span className="w-6 h-6 rounded-full border bg-gray-100" />
+                              )}
+                              <span className="font-medium">{r.client?.name}</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        <Link
+                          href={providerRequestsShow.url(r.id)}
+                          className="text-sm underline"
+                        >
+                          Open
+                        </Link>
+                      </div>
+
+                      <div className="text-sm text-gray-700 mt-2 line-clamp-2">
+                        {r.description}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })
           )}
         </div>
 
         {/* Pagination */}
-        {requests.links && requests.links.length > 0 && (
-          <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {requests.links.map((l, idx) => (
-              <button
-                key={idx}
-                disabled={!l.url}
-                onClick={() => l.url && router.visit(l.url)}
-                style={{
-                  padding: "6px 10px",
-                  border: "1px solid #ddd",
-                  background: l.active ? "#eee" : "white",
-                  cursor: l.url ? "pointer" : "not-allowed",
-                }}
-                dangerouslySetInnerHTML={{ __html: l.label }}
-              />
-            ))}
-          </div>
-        )}
+        {requests.links?.length > 0 && renderPagination(requests.links)}
       </div>
     </AppLayout>
   );

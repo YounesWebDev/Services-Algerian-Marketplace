@@ -3,32 +3,37 @@ import { Link } from "@inertiajs/react";
 import { Menu, X, House, GitPullRequest, Flag, SquareAsterisk, UsersRound, Info } from "lucide-react";
 import { useState } from "react";
 
-import { login, register } from "@/routes";
+import { dashboard, home as homeRoute, login, register } from "@/routes";
+import { index as providerServicesIndex } from "@/routes/provider/my/services";
+import { index as providerRequestsIndex } from "@/routes/provider/requests";
+import { index as servicesIndex } from "@/routes/services";
+import type { User } from "@/types";
 
 
 type NavbarProps = {
-  user: any;
+  user: User | null;
   canRegister: boolean;
 };
 
 export default function Navbar({ user, canRegister }: NavbarProps) {
   const [openMenu, setOpenMenu] = useState(false);
 
-  const dashboardUrl =
-    user?.role === "provider" ? "/services/my" : "/admin/reports";
+  const dashboardUrl = dashboard().url;
 
   return (
     <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border border-gray-200 fixed w-full z-30 bg-primary-foreground/30">
       <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <Link className="hover:text-primary transition" href="/">
+        <Link className="hover:text-primary transition" href={homeRoute.url()}>
           <div className="font-bold text-xl">PROfinder</div>
         </Link>
 
         <div className="hidden md:flex gap-6">
-          <Link className="hover:text-primary transition" href="/">Home</Link>
+          <Link className="hover:text-primary transition" href={homeRoute.url()}>
+            Home
+          </Link>
 
           {user?.role === "provider" && (
-            <Link className="hover:text-primary transition" href="/requests">
+            <Link className="hover:text-primary transition" href={providerRequestsIndex.url()}>
               Requests
             </Link>
           )}
@@ -40,7 +45,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
           )}
 
           {user?.role === "provider" ? (
-            <Link className="hover:text-primary transition" href="/services/my">
+            <Link className="hover:text-primary transition" href={providerServicesIndex.url()}>
               My Services
             </Link>
           ) : user?.role === "admin" ? (
@@ -48,7 +53,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
               Users
             </Link>
           ) : (
-            <Link className="hover:text-primary transition" href="/services">
+            <Link className="hover:text-primary transition" href={servicesIndex.url()}>
               Services
             </Link>
           )}
@@ -107,12 +112,12 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
             </Link>
           )}
 
-          <Link className="flex gap-3 items-center p-2" href="/">
+          <Link className="flex gap-3 items-center p-2" href={homeRoute.url()}>
             <House /> Home
           </Link>
 
           {user?.role === "provider" && (
-            <Link className="flex gap-3 items-center p-2" href="/requests">
+            <Link className="flex gap-3 items-center p-2" href={providerRequestsIndex.url()}>
               <GitPullRequest /> Requests
             </Link>
           )}
@@ -124,7 +129,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
           )}
 
           {user?.role === "provider" ? (
-            <Link className="flex gap-3 items-center p-2" href="/services/my">
+            <Link className="flex gap-3 items-center p-2" href={providerServicesIndex.url()}>
               <SquareAsterisk /> My Services
             </Link>
           ) : user?.role === "admin" ? (
@@ -132,7 +137,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
               <UsersRound /> Users
             </Link>
           ) : (
-            <Link className="flex gap-3 items-center p-2" href="/services">
+            <Link className="flex gap-3 items-center p-2" href={servicesIndex.url()}>
               <SquareAsterisk /> Services
             </Link>
           )}

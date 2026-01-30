@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('payer_id')->constrained('users')->cascadeOnDelete();
 
             $table->string('payment_type'); // cash|online
-            $table->string('online_provider')->nullable(); // stripe|paypal|other
+            $table->string('online_provider')->nullable(); // Dahabia Card
 
             $table->decimal('amount', 10, 2);
             $table->decimal('platform_fee', 10, 2);

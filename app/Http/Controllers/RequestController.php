@@ -4,22 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Offer;
 use App\Models\Request as JobRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
+use function PHPUnit\Framework\isNumeric;
 
 class RequestController extends Controller
 {
     // Provider: list open requests
     public function index(Request $request)
     {
-        $user = $request->user();
-
-        // only provider can access
-        if (! $user || $user->role !== 'provider') {
-            abort(403);
-        }
-
         $q = (string) $request->query('q', '');
         $city = (string) $request->query('city', '');
         $category = (string) $request->query('category', '');
@@ -29,7 +25,7 @@ class RequestController extends Controller
             ->with([
                 'category:id,name,slug',
                 'city:id,name',
-                'client:id,name',
+                'client:id,name,avatar_path',
                 'media:id,request_id,path,type,position',
             ])
             ->latest();
@@ -43,8 +39,8 @@ class RequestController extends Controller
         }
 
         if ($category !== '') {
-            if (is_numeric($category)) {
-                $query->where('category_id', (int) $category);
+            if (isNumeric($category)) {
+                $query->where('category_id', $category);
             } else {
                 $categoryId = Category::where('slug', $category)->value('id');
                 if ($categoryId) {
@@ -71,29 +67,25 @@ class RequestController extends Controller
     }
 
     // Provider: request details
-    public function show(JobRequest $requestModel, Request $request)
+    public function show(Request $request, JobRequest $requestModel)
     {
-        $user = $request->user();
-
-        // only provider can access
-        if (! $user || $user->role !== 'provider') {
-            abort(403);
-        }
-
-        $requestModel->load([
-            'category:id,name,slug',
-            'city:id,name',
-            'client:id,name',
-            'media:id,request_id,path,type,position',
-        ]);
-
-        // only open visible
         if ($requestModel->status !== 'open') {
             abort(404);
         }
+        $requestModel->load([
+            'category:id,name,slug',
+            'city:id,name',
+            'client:id,name,avatar_path',
+            'media:id,request_id,path,type,position',
+        ]);
+
+        $hasOffer = Offer::where('request_id', $requestModel->id)
+            ->where('provider_id', $request->user()->id)
+            ->exists();
 
         return Inertia::render('Provider/Requests/Show', [
             'request' => $requestModel,
+            'has_offer' => $hasOffer,
         ]);
     }
 }

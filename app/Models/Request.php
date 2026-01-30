@@ -10,6 +10,7 @@ class Request extends Model
     use HasFactory;
 
     protected $fillable = [
+        'client_id',
         'category_id',
         'city_id',
         'title',
@@ -17,7 +18,6 @@ class Request extends Model
         'budget_min',
         'budget_max',
         'urgency',
-        'visibility',
         'expires_at',
         'status',
     ];

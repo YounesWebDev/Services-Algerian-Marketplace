@@ -9,7 +9,15 @@ class RequestMedia extends Model
 {
     use HasFactory;
 
-    public function request(){
+    protected $fillable = [
+        'request_id',
+        'path',
+        'type',
+        'position',
+    ];
+
+    public function request()
+    {
         return $this->belongsTo(\App\Models\Request::class);
     }
 }

@@ -16,11 +16,11 @@ class AcceptOfferController extends Controller
         // load request for ownership
         $offer->load('request');
 
-        if (! $offer->request) {
+        if (!$offer->request) {
             abort(404);
         }
         // only the owner client can accept offers
-        if ($offer->request->client_id != $user->id) {
+        if ($offer->request->client_id !== $user->id) {
             abort(403);
         }
 
@@ -34,8 +34,8 @@ class AcceptOfferController extends Controller
             return back();
         }
 
-        DB::transaction(function () use ($offer): void {
-            // 1) accept this offer
+        DB::transaction(function () use ($offer) {
+            // 1) mark this offer as assigned
             $offer->update(['status' => 'assigned']);
 
             // 2) reject other offers for same request

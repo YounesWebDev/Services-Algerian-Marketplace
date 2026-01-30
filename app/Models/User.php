@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'status',
+        'avatar_path',
     ];
 
     /**
@@ -65,9 +68,9 @@ class User extends Authenticatable
         return $this->role === 'client';
     }
 
-    public function providerProfile()
+    public function profile()
     {
-        return $this->hasOne(\App\Models\ProviderProfile::class);
+        return $this->hasOne(\App\Models\Profile::class);
     }
 
     public function providerVerifications()

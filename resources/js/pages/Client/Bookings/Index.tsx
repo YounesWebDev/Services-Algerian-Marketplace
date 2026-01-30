@@ -1,145 +1,200 @@
-import { Link, router, usePage } from "@inertiajs/react";
-import { CreditCard, Eye } from "lucide-react";
-import React from "react";
+import { Head, Link, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
-import {
-  index as clientBookingsIndex,
-  show as clientBookingsShow,
-} from "@/routes/client/bookings";
+import { index as clientBookingsIndex, show as clientBookingsShow } from "@/routes/client/bookings";
+import { show as serviceShow } from "@/routes/services";
 
-type PaymentMini = { status: string };
+type Provider = { id: number; name: string; avatar_path: string | null };
 
-type Booking = {
+type Service = { id: number; title: string; slug: string };
+type RequestItem = { id: number; title: string };
+type Offer = { id: number; proposed_price: string; status: string; request?: RequestItem };
+
+type Payment = {
   id: number;
+  status: string; // pending | paid
+  payment_type: "cash" | "online";
+  paid_at: string | null;
+};
+
+type BookingItem = {
+  id: number;
+  source: "service" | "request_offer" | string;
   status: string;
-  total_amount: string | number;
+  total_amount: string;
   currency: string;
+  scheduled_at: string | null;
 
-  payment?: PaymentMini | null;
+  provider: Provider;
 
-  provider?: { id: number; name: string; avatar_path?: string | null };
-  offer?: { id: number; proposed_price: string | number; status: string; request?: { title: string } };
-  service?: { id: number; title: string; slug: string };
+  service?: Service | null;
+  offer?: Offer | null;
+  payment?: Payment | null;
 };
 
 type PaginationLink = { url: string | null; label: string; active: boolean };
-type Paginated<T> = { data: T[]; links: PaginationLink[] };
 
-type PageProps = {
-  bookings: Paginated<Booking>;
-  filters: { status: string };
-};
+export default function ClientBookingsIndex() {
+  const { props } = usePage<{
+    bookings: { data: BookingItem[]; links: PaginationLink[] };
+    filters: { status: string };
+    flash?: { success?: string };
+  }>();
 
-export default function Index() {
-  const { bookings, filters } = usePage<PageProps>().props;
-
-  const onStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const status = e.target.value;
-    const url = status
-      ? clientBookingsIndex.url({ query: { status } })
-      : clientBookingsIndex.url();
-
-    router.get(url, {}, { preserveState: true, replace: true });
-  };
-
-  const paymentLabel = (status?: string) => {
-    if (!status) return "Not created";
-    if (status === "paid") return "Paid";
-    if (status === "pending") return "Pending";
-    return status;
-  };
+  const { bookings, filters, flash } = props;
 
   return (
     <AppLayout>
-      <div className="p-4 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-primary">My Bookings</h1>
+      <Head title="Bookings" />
 
-        <div className="mt-3 p-2 border border-gray-200 rounded-3xl w-max flex items-center">
-          <label className="mr-2">Filter by status:</label>
-          <select value={filters.status} onChange={onStatusChange} className="border border-gray-300 rounded-3xl px-2 py-1 bg-background text-foreground">
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+      <div className="p-6 space-y-4">
+        <div>
+          <h1 className="text-xl font-semibold">My Bookings</h1>
+          <p className="text-sm text-gray-600">
+            Bookings come from: booking a service OR accepting an offer.
+          </p>
         </div>
 
-        <div className="mt-4">
+        {flash?.success ? (
+          <div className="rounded-md border p-3 text-sm bg-green-50">
+            {flash.success}
+          </div>
+        ) : null}
+
+        {/* Status filter */}
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={clientBookingsIndex.url()}
+            className={`px-3 py-1 rounded-md text-sm border ${
+              filters.status === "" ? "bg-black text-white" : "bg-white"
+            }`}
+          >
+            All
+          </Link>
+
+          {["pending", "confirmed", "in_progress", "completed", "cancelled"].map((s) => (
+            <Link
+              key={s}
+              href={clientBookingsIndex.url({ query: { status: s } })}
+              className={`px-3 py-1 rounded-md text-sm border ${
+                filters.status === s ? "bg-black text-white" : "bg-white"
+              }`}
+            >
+              {s}
+            </Link>
+          ))}
+        </div>
+
+        {/* List */}
+        <div className="space-y-3">
           {bookings.data.length === 0 ? (
-            <p>No bookings found.</p>
-          ) : (
-            <div className="overflow-x-auto bg-foreground/30 rounded-4xl p-4 border border-gray-200">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="text-left border-b border-gray-300 p-2">ID</th>
-                    <th className="text-left border-b border-gray-300 p-2">Provider</th>
-                    <th className="text-left border-b border-gray-300 p-2">Title</th>
-                    <th className="text-left border-b border-gray-300 p-2">Amount</th>
-                    <th className="text-left border-b border-gray-300 p-2">Booking</th>
-                    <th className="text-left border-b border-gray-300 p-2">Payment</th>
-                    <th className="text-left border-b border-gray-300 p-2">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {bookings.data.map((b) => {
-                    const title = b.offer?.request?.title || b.service?.title || "Booking";
-                    const payStatus = b.payment?.status;
-                    const showPay = b.status === "pending" && payStatus !== "paid";
-
-                    return (
-                      <tr key={b.id}>
-                        <td className="border-b border-gray-200 p-2">#{b.id}</td>
-
-                        <td className="border-b border-gray-200 p-2">
-                          {b.provider?.name ?? "-"}
-                        </td>
-
-                        <td className="border-b border-gray-200 p-2">{title}</td>
-
-                        <td className="border-b border-gray-200 p-2">
-                          {b.total_amount} {b.currency}
-                        </td>
-
-                        <td className="border-b border-gray-200 p-2">{b.status}</td>
-
-                        <td className="border-b border-gray-200 p-2">
-                          {paymentLabel(payStatus)}
-                        </td>
-
-                        <td className="border-b border-gray-200 w-max space-x-2 flex justify-center p-1 rounded-3xl">
-                          <Link href={clientBookingsShow.url(b.id)} className="text-primary hover:underline">
-                            <Eye/>
-                          </Link>
-
-                          {showPay && (
-                            <Link href={clientBookingsShow.url(b.id)} className="text-primary hover:underline">
-                              <CreditCard/>
-                            </Link>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="rounded-md border p-4 text-sm text-gray-600">
+              No bookings found.
             </div>
+          ) : (
+            bookings.data.map((b) => {
+              const fromService = b.source === "service";
+              const title = fromService
+                ? b.service?.title ?? "Service booking"
+                : b.offer?.request?.title ?? "Request booking";
+
+              return (
+                <div key={b.id} className="rounded-md border p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="font-medium">{title}</div>
+
+                      <div className="text-sm text-gray-600">
+                        Source: <span className="font-medium">{b.source}</span> • Status:{" "}
+                        <span className="font-medium">{b.status}</span>
+                      </div>
+
+                      <div className="text-sm text-gray-600">
+                        Total: <span className="font-medium">{b.total_amount}</span> {b.currency}
+                        {b.scheduled_at ? (
+                          <>
+                            {" "}
+                            • Scheduled: <span className="font-medium">{b.scheduled_at}</span>
+                          </>
+                        ) : null}
+                      </div>
+
+                      <div className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+                        {b.provider?.avatar_path ? (
+                          <img
+                            src={b.provider.avatar_path}
+                            alt={b.provider.name}
+                            className="w-7 h-7 rounded-full object-cover border"
+                          />
+                        ) : (
+                          <span className="w-7 h-7 rounded-full border bg-gray-100" />
+                        )}
+                        <span>
+                          Provider: <span className="font-medium">{b.provider?.name}</span>
+                        </span>
+                      </div>
+
+                      {/* Payment quick status */}
+                      <div className="text-xs text-gray-500 mt-2">
+                        Payment:{" "}
+                        {b.payment ? (
+                          <>
+                            <span className="font-medium">{b.payment.payment_type}</span> •{" "}
+                            <span className="font-medium">{b.payment.status}</span>
+                            {b.payment.payment_type === "cash" && b.payment.status === "pending" ? (
+                              <> (waiting provider confirm)</>
+                            ) : null}
+                          </>
+                        ) : (
+                          <span className="font-medium">not started</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action */}
+                    <div className="flex flex-col items-end gap-2">
+                      <span className="text-xs px-2 py-1 rounded border bg-gray-50">
+                        Booking #{b.id}
+                      </span>
+
+                      <Link
+                        href={clientBookingsShow.url(b.id)}
+                        className="rounded-md bg-black px-3 py-2 text-white text-sm"
+                      >
+                        Open
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Origin link */}
+                  <div className="mt-3 text-sm text-gray-700">
+                    {fromService && b.service?.slug ? (
+                      <Link className="underline" href={serviceShow.url(b.service.slug)}>
+                        View service
+                      </Link>
+                    ) : null}
+
+                    {!fromService ? (
+                      <span className="text-gray-500">(Created from request offer)</span>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
 
         {/* Pagination */}
-        {bookings.links && bookings.links.length > 0 && (
-          <div className="mt-4 flex gap-2 flex-wrap">
+        {bookings.links?.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2">
             {bookings.links.map((l, idx) => (
-              <button
+              <Link
                 key={idx}
-                disabled={!l.url}
-                onClick={() => l.url && router.visit(l.url)}
-                className={`px-2.5 py-1.5 border border-gray-300 bg-foreground rounded-3xl transition ${
-                  l.active ? "bg-foreground text-background" : "bg-white text-foreground"
-                } ${l.url ? "cursor-pointer bg-primary hover:bg-foreground hover:text-background" : "cursor-not-allowed opacity-50"}`}
+                href={l.url ?? ""}
+                preserveScroll
+                className={`px-3 py-1 rounded border text-sm ${
+                  l.active ? "bg-black text-white" : "bg-white"
+                } ${l.url === null ? "pointer-events-none opacity-40" : ""}`}
                 dangerouslySetInnerHTML={{ __html: l.label }}
               />
             ))}

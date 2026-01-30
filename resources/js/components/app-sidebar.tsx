@@ -7,6 +7,7 @@ import {
     Tags,
     Briefcase,
     BadgePercent,
+    BookUser,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -23,8 +24,13 @@ import {
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
 import { index as clientBookingsIndex } from "@/routes/client/bookings";
+import {index as requestsIndex} from "@/routes/client/my/requests"
 import { index as clientOffersIndex } from "@/routes/client/offers";
 import { edit as editProfile } from "@/routes/profile";
+import { index as providerBookingsIndex } from "@/routes/provider/bookings";
+import {
+    index as providerServicesIndex,
+} from "@/routes/provider/my/services";
 import { index as servicesIndex } from "@/routes/services";
 import { type NavItem, type SharedData } from "@/types";
 
@@ -52,6 +58,7 @@ const footerNavItems: NavItem[] = [
 const clientNavItems: NavItem[] = [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
     { title: "Browse Services", href: servicesIndex.url(), icon: Briefcase },
+    { title: "My Requests", href: requestsIndex.url(), icon: Briefcase },
     { title: "Offers", href: clientOffersIndex.url(), icon: BadgePercent },
     { title: "Bookings", href: clientBookingsIndex.url(), icon: BookOpen },
     { title: "Profile", href: editProfile(), icon: User },
@@ -61,8 +68,10 @@ const clientNavItems: NavItem[] = [
 // Provider nav
 // ----------------------------
 const providerNavItems: NavItem[] = [
-    { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+    { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
+    { title: "My Services", href: providerServicesIndex().url, icon: BookUser },
     { title: "Browse Requests", href: "/requests", icon: Briefcase },
+    { title: "Bookings", href: providerBookingsIndex.url(), icon: BookOpen },
     { title: "Profile", href: editProfile(), icon: User },
 ];
 

@@ -2,42 +2,35 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\FeeSetting;
-use App\Models\Category;
-use App\Models\City;
-use App\Models\Service;
-use App\Models\ServiceMedia;
-
-use App\Models\ProviderProfile;
-use App\Models\ProviderVerification;
-
-use App\Models\Request as JobRequest; // IMPORTANT: your model name may be Request, but we alias it to avoid Illuminate\Http\Request
-use App\Models\RequestMedia;
-
-use App\Models\Offer;
-use App\Models\Chat;
-use App\Models\Message;
-
 use App\Models\Booking;
+use App\Models\Category;
+use App\Models\Chat;
+use App\Models\City;
+use App\Models\Dispute;
+use App\Models\FeeSetting;
+use App\Models\Message; // ✅ changed (was ProviderProfile)
+use App\Models\Offer;
 use App\Models\Payment;
 use App\Models\Payout;
-
-use App\Models\Review;
-use App\Models\Dispute;
+use App\Models\Profile;
+use App\Models\ProviderVerification;
 use App\Models\Report;
-
+use App\Models\Request as JobRequest;
+use App\Models\RequestMedia;
+use App\Models\Review;
+use App\Models\Service;
+use App\Models\ServiceMedia;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class InitialSeeder extends Seeder
 {
     public function run(): void
     {
         // ----------------------------
-        // 1) Users
+        // 1) Users (+ avatar_path)
         // ----------------------------
         $admin = User::firstOrCreate(
             ['email' => 'admin@dzservices.test'],
@@ -46,6 +39,7 @@ class InitialSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'status' => 'active',
+                'avatar_path' => '/storage/seed/avatars/admin.jpg',
             ]
         );
 
@@ -56,6 +50,7 @@ class InitialSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'client',
                 'status' => 'active',
+                'avatar_path' => '/storage/seed/avatars/client1.jpg',
             ]
         );
 
@@ -66,6 +61,7 @@ class InitialSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'client',
                 'status' => 'active',
+                'avatar_path' => '/storage/seed/avatars/client2.jpg',
             ]
         );
 
@@ -76,6 +72,7 @@ class InitialSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'provider',
                 'status' => 'active',
+                'avatar_path' => '/storage/seed/avatars/provider1.jpg',
             ]
         );
 
@@ -86,6 +83,7 @@ class InitialSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'provider',
                 'status' => 'active',
+                'avatar_path' => '/storage/seed/avatars/provider2.jpg',
             ]
         );
 
@@ -95,7 +93,8 @@ class InitialSeeder extends Seeder
                 'name' => 'Demo Provider 3',
                 'password' => Hash::make('password'),
                 'role' => 'provider',
-                'status' => 'active',
+                'status' => 'inactive', // ✅ test inactive provider
+                'avatar_path' => '/storage/seed/avatars/provider3.jpg',
             ]
         );
 
@@ -156,17 +155,70 @@ class InitialSeeder extends Seeder
         }
 
         // ----------------------------
-        // 5) Provider Profiles
+        // 5) Profiles (for ALL users)
         // ----------------------------
+        $someCities = City::inRandomOrder()->take(10)->pluck('id')->toArray();
+
+        // admin profile
+        Profile::updateOrCreate(
+            ['user_id' => $admin->id],
+            [
+                'phone' => '+213000000001',
+                'city_id' => $someCities[0] ?? null,
+                'address' => 'Algeria',
+                'bio' => 'Admin profile',
+                'company_name' => null,
+                'website' => null,
+                'verified_at' => null,
+                'rating_avg' => 0,
+                'rating_count' => 0,
+            ]
+        );
+
+        // client profiles
+        Profile::updateOrCreate(
+            ['user_id' => $client1->id],
+            [
+                'phone' => '+213000000101',
+                'city_id' => $someCities[1] ?? null,
+                'address' => 'Client Address 1',
+                'bio' => 'Client profile 1 for testing.',
+                'company_name' => null,
+                'website' => null,
+                'verified_at' => null,
+                'rating_avg' => 0,
+                'rating_count' => 0,
+            ]
+        );
+
+        Profile::updateOrCreate(
+            ['user_id' => $client2->id],
+            [
+                'phone' => '+213000000102',
+                'city_id' => $someCities[2] ?? null,
+                'address' => 'Client Address 2',
+                'bio' => 'Client profile 2 for testing.',
+                'company_name' => null,
+                'website' => null,
+                'verified_at' => null,
+                'rating_avg' => 0,
+                'rating_count' => 0,
+            ]
+        );
+
+        // provider profiles
         $providers = [$provider1, $provider2, $provider3];
 
         foreach ($providers as $idx => $p) {
-            ProviderProfile::updateOrCreate(
+            Profile::updateOrCreate(
                 ['user_id' => $p->id],
                 [
-                    'bio' => "Demo provider bio (#" . ($idx + 1) . "). Available for professional work across multiple wilayas.",
+                    'phone' => '+21300000020'.($idx + 1),
+                    'city_id' => $someCities[3 + $idx] ?? null,
                     'address' => 'Algeria',
-                    'company_name' => 'Demo Company ' . ($idx + 1),
+                    'bio' => 'Demo provider bio (#'.($idx + 1).').',
+                    'company_name' => 'Demo Company '.($idx + 1),
+                    'website' => 'https://example.com/provider-'.($idx + 1),
                     'verified_at' => $idx === 0 ? now() : null,
                     'rating_avg' => $idx === 0 ? 4.6 : 0,
                     'rating_count' => $idx === 0 ? 12 : 0,
@@ -191,49 +243,45 @@ class InitialSeeder extends Seeder
         );
 
         // ----------------------------
-        // 7) Demo Services + Service Media
+        // 7) Demo Services + Service Media (MORE + multiple statuses + multiple media)
         // ----------------------------
-        $someCities = City::inRandomOrder()->take(8)->pluck('id')->toArray();
-        $someCategories = Category::inRandomOrder()->take(10)->pluck('id')->toArray();
+        $someCategories = Category::inRandomOrder()->take(12)->pluck('id')->toArray();
 
         $demoServices = [
-            ['Plumbing repair and installation', 'fixed', 'cash'],
-            ['House deep cleaning service', 'fixed', 'online'],
-            ['Electrical wiring and fixes', 'hourly', 'both'],
-            ['AC installation and maintenance', 'quote', 'cash'],
-            ['Phone screen repair', 'fixed', 'online'],
-            ['Laptop formatting and cleanup', 'fixed', 'cash'],
-            ['Car diagnostics and repair', 'hourly', 'cash'],
-            ['Professional wall painting', 'quote', 'both'],
-            ['CCTV installation', 'fixed', 'online'],
-            ['Moving and transport service', 'quote', 'cash'],
-            ['Garden cleaning and trimming', 'hourly', 'cash'],
-            ['Web development landing page', 'fixed', 'online'],
+            ['Plumbing repair and installation', 'fixed', 'cash', 'approved'],
+            ['House deep cleaning service', 'fixed', 'online', 'approved'],
+            ['Electrical wiring and fixes', 'hourly', 'both', 'pending'],
+            ['AC installation and maintenance', 'quote', 'cash', 'approved'],
+            ['Phone screen repair', 'fixed', 'online', 'rejected'],
+            ['Laptop formatting and cleanup', 'fixed', 'cash', 'approved'],
+            ['Car diagnostics and repair', 'hourly', 'cash', 'approved'],
+            ['Professional wall painting', 'quote', 'both', 'pending'],
+            ['CCTV installation', 'fixed', 'online', 'approved'],
+            ['Moving and transport service', 'quote', 'cash', 'approved'],
+            ['Garden cleaning and trimming', 'hourly', 'cash', 'approved'],
+            ['Web development landing page', 'fixed', 'online', 'approved'],
+            // extra
+            ['Pest control service', 'fixed', 'cash', 'approved'],
+            ['Private math lessons', 'hourly', 'cash', 'approved'],
+            ['Graphic design logo pack', 'fixed', 'online', 'approved'],
+            ['Digital marketing for Instagram', 'quote', 'online', 'pending'],
         ];
 
+        // put ANY images with these names inside /public/storage/seed/services/
         $serviceImageFiles = [
-            'service-01-plumbing-repair-and-installation.jpg',
-            'service-02-house-deep-cleaning-service.jpg',
-            'service-03-electrical-wiring-and-fixes.jpg',
-            'service-04-ac-installation-and-maintenance.jpg',
-            'service-05-phone-screen-repair.jpg',
-            'service-06-laptop-formatting-and-cleanup.jpg',
-            'service-07-car-diagnostics-and-repair.jpg',
-            'service-08-professional-wall-painting.jpg',
-            'service-09-cctv-installation.jpg',
-            'service-10-moving-and-transport-service.jpg',
-            'service-11-garden-cleaning-and-trimming.jpg',
-            'service-12-web-development-landing-page.jpg',
+            'service-01.jpg', 'service-02.jpg', 'service-03.jpg', 'service-04.jpg',
+            'service-05.jpg', 'service-06.jpg', 'service-07.jpg', 'service-08.jpg',
+            'service-09.jpg', 'service-10.jpg', 'service-11.jpg', 'service-12.jpg',
         ];
 
         $createdServices = [];
 
-        foreach ($demoServices as $i => [$title, $pricingType, $paymentType]) {
+        foreach ($demoServices as $i => [$title, $pricingType, $paymentType, $status]) {
             $provider = $providers[$i % count($providers)];
             $categoryId = $someCategories[$i % count($someCategories)];
             $cityId = $someCities[$i % count($someCities)];
 
-            $slug = Str::slug($title) . '-' . ($i + 1);
+            $slug = Str::slug($title).'-'.($i + 1);
 
             $service = Service::updateOrCreate(
                 ['slug' => $slug],
@@ -242,46 +290,58 @@ class InitialSeeder extends Seeder
                     'category_id' => $categoryId,
                     'city_id' => $cityId,
                     'title' => $title,
-                    'description' => 'Demo service created by seeder for testing the home page and services pages.',
+                    'description' => 'Demo service created by seeder for testing.',
                     'base_price' => 1500 + ($i * 250),
                     'pricing_type' => $pricingType,
-                    'payment_type' => $paymentType, // <-- new column in services
-                    'status' => 'approved',
+                    'payment_type' => $paymentType,
+                    'status' => $status,
                 ]
             );
 
             $createdServices[] = $service;
 
-            // cover image
-            $imageFile = $serviceImageFiles[$i] ?? $serviceImageFiles[$i % count($serviceImageFiles)];
+            // Add 3 images per service
+            for ($pos = 0; $pos < 3; $pos++) {
+                $img = $serviceImageFiles[($i + $pos) % count($serviceImageFiles)];
 
-            ServiceMedia::updateOrCreate(
-                [
-                    'service_id' => $service->id,
-                    'position' => 0,
-                ],
-                [
-                    'path' => "/storage/seed/services/{$imageFile}",
-                    'type' => 'image',
-                    'position' => 0,
-                ]
-            );
+                ServiceMedia::updateOrCreate(
+                    [
+                        'service_id' => $service->id,
+                        'position' => $pos,
+                    ],
+                    [
+                        'path' => "/storage/seed/services/{$img}",
+                        'type' => 'image',
+                        'position' => $pos,
+                    ]
+                );
+            }
         }
 
         // ----------------------------
-        // 8) Requests + Request Media
+        // 8) Requests + Request Media (MORE + multiple statuses + multiple media)
         // ----------------------------
-        $requestTitles = [
-            'Need a plumber urgently',
-            'Looking for home deep cleaning',
-            'Need electrician for new lights',
-            'AC maintenance before summer',
-            'Need a web landing page quickly',
+        $requestSeeds = [
+            ['Need a plumber urgently', 'open'],
+            ['Looking for home deep cleaning', 'open'],
+            ['Need electrician for new lights', 'in_discussion'],
+            ['AC maintenance before summer', 'assigned'],
+            ['Need a web landing page quickly', 'open'],
+            ['Painting my apartment (2 rooms)', 'open'],
+            ['Fix my phone screen today', 'closed'],
+            ['Install CCTV for small shop', 'open'],
+            ['Garden cleanup this weekend', 'cancelled'],
+            ['Need car diagnostics', 'open'],
+        ];
+
+        // put ANY images with these names inside /public/storage/seed/requests/
+        $requestImageFiles = [
+            'request-01.jpg', 'request-02.jpg', 'request-03.jpg', 'request-04.jpg', 'request-05.jpg',
         ];
 
         $createdRequests = [];
 
-        foreach ($requestTitles as $i => $title) {
+        foreach ($requestSeeds as $i => [$title, $status]) {
             $client = ($i % 2 === 0) ? $client1 : $client2;
 
             $categoryId = $someCategories[$i % count($someCategories)];
@@ -296,63 +356,82 @@ class InitialSeeder extends Seeder
                     'category_id' => $categoryId,
                     'city_id' => $cityId,
                     'description' => 'Demo request created by seeder for testing requests + offers + chats.',
-                    'budget_min' => 2000,
-                    'budget_max' => 9000,
+                    'budget_min' => 2000 + ($i * 200),
+                    'budget_max' => 9000 + ($i * 300),
                     'urgency' => ['low', 'medium', 'high'][$i % 3],
-                    'status' => 'open',
-                    'visibility' => 'providers_only',
+                    'status' => $status,
                     'expires_at' => now()->addDays(7 + $i),
                 ]
             );
 
             $createdRequests[] = $req;
 
-            // add 1 media for first 3 requests
-            if ($i < 3) {
+            // add 2 images per request
+            for ($pos = 0; $pos < 2; $pos++) {
+                $img = $requestImageFiles[($i + $pos) % count($requestImageFiles)];
+
                 RequestMedia::updateOrCreate(
                     [
                         'request_id' => $req->id,
-                        'position' => 0,
+                        'position' => $pos,
                     ],
                     [
-                        'path' => "/storage/seed/services/" . $serviceImageFiles[$i], // reuse demo images
+                        'path' => "/storage/seed/requests/{$img}",
                         'type' => 'image',
-                        'position' => 0,
+                        'position' => $pos,
                     ]
                 );
             }
         }
 
         // ----------------------------
-        // 9) Offers
+        // 9) Offers (MORE + multiple statuses)
         // ----------------------------
         $createdOffers = [];
 
+        $offerStatusPool = ['sent', 'rejected', 'assigned'];
+
         foreach ($createdRequests as $i => $req) {
-            $provider = $providers[$i % count($providers)];
+            // create 2 offers per request (provider1 + provider2)
+            for ($k = 0; $k < 2; $k++) {
+                $provider = $providers[$k];
 
-            $offer = Offer::updateOrCreate(
-                [
-                    'request_id' => $req->id,
-                    'provider_id' => $provider->id,
-                ],
-                [
-                    'message' => 'Hello! I can help with this request. Here is my offer (demo seed).',
-                    'proposed_price' => 3500 + ($i * 400),
-                    'estimated_days' => 1 + ($i % 5),
-                    'status' => 'sent',
-                ]
-            );
+                $status = $req->status === 'open'
+                    ? 'sent'
+                    : $offerStatusPool[($i + $k) % count($offerStatusPool)];
 
-            $createdOffers[] = $offer;
+                $offer = Offer::updateOrCreate(
+                    [
+                        'request_id' => $req->id,
+                        'provider_id' => $provider->id,
+                    ],
+                    [
+                        'message' => 'Hello! I can help with this request. (seed)',
+                        'proposed_price' => 3500 + ($i * 400) + ($k * 300),
+                        'estimated_days' => 1 + (($i + $k) % 5),
+                        'status' => $status,
+                    ]
+                );
+
+                $createdOffers[] = $offer;
+            }
+        }
+
+        // ensure at least one assigned offer + assigned request (to test booking from offer)
+        if (! empty($createdOffers)) {
+            $specialOffer = $createdOffers[0];
+            $specialOffer->update(['status' => 'assigned']);
+
+            $specialReq = JobRequest::findOrFail($specialOffer->request_id);
+            $specialReq->update(['status' => 'assigned']);
         }
 
         // ----------------------------
-        // 10) Chats + Messages (service chats + request chats)
+        // 10) Chats + Messages
         // ----------------------------
         $createdChats = [];
 
-        // Service chats (client1 talks with providers on some services)
+        // Service chats
         for ($i = 0; $i < min(4, count($createdServices)); $i++) {
             $service = $createdServices[$i];
 
@@ -399,17 +478,18 @@ class InitialSeeder extends Seeder
         }
 
         // Request chats (client + provider about offer)
-        foreach ($createdOffers as $i => $offer) {
-            $req = $createdRequests[$i];
-            $providerId = $offer->provider_id;
-            $clientId = $req->client_id;
+        foreach (array_slice($createdOffers, 0, 6) as $offer) {
+            $req = JobRequest::find($offer->request_id);
+            if (! $req) {
+                continue;
+            }
 
             $chat = Chat::updateOrCreate(
                 [
                     'type' => 'request',
                     'request_id' => $req->id,
-                    'client_id' => $clientId,
-                    'provider_id' => $providerId,
+                    'client_id' => $req->client_id,
+                    'provider_id' => $offer->provider_id,
                 ],
                 [
                     'service_id' => null,
@@ -422,7 +502,7 @@ class InitialSeeder extends Seeder
             Message::updateOrCreate(
                 [
                     'chat_id' => $chat->id,
-                    'sender_id' => $clientId,
+                    'sender_id' => $req->client_id,
                     'body' => 'Thanks for the offer. Can you start tomorrow?',
                 ],
                 [
@@ -434,7 +514,7 @@ class InitialSeeder extends Seeder
             Message::updateOrCreate(
                 [
                     'chat_id' => $chat->id,
-                    'sender_id' => $providerId,
+                    'sender_id' => $offer->provider_id,
                     'body' => 'Yes, I can start tomorrow. I’ll confirm once you accept.',
                 ],
                 [
@@ -447,54 +527,52 @@ class InitialSeeder extends Seeder
         }
 
         // ----------------------------
-        // 11) Bookings (from service + from accepted offer)
+        // 11) Bookings (ALL cases)
         // ----------------------------
         $createdBookings = [];
 
-        // booking from service (client1 -> provider on service #1)
-        if (!empty($createdServices)) {
-            $service = $createdServices[0];
+        // A) pending booking from assigned offer (to test Week 3 payment)
+        $assignedOffer = Offer::where('status', 'assigned')->first();
+        if ($assignedOffer) {
+            $req = JobRequest::find($assignedOffer->request_id);
+
+            $booking = Booking::updateOrCreate(
+                [
+                    'source' => 'request_offer',
+                    'offer_id' => $assignedOffer->id,
+                    'client_id' => $req?->client_id,
+                    'provider_id' => $assignedOffer->provider_id,
+                ],
+                [
+                    'service_id' => null,
+                    'scheduled_at' => null,
+                    'status' => 'pending',
+                    'total_amount' => $assignedOffer->proposed_price,
+                    'currency' => 'DZD',
+                ]
+            );
+
+            $createdBookings[] = $booking;
+        }
+
+        // B) bookings from services with different statuses
+        $bookingStatusPool = ['confirmed', 'completed', 'cancelled'];
+
+        foreach (array_slice($createdServices, 0, 6) as $i => $service) {
+            $client = ($i % 2 === 0) ? $client1 : $client2;
 
             $booking = Booking::updateOrCreate(
                 [
                     'source' => 'service',
                     'service_id' => $service->id,
-                    'client_id' => $client1->id,
+                    'client_id' => $client->id,
                     'provider_id' => $service->provider_id,
                 ],
                 [
                     'offer_id' => null,
-                    'scheduled_at' => now()->addDays(2),
-                    'status' => 'completed',
-                    'total_amount' => 5000,
-                    'currency' => 'DZD',
-                ]
-            );
-
-            $createdBookings[] = $booking;
-        }
-
-        // booking from offer (client2 accepts offer #2 for request #2)
-        if (count($createdOffers) >= 2) {
-            $offer = $createdOffers[1];
-            $req = $createdRequests[1];
-
-            // mark offer accepted (demo)
-            $offer->update(['status' => 'accepted']);
-            $req->update(['status' => 'assigned']);
-
-            $booking = Booking::updateOrCreate(
-                [
-                    'source' => 'request_offer',
-                    'offer_id' => $offer->id,
-                    'client_id' => $req->client_id,
-                    'provider_id' => $offer->provider_id,
-                ],
-                [
-                    'service_id' => null,
-                    'scheduled_at' => now()->addDays(3),
-                    'status' => 'confirmed',
-                    'total_amount' => $offer->proposed_price,
+                    'scheduled_at' => now()->addDays($i + 1),
+                    'status' => $bookingStatusPool[$i % count($bookingStatusPool)],
+                    'total_amount' => 4500 + ($i * 350),
                     'currency' => 'DZD',
                 ]
             );
@@ -503,7 +581,7 @@ class InitialSeeder extends Seeder
         }
 
         // ----------------------------
-        // 12) Payments (for bookings)
+        // 12) Payments (pending + paid)
         // ----------------------------
         $fee = FeeSetting::where('active', true)->first();
         $commissionRate = $fee ? (float) $fee->commission_rate : 0.07;
@@ -513,59 +591,71 @@ class InitialSeeder extends Seeder
             $platformFee = round($amount * $commissionRate, 2);
             $providerAmount = round($amount - $platformFee, 2);
 
+            // make some online, some cash
             $paymentType = ($i % 2 === 0) ? 'online' : 'cash';
 
+            // pending for pending booking + some cash pending example
+            $status = 'paid';
+            if ($booking->status === 'pending') {
+                $status = 'pending';
+            }
+            if ($paymentType === 'cash' && $booking->status === 'confirmed') {
+                $status = 'pending';
+            }
+
             Payment::updateOrCreate(
-                [
-                    'booking_id' => $booking->id,
-                ],
+                ['booking_id' => $booking->id],
                 [
                     'payer_id' => $booking->client_id,
-                    'payment_type' => $paymentType, // payments table field
-                    'online_provider' => $paymentType === 'online' ? 'stripe' : null,
+                    'payment_type' => $paymentType,
+                    'online_provider' => $paymentType === 'online' ? 'fake' : null,
                     'amount' => $amount,
                     'platform_fee' => $platformFee,
                     'provider_amount' => $providerAmount,
-                    'status' => $paymentType === 'online' ? 'paid' : 'pending',
-                    'paid_at' => $paymentType === 'online' ? now()->subDay() : null,
-                    'metadata' => json_encode(['seed' => true]),
+                    'status' => $status,
+                    'paid_at' => $status === 'paid' ? now()->subDay() : null,
+                    'metadata' => [
+                        'seed' => true,
+                        'phone' => '+000000000',
+                        'code' => '000000',
+                    ],
                 ]
             );
 
             // ----------------------------
-            // 13) Payouts (only for paid & completed bookings)
+            // 13) Payouts (pending + sent)
             // ----------------------------
-            if ($paymentType === 'online' && $booking->status === 'completed') {
+            if ($status === 'paid' && $paymentType === 'online') {
+                $payoutStatus = ($booking->status === 'completed') ? 'sent' : 'pending';
+
                 Payout::updateOrCreate(
                     [
                         'provider_id' => $booking->provider_id,
                         'amount' => $providerAmount,
                     ],
                     [
-                        'status' => 'sent',
-                        'sent_at' => now()->subHours(6),
-                        'method' => 'bank_transfer',
-                        'metadata' => json_encode(['seed' => true, 'booking_id' => $booking->id]),
+                        'status' => $payoutStatus,
+                        'sent_at' => $payoutStatus === 'sent' ? now()->subHours(6) : null,
+                        'method' => $payoutStatus === 'sent' ? 'bank_transfer' : null,
+                        'metadata' => ['seed' => true, 'booking_id' => $booking->id],
                     ]
                 );
             }
         }
 
         // ----------------------------
-        // 14) Reviews (for completed booking)
+        // 14) Reviews (example for completed booking)
         // ----------------------------
-        if (!empty($createdBookings) && !empty($createdServices)) {
-            $booking = $createdBookings[0];
-            $service = $createdServices[0];
-
+        $completed = Booking::where('status', 'completed')->first();
+        if ($completed) {
             Review::updateOrCreate(
                 [
-                    'booking_id' => $booking->id,
-                    'client_id' => $booking->client_id,
-                    'provider_id' => $booking->provider_id,
+                    'booking_id' => $completed->id,
+                    'client_id' => $completed->client_id,
+                    'provider_id' => $completed->provider_id,
                 ],
                 [
-                    'service_id' => $service->id,
+                    'service_id' => $completed->service_id,
                     'rating' => 5,
                     'comment' => 'Great service! Fast and professional. (seed demo)',
                     'status' => 'published',
@@ -576,17 +666,16 @@ class InitialSeeder extends Seeder
         // ----------------------------
         // 15) Disputes (example)
         // ----------------------------
-        if (count($createdBookings) >= 2) {
-            $booking = $createdBookings[1];
-
+        $anyBooking = Booking::first();
+        if ($anyBooking) {
             Dispute::updateOrCreate(
                 [
-                    'booking_id' => $booking->id,
-                    'opened_by' => $booking->client_id,
+                    'booking_id' => $anyBooking->id,
+                    'opened_by' => $anyBooking->client_id,
                 ],
                 [
                     'reason' => 'Scheduling issue',
-                    'description' => 'Provider asked to reschedule multiple times (seed demo).',
+                    'description' => 'Seed dispute example.',
                     'status' => 'open',
                     'resolution_note' => null,
                     'resolved_by' => null,
@@ -597,8 +686,8 @@ class InitialSeeder extends Seeder
         // ----------------------------
         // 16) Reports (example)
         // ----------------------------
-        if (!empty($createdServices)) {
-            $service = $createdServices[2] ?? $createdServices[0];
+        if (! empty($createdServices)) {
+            $service = $createdServices[0];
 
             Report::updateOrCreate(
                 [
@@ -611,25 +700,6 @@ class InitialSeeder extends Seeder
                     'status' => 'open',
                 ]
             );
-        }
-
-        if (!empty($createdChats)) {
-            $chat = $createdChats[0];
-            $msg = Message::where('chat_id', $chat->id)->first();
-
-            if ($msg) {
-                Report::updateOrCreate(
-                    [
-                        'reporter_id' => $client1->id,
-                        'target_type' => 'message',
-                        'target_id' => $msg->id,
-                    ],
-                    [
-                        'reason' => 'Spam / suspicious',
-                        'status' => 'open',
-                    ]
-                );
-            }
         }
     }
 }

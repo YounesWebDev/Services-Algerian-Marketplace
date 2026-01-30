@@ -11,6 +11,7 @@ class Offer extends Model
 
     protected $fillable = [
         'request_id',
+        'provider_id',
         'message',
         'proposed_price',
         'estimated_days',

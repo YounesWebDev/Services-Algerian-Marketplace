@@ -2,9 +2,20 @@ import { router, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
 // shadcn/ui
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import AppLayout from "@/layouts/app-layout";
+import { cn } from "@/lib/utils";
 import { SharedData } from "@/types";
 
 // Utility to convert storage paths to accessible URLs
@@ -23,6 +34,14 @@ function getCoverImage(service: Service): string {
   const first = service.media[0];
 
   return toStorageUrl(first.path);
+}
+
+function getInitials(name?: string | null) {
+  if (!name) return "U";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+  return (first + last).toUpperCase() || "U";
 }
 
 type ServiceMedia = {
@@ -88,6 +107,81 @@ type Props = {
   cities: City[];
   filters: Filters;
 };
+
+function renderPagination(links: PaginationLink[]) {
+  if (!links?.length) {
+    return null;
+  }
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        {links.map((link, idx) => {
+          const labelText = link.label
+            .replace(/&laquo;|&raquo;/g, "")
+            .replace(/&hellip;/g, "...")
+            .replace(/&nbsp;/g, " ")
+            .trim();
+
+          const lowerLabel = labelText.toLowerCase();
+          const isPrev = lowerLabel.includes("previous");
+          const isNext = lowerLabel.includes("next");
+          const isEllipsis = labelText === "..." || labelText === "…";
+
+          if (isEllipsis) {
+            return (
+              <PaginationItem key={`ellipsis-${idx}`}>
+                <PaginationEllipsis />
+              </PaginationItem>
+            );
+          }
+
+          if (!link.url) {
+            return (
+              <PaginationItem key={`disabled-${idx}`}>
+                <span
+                  className={cn(
+                    buttonVariants({
+                      variant: "outline",
+                      size: isPrev || isNext ? "default" : "icon",
+                    }),
+                    "pointer-events-none opacity-50",
+                  )}
+                >
+                  {isPrev ? "Previous" : isNext ? "Next" : labelText}
+                </span>
+              </PaginationItem>
+            );
+          }
+
+          if (isPrev) {
+            return (
+              <PaginationItem key={`prev-${idx}`}>
+                <PaginationPrevious href={link.url} preserveScroll />
+              </PaginationItem>
+            );
+          }
+
+          if (isNext) {
+            return (
+              <PaginationItem key={`next-${idx}`}>
+                <PaginationNext href={link.url} preserveScroll />
+              </PaginationItem>
+            );
+          }
+
+          return (
+            <PaginationItem key={`${link.url}-${idx}`}>
+              <PaginationLink href={link.url} preserveScroll isActive={link.active}>
+                {labelText}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        })}
+      </PaginationContent>
+    </Pagination>
+  );
+}
 
 export default function Index({ services, categories, cities, filters }: Props) {
   // Local UI state (start with filters coming from backend)
@@ -181,17 +275,17 @@ export default function Index({ services, categories, cities, filters }: Props) 
           if (user?.role === "provider" || user?.role === "admin") return;
           router.get(`/services/${s.slug}`);
         }}
-        className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden 
+        className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden p-0
              hover:shadow-xl transition-all duration-300 bg-primary-foreground/30 
              hover:bg-primary-foreground/40 text-foreground"
       >
         {/* cover Image only if exists */}
        {cover ? (
-                                       <div className="w-full h-44 overflow-hidden rounded-t-3xl ">
+                                       <div className="w-full h-44 overflow-hidden rounded-t-4xl">
                                            <img
                                                src={cover}
                                                alt={s.title}
-                                               className=" block w-full h-full object-cover m-0 hover:scale-105 transition-transform duration-300"
+                                               className="block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                                loading="lazy"
                                            />
                                        </div>
@@ -203,20 +297,22 @@ export default function Index({ services, categories, cities, filters }: Props) 
        
                                        <div className="flex justify-between items-center">
                                            <div className="flex gap-2 items-center">
-                                               {s.provider?.avatar_path && (
-                                                   <img
-                                                       src={toStorageUrl(s.provider.avatar_path)}
-                                                       alt={s.provider?.name}
-                                                       className="w-8 h-8 rounded-full object-cover"
+                                               <Avatar className="size-8">
+                                                   <AvatarImage
+                                                       src={s.provider?.avatar_path ? toStorageUrl(s.provider.avatar_path) : ""}
+                                                       alt={s.provider?.name ?? "Provider"}
                                                    />
-                                               )}
+                                                   <AvatarFallback>
+                                                       {getInitials(s.provider?.name)}
+                                                   </AvatarFallback>
+                                               </Avatar>
                                                <div className="text-sm">{s.provider?.name}</div>
                                            </div>
-                                           <span className="text-xs text-foreground">Payment: {s.payment_type}</span>
+                                           <span className="text-xs text-muted-foreground">Payment: {s.payment_type}</span>
                                        </div>
        
                                        <div className="mt-auto">
-                                           <span className="text-sm text-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
+                                           <span className="text-sm text-muted-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-foreground transition duration-300">
                                                {s.pricing_type}{s.base_price ? ` - ${s.base_price} DZD` : ""}
                                            </span>
                                        </div>
@@ -234,29 +330,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
       </div>
 
       {/* Pagination */}
-      {services.links?.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {services.links.map((l, idx) => (
-            <button
-            key={`${l.url ?? "null"}-${idx}`}
-            type="button"
-            disabled={!l.url}
-            onClick={() =>
-                l.url && router.get(l.url, {}, { preserveState: true })
-              }
-              className={[
-                "px-3 py-1.5 text-sm border rounded-md",
-                l.active
-                ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted",
-                  !l.url ? "opacity-50 cursor-not-allowed" : "",
-                ].join(" ")}
-                // Laravel labels can be "&laquo;" etc
-              dangerouslySetInnerHTML={{ __html: l.label }}
-            />
-          ))}
-        </div>
-      )}
+      {services.links?.length > 0 && renderPagination(services.links)}
     </div>
   </AppLayout>
   ) : (
@@ -329,17 +403,17 @@ export default function Index({ services, categories, cities, filters }: Props) 
           if (user?.role === "provider" || user?.role === "admin") return;
           router.get(`/services/${s.slug}`);
         }}
-        className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden 
+        className="flex flex-col text-left border rounded-4xl h-70 overflow-hidden p-0
              hover:shadow-xl transition-all duration-300 bg-primary-foreground/30 
              hover:bg-primary-foreground/40 text-foreground"
       >
         {/* cover Image only if exists */}
        {cover ? (
-                                       <div className="w-full h-44 overflow-hidden rounded-t-3xl ">
+                                       <div className="w-full h-44 overflow-hidden rounded-t-4xl">
                                            <img
                                                src={cover}
                                                alt={s.title}
-                                               className=" block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                               className="block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                                loading="lazy"
                                            />
                                        </div>
@@ -351,20 +425,22 @@ export default function Index({ services, categories, cities, filters }: Props) 
        
                                        <div className="flex justify-between items-center">
                                            <div className="flex gap-2 items-center">
-                                               {s.provider?.avatar_path && (
-                                                   <img
-                                                       src={toStorageUrl(s.provider.avatar_path)}
-                                                       alt={s.provider?.name}
-                                                       className="w-8 h-8 rounded-full object-cover"
+                                               <Avatar className="size-8">
+                                                   <AvatarImage
+                                                       src={s.provider?.avatar_path ? toStorageUrl(s.provider.avatar_path) : ""}
+                                                       alt={s.provider?.name ?? "Provider"}
                                                    />
-                                               )}
+                                                   <AvatarFallback>
+                                                       {getInitials(s.provider?.name)}
+                                                   </AvatarFallback>
+                                               </Avatar>
                                                <div className="text-sm">{s.provider?.name}</div>
                                            </div>
-                                           <span className="text-xs text-foreground">Payment: {s.payment_type}</span>
+                                           <span className="text-xs text-muted-foreground">Payment: {s.payment_type}</span>
                                        </div>
        
                                        <div className="mt-auto">
-                                           <span className="text-sm text-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-background hover:bg-foreground transition duration-300">
+                                           <span className="text-sm text-muted-foreground border border-gray-200 rounded-full px-3 py-1 bg-white/20 backdrop-blur-sm hover:text-foreground transition duration-300">
                                                {s.pricing_type}{s.base_price ? ` - ${s.base_price} DZD` : ""}
                                            </span>
                                        </div>
@@ -384,29 +460,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
 
 
       {/* Pagination */}
-      {services.links?.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {services.links.map((l, idx) => (
-            <button
-            key={`${l.url ?? "null"}-${idx}`}
-            type="button"
-            disabled={!l.url}
-            onClick={() =>
-                l.url && router.get(l.url, {}, { preserveState: true })
-              }
-              className={[
-                "px-3 py-1.5 text-sm border rounded-md",
-                l.active
-                ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted",
-                  !l.url ? "opacity-50 cursor-not-allowed" : "",
-                ].join(" ")}
-                // Laravel labels can be "&laquo;" etc
-              dangerouslySetInnerHTML={{ __html: l.label }}
-            />
-          ))}
-        </div>
-      )}
+      {services.links?.length > 0 && renderPagination(services.links)}
     </div>
   );
 }
