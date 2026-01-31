@@ -25,6 +25,11 @@
     MessageCircleMore,
     Flag,
     ShieldHalf,
+    House,
+    GitPullRequest,
+    SquareAsterisk,
+    UsersRound,
+    Info,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
 
@@ -237,19 +242,15 @@ import { dashboard, login, register } from "@/routes";
                     <Link className="hover:text-primary    p-1 transition" href="/">
                         Home
                     </Link>
-                    {user?.role === "provider" || auth?.user=== null ? (
+                    {user?.role === "provider"  ? (
                         <Link className="hover:text-primary    p-1 transition" href="/requests">
                             Requests
                         </Link>
-                    ) : user?.role ==="admin" ? (
+                    ) : user?.role === "admin" ? (
                         <Link className="hover:text-primary    p-1 transition" href="/admin/reports">
                             Reports
                         </Link>
-                    ) : (
-                        <Link className="hover:text-primary    p-1 transition" href="/bookings">
-                            My Bookings
-                        </Link>
-                    )}
+                    ) : null}
                     {user?.role === "provider" ? (
                         <Link className="hover:text-primary    p-1 transition" href="/services/my">
                             My Services
@@ -261,6 +262,11 @@ import { dashboard, login, register } from "@/routes";
                     ) : (
                         <Link className="hover:text-primary     p-1 transition" href="/services">
                             Services
+                        </Link>
+                    )}
+                    { !user && (
+                        <Link className="hover:text-primary    p-1 transition" href="/about">
+                            About
                         </Link>
                     )}
                     
@@ -291,43 +297,59 @@ import { dashboard, login, register } from "@/routes";
                             {user ? (
                                 <Link
                                 href={dashboard()}
-                                className="inline-block rounded-full border text-white font-bold border-[#19140035] px-5 py-1.5 transition-all hover:backdrop-blur-sm text-sm leading-normal  hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] hover:bg-green-500  "
+                                className="inline-block rounded-full border text-white font-bold border-[#19140035] px-5 py-1.5 transitio hover:bg-white hover:text-black duration-700 "
                                 >
                                     <p className="font-bold text-white">Dashboard</p>
                                 </Link>
                             ):(
                                 <>
-                                    <Link
+                                   <div className="flex justify-center gap-3"> <Link
                                         href={login()}
-                                        className="inline-block font-bold rounded-sm border border-[#19140035]  transition-all w-max hover:backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-white hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                        className="flex justify-center items-center font-bold rounded-3xl border border-gray-200   bg-white/30 backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-white hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
                                     >
                                         <p className="font-bold ">Log in</p>
                                     </Link>
                                         {canRegister && (
                                             <Link
                                             href={register()}
-                                            className="inline-block font-bold rounded-sm border border-[#19140035] p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm text-white hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                            className="inline-block font-bold rounded-3xl border bg-white text-black p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm hover:border-[#1915014a]  dark:hover:border-[#62605b]"
                                             >
                                                <p className="font-bold ">Register</p>
-                                            </Link>
-                                        )}
+                                            </Link>)}</div>
+                                        
                                 </>
                             )}
-                        <div>
-                            <Link className="hover:text-primary hover:border hover:border-primary  hover:rounded-full p-1 transition" href="/">
-                            <span className="font-bold ">Home</span>
-                            </Link>
-                        </div>
-                        <div>
-                            <Link className="hover:text-white hover:border hover:border-primary hover:rounded-full p-1 transition" href="/requests">
-                            Requests
-                            </Link>
-                        </div>
-                        <div>
-                            <Link className="hover:text-primary text-white hover:border hover:border-primary  hover:rounded-full p-1 transition" href="/services">
-                            Services
-                            </Link>
-                        </div>
+                            <Link className=" flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 " href="/">
+                          <House/> Home
+                    </Link>
+                    {user?.role === "provider"  ? (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/requests">
+                          <GitPullRequest/>  Requests
+                        </Link>
+                    ) : user?.role === "admin" ? (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/admin/reports">
+                           <Flag/> Reports
+                        </Link>
+                    ) : null}
+                    {user?.role === "provider" ? (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/services/my">
+                           <SquareAsterisk/> My Services
+                        </Link>
+                    ) : user?.role ==="admin" ? (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/admin/users">
+                            <UsersRound/> Users
+                        </Link>
+                    ) : (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/services">
+                           <SquareAsterisk/> Services
+                        </Link>
+                    )}
+                    { !user && (
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 transition" href="/about">
+                           <Info/> About
+                        </Link>
+                    )}
+                       
                         </div>
                     </div>
             )}
@@ -338,7 +360,7 @@ import { dashboard, login, register } from "@/routes";
                     {user ? (
                         <Link
                             href={dashboard()}
-                            className="inline-block rounded-full border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b] transition duration-300 hover:bg-green-400"
+                            className="inline-block rounded-full transition duration-700 p-2 border border-gray-200 hover:bg-primary"
                             >
                             Dashboard
                         </Link>
