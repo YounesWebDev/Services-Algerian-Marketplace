@@ -87,6 +87,16 @@ export default function ClientBookingShow() {
   }
 
   const canPay = booking.status === "pending" || booking.status === "confirmed";
+  const canCancel = booking.status === "pending" || booking.status === "confirmed";
+
+  const cancelForm = useForm({});
+
+  function submitCancel(e: React.FormEvent) {
+    e.preventDefault();
+    cancelForm.post(`/bookings/${booking.id}/cancel`, {
+      preserveScroll: true,
+    });
+  }
 
   return (
     <AppLayout>
@@ -114,6 +124,12 @@ export default function ClientBookingShow() {
         {errors?.payment ? (
           <div className="rounded-md border p-3 text-sm bg-red-50 text-red-700">
             {errors.payment}
+          </div>
+        ) : null}
+
+        {errors?.booking ? (
+          <div className="rounded-md border p-3 text-sm bg-red-50 text-red-700">
+            {errors.booking}
           </div>
         ) : null}
 
@@ -171,6 +187,25 @@ export default function ClientBookingShow() {
                 </>
               ) : null}
             </div>
+          </div>
+        ) : null}
+
+        {/* Cancel booking */}
+        {canCancel ? (
+          <div className="rounded-md border p-4">
+            <div className="font-medium">Cancel booking</div>
+            <p className="text-sm text-gray-600 mt-1">
+              You can cancel while the booking is pending or confirmed.
+            </p>
+            <form onSubmit={submitCancel} className="mt-3">
+              <button
+                type="submit"
+                disabled={cancelForm.processing}
+                className="rounded-md bg-red-600 px-4 py-2 text-white text-sm disabled:opacity-60"
+              >
+                {cancelForm.processing ? "Cancelling..." : "Cancel Booking"}
+              </button>
+            </form>
           </div>
         ) : null}
 

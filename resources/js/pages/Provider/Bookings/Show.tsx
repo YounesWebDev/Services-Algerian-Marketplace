@@ -37,6 +37,13 @@ type BookingItem = {
   payment?: Payment | null;
 };
 
+function getAllowedNextStatuses(current: string): string[] {
+  if (current === "pending") return ["confirmed", "cancelled"];
+  if (current === "confirmed") return ["in_progress", "cancelled"];
+  if (current === "in_progress") return ["completed"];
+  return [];
+}
+
 export default function ProviderBookingShow() {
   const { props } = usePage<{
     booking: BookingItem;
@@ -56,11 +63,25 @@ export default function ProviderBookingShow() {
     booking.payment.payment_type === "cash" &&
     booking.payment.status === "pending";
 
-  const confirmForm = useForm({});
+  // Cash confirm form
+  const confirmCashForm = useForm({});
 
   function confirmCash(e: React.FormEvent) {
     e.preventDefault();
-    confirmForm.post(confirmCashPayment.url(booking.id), {
+    confirmCashForm.post(confirmCashPayment.url(booking.id), {
+      preserveScroll: true,
+    });
+  }
+
+  // Status update form
+  const allowed = getAllowedNextStatuses(booking.status);
+  const statusForm = useForm<{ status: string }>({
+    status: allowed[0] ?? "",
+  });
+
+  function updateStatus(e: React.FormEvent) {
+    e.preventDefault();
+    statusForm.post(`/my/bookings/${booking.id}/status`, {
       preserveScroll: true,
     });
   }
@@ -91,6 +112,12 @@ export default function ProviderBookingShow() {
         {errors?.payment ? (
           <div className="rounded-md border p-3 text-sm bg-red-50 text-red-700">
             {errors.payment}
+          </div>
+        ) : null}
+
+        {errors?.status ? (
+          <div className="rounded-md border p-3 text-sm bg-red-50 text-red-700">
+            {errors.status}
           </div>
         ) : null}
 
@@ -135,6 +162,45 @@ export default function ProviderBookingShow() {
           ) : null}
         </div>
 
+        {/* ✅ Status update section */}
+        <div className="rounded-md border p-4">
+          <div className="font-medium">Booking status</div>
+          <p className="text-sm text-gray-600 mt-1">
+            Follow the workflow: pending → confirmed → in_progress → completed (or cancel).
+          </p>
+
+          {allowed.length === 0 ? (
+            <div className="text-sm text-gray-600 mt-3">
+              No status actions available (already {booking.status}).
+            </div>
+          ) : (
+            <form onSubmit={updateStatus} className="mt-3 flex flex-col md:flex-row gap-3 md:items-end">
+              <div className="flex-1">
+                <label className="block text-sm font-medium">Next status</label>
+                <select
+                  className="mt-1 w-full rounded-md border p-2"
+                  value={statusForm.data.status}
+                  onChange={(e) => statusForm.setData("status", e.target.value)}
+                >
+                  {allowed.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                disabled={statusForm.processing || !statusForm.data.status}
+                className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
+              >
+                {statusForm.processing ? "Updating..." : "Update Status"}
+              </button>
+            </form>
+          )}
+        </div>
+
         {/* Payment info */}
         <div className="rounded-md border p-4 space-y-2">
           <div className="font-medium">Payment</div>
@@ -177,7 +243,7 @@ export default function ProviderBookingShow() {
           )}
         </div>
 
-        {/* Confirm cash */}
+        {/* ✅ Confirm cash */}
         {cashNeedsConfirm ? (
           <div className="rounded-md border p-4">
             <div className="font-medium">Confirm cash received</div>
@@ -188,10 +254,10 @@ export default function ProviderBookingShow() {
             <form onSubmit={confirmCash} className="mt-3">
               <button
                 type="submit"
-                disabled={confirmForm.processing}
+                disabled={confirmCashForm.processing}
                 className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
               >
-                {confirmForm.processing ? "Confirming..." : "Confirm Cash Payment"}
+                {confirmCashForm.processing ? "Confirming..." : "Confirm Cash Payment"}
               </button>
             </form>
           </div>

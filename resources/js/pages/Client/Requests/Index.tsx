@@ -164,7 +164,15 @@ export default function ClientRequestsIndex() {
           ) : (
             requests.data.map((r) => (
               <div key={r.id} className="rounded-md border p-4">
-                <div className="font-medium">{r.title}</div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-medium">{r.title}</div>
+                  <Link
+                    href={`/my/requests/${r.id}`}
+                    className="text-sm underline"
+                  >
+                    View
+                  </Link>
+                </div>
                 <div className="text-sm text-gray-600 mt-1">
                   {r.category?.name} - {r.city?.name}
                 </div>

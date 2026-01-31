@@ -99,4 +99,39 @@ class MyRequestController extends Controller
 
         return redirect()->route('client.my.requests.index');
     }
+
+    public function show(Request $httpRequest, JobRequest $request)
+    {
+        $user = $httpRequest->user();
+        // only owner can view their request
+        if($request->client_id !== $user->id){
+            abort(403);
+        }
+
+        $request->load([
+            'category:id,name,slug',
+            'city:id,name',
+            'media:id,request_id,path,type,position',
+        ]);
+
+        // offers for this request
+        $offers = $request->offers()
+        ->with(['provider:id,name,avatar_path'])
+        ->latest()
+        ->get([
+            'id',
+            'request_id',
+            'provider_id',
+            'message',
+            'proposed_price',
+            'estimated_days',
+            'status',
+            'created_at',
+        ]);
+
+        return Inertia::render('Client/Requests/Show' , [
+            'request' => $request,
+            'offers' => $offers,
+        ]);
+    }
 }

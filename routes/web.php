@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified', 'role:provider'])
         Route::get('/my/bookings' , [ProviderBookingController::class , 'index'])->name('bookings.index');
         Route::get('/my/bookings/{booking}',[ProviderBookingController::class , 'show'])->name('bookings.show');
         Route::post('/my/bookings/{booking}/cash/confirm',[ProviderBookingController::class,'confirmCash'])->name('bookings.cash.confirm');
+        Route::post('/my/bookings/{booking}/status', [ProviderBookingController::class, 'updateStatus'])->name('bookings.status');
         // offers
         Route::post('/requests/{request}/offers', SendOfferController::class)->name('requests.offers.store');
     });
@@ -66,6 +67,7 @@ Route::middleware(['auth', 'verified', 'role:client'])
 
         // Requests
         Route::get('/my/requests', [MyRequestController::class, 'index'])->name('my.requests.index');
+        Route::get('/my/requests/{request}', [MyRequestController::class, 'show'])->name('my.requests.show');
         Route::get('/requests/create', [MyRequestController::class, 'create'])->name('my.requests.create');
         Route::post('/requests', [MyRequestController::class, 'store'])->name('my.requests.store');
 
@@ -76,8 +78,8 @@ Route::middleware(['auth', 'verified', 'role:client'])
         // Bookings
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/services/{service:slug}/book', [BookingController::class , 'storeFromService'])
-    ->name('services.book');
+        Route::post('/services/{service:slug}/book', [BookingController::class , 'storeFromService'])->name('services.book');
+        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 
         
 

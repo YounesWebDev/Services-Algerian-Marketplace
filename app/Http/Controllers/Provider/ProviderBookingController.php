@@ -61,8 +61,66 @@ class ProviderBookingController extends Controller
         ]);
     }
 
-    // provider confirms cash payment
+    // provider pudates booking status
+    // allowed transition : pending -> confirmed or cancelled       confirmed -> in progress or cancelled    in progress -> completed
+    public function updateStatus(Request $request , Booking $booking){
+        $user = $request->user();
 
+        // only booking provider 
+        if($booking->provider_id !== $user->id){
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'status' => ['required' , 'in:confirmed,in_progress,completed,cancelled'],
+        ]);
+
+        $newStatus = $data['status'];
+        $current = $booking->status;
+
+        // Allowed transitions
+        $allowed = [
+            'pending' => ['confirmed' , 'cancelled'],
+            'confirmed' => ['in_progress' , 'cancelled'],
+            'in_progress' => ['completed'],
+            'completed' => [],
+            'cancelled' => [],
+        ];
+
+        if(!isset($allowed[$current]) || !in_array($newStatus , $allowed[$current] , true)){
+            return back()->withErrors([
+                'status' => "You can't change status from {$current} to {$newStatus}",
+            ]);
+        }
+
+        if ($newStatus === 'in_progress') {
+            $payment = Payment::where('booking_id', $booking->id)->first();
+
+            if (! $payment || $payment->status !== 'paid') {
+                return back()->withErrors([
+                    'status' => 'Booking cannot start until the client completes payment.',
+                ]);
+            }
+        }
+
+        $booking->update([
+            'status' => $newStatus,
+        ]);
+
+        if ($newStatus === 'cancelled' && $booking->source === 'request_offer') {
+            $booking->loadMissing(['offer.request']);
+
+            if ($booking->offer?->request) {
+                $booking->offer->request->update([
+                    'status' => 'open',
+                ]);
+            }
+        }
+
+        return back()->with('success' , 'Booking status updated');
+    }
+
+    // provider confirms cash payment
     public function confirmCash(Request $request , Booking $booking){
         $user = $request->user();
 

@@ -266,5 +266,41 @@ class BookingController extends Controller
                 ->route('client.bookings.show' , $booking->id)
                 ->with('success' , 'Payment confirmed successfully');
     }
-}
 
+    public function cancel(Request $request, Booking $booking)
+    {
+        $user = $request->user();
+
+        if ($booking->client_id !== $user->id) {
+            abort(403);
+        }
+
+        if (in_array($booking->status, ['in_progress', 'completed', 'cancelled'], true)) {
+            return back()->withErrors([
+                'booking' => 'This booking cannot be cancelled in its current status.',
+            ]);
+        }
+
+        $booking->update([
+            'status' => 'cancelled',
+        ]);
+
+        if ($booking->source === 'request_offer') {
+            $booking->loadMissing(['offer.request']);
+
+            if ($booking->offer) {
+                $booking->offer->update([
+                    'status' => 'rejected',
+                ]);
+            }
+
+            if ($booking->offer?->request) {
+                $booking->offer->request->update([
+                    'status' => 'open',
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Booking cancelled successfully.');
+    }
+}

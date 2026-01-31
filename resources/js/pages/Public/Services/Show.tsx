@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { login } from "@/routes";
+import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { index as servicesIndex } from "@/routes/services";
 import { SharedData } from "@/types";
 
@@ -54,7 +55,17 @@ export default function Show({ service }: { service: Service }) {
   return (
     <div className="mx-auto max-w-4xl px-6 py-10 space-y-6">
       {/* Back */}
-      <Button variant="outline" onClick={() => router.get(servicesIndex.url())} className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
+      <Button
+        variant="outline"
+        onClick={() =>
+          router.get(
+            user?.role === "provider"
+              ? providerServicesIndex.url()
+              : servicesIndex.url(),
+          )
+        }
+        className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl"
+      >
         ← Back to Services
       </Button>
 
@@ -213,7 +224,17 @@ export default function Show({ service }: { service: Service }) {
           Contact provider
         </Button>
 
-        <Button variant="outline" onClick={() => router.get(servicesIndex.url())}  className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl">
+        <Button
+          variant="outline"
+          onClick={() =>
+            router.get(
+              user?.role === "provider"
+                ? providerServicesIndex.url()
+                : servicesIndex.url(),
+            )
+          }
+          className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl"
+        >
           Browse more
         </Button>
       </div>
