@@ -3,6 +3,7 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import AppLayout from "@/layouts/app-layout";
 import { index as myRequestsIndex } from "@/routes/client/my/requests";
 import { accept as clientOffersAccept } from "@/routes/client/offers";
+import { show as profileShow } from "@/routes/profiles";
 
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
@@ -183,6 +184,14 @@ export default function ClientRequestShow() {
                             <span className="w-7 h-7 rounded-full border bg-gray-100" />
                           )}
                           <div className="font-medium">{o.provider?.name ?? "Provider"}</div>
+                          {o.provider ? (
+                            <Link
+                              href={profileShow(o.provider.id).url}
+                              className="text-xs underline"
+                            >
+                              View profile
+                            </Link>
+                          ) : null}
                           <span className="text-xs px-2 py-1 rounded border bg-gray-50">
                             {o.status}
                           </span>

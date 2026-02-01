@@ -4,6 +4,7 @@ import React, { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { login } from "@/routes";
+import { show as profileShow } from "@/routes/profiles";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { index as servicesIndex } from "@/routes/services";
 import { SharedData } from "@/types";
@@ -71,14 +72,26 @@ export default function Show({ service }: { service: Service }) {
 
       {/* Title */}
       <div className="space-y-2">
-        {service.provider?.name && (
-            <span className="text-4xl px-2 py-1">
-              {service.provider?.avatar_path && (
-                                         <img src={service.provider.avatar_path} alt={service.provider?.name} className="w-8 h-8 rounded-full object-cover" />
-                                     )}
-               {service.provider.name}
-            </span>
-          )}
+        {service.provider?.name ? (
+          <div className="flex items-center gap-3">
+            {service.provider.avatar_path ? (
+              <img
+                src={service.provider.avatar_path}
+                alt={service.provider.name}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : null}
+            <span className="text-4xl px-2 py-1">{service.provider.name}</span>
+            {service.provider.id ? (
+              <Link
+                href={profileShow(service.provider.id).url}
+                className="text-sm underline"
+              >
+                View profile
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
         <h1 className="text-2xl font-bold">{service.title}</h1>
 
         <div className="text-sm text-muted-foreground flex flex-wrap gap-2">

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\Service;
@@ -83,8 +82,7 @@ class ServicesController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-            $services->getCollection()->load('provider:id,name,avatar_path');
-
+        $services->getCollection()->load('provider:id,name,avatar_path');
 
         return Inertia::render('Public/Services/Index', [
             'services' => $services,
@@ -109,7 +107,7 @@ class ServicesController extends Controller
             'media' => fn ($q) => $q->orderBy('position'),
             'category:id,name,slug',
             'city:id,name',
-            'provider:id,name',
+            'provider:id,name,avatar_path',
         ]);
 
         return Inertia::render('Public/Services/Show', [

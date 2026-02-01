@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import { show as profileShow } from "@/routes/profiles";
 import { index as providerRequestsIndex } from "@/routes/provider/requests";
 import { store as providerRequestsOffersStore } from "@/routes/provider/requests/offers";
 
@@ -113,6 +114,11 @@ export default function ProviderRequestsShow() {
               )}
               <span className="font-medium">{r.client?.name}</span>
             </span>
+            {r.client ? (
+              <Link href={profileShow(r.client.id).url} className="text-xs underline">
+                View profile
+              </Link>
+            ) : null}
           </div>
         </div>
 

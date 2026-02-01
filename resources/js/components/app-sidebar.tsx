@@ -3,7 +3,7 @@ import {
     BookOpen,
     Folder,
     LayoutGrid,
-    User,
+    User as userIcon,
     Tags,
     Briefcase,
     BadgePercent,
@@ -26,13 +26,13 @@ import { dashboard } from "@/routes";
 import { index as clientBookingsIndex } from "@/routes/client/bookings";
 import {index as requestsIndex} from "@/routes/client/my/requests"
 import { index as clientOffersIndex } from "@/routes/client/offers";
-import { edit as editProfile } from "@/routes/profile";
+import { show as profileShow } from "@/routes/profiles";
 import { index as providerBookingsIndex } from "@/routes/provider/bookings";
 import {
     index as providerServicesIndex,
 } from "@/routes/provider/my/services";
 import { index as servicesIndex } from "@/routes/services";
-import { type NavItem, type SharedData } from "@/types";
+import { type NavItem, type SharedData, type User } from "@/types";
 
 import AppLogo from "./app-logo";
 
@@ -55,24 +55,24 @@ const footerNavItems: NavItem[] = [
 // ----------------------------
 // Client nav
 // ----------------------------
-const clientNavItems: NavItem[] = [
+const clientNavItems = (user: User): NavItem[] => [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
     { title: "Browse Services", href: servicesIndex.url(), icon: Briefcase },
     { title: "My Requests", href: requestsIndex.url(), icon: Briefcase },
     { title: "Offers", href: clientOffersIndex.url(), icon: BadgePercent },
     { title: "Bookings", href: clientBookingsIndex.url(), icon: BookOpen },
-    { title: "Profile", href: editProfile(), icon: User },
+    { title: "Profile", href: profileShow(user.id).url, icon: userIcon },
 ];
 
 // ----------------------------
 // Provider nav
 // ----------------------------
-const providerNavItems: NavItem[] = [
+const providerNavItems = (user: User): NavItem[] => [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
     { title: "My Services", href: providerServicesIndex().url, icon: BookUser },
     { title: "Browse Requests", href: "/requests", icon: Briefcase },
     { title: "Bookings", href: providerBookingsIndex.url(), icon: BookOpen },
-    { title: "Profile", href: editProfile(), icon: User },
+    { title: "Profile", href: profileShow(user.id).url, icon: userIcon },
 ];
 
 // ----------------------------
@@ -87,21 +87,23 @@ const adminNavItems: NavItem[] = [
 // Helper: pick menu by role
 // role is unknown in your types, so we convert safely.
 // ----------------------------
-function getNavItems(role: unknown): NavItem[] {
-    const r = typeof role === "string" ? role : undefined;
+function getNavItems(user: User | undefined): NavItem[] {
+    if (!user) return [];
+
+    const r = typeof user.role === "string" ? user.role : undefined;
 
     if (r === "admin") return adminNavItems;
-    if (r === "provider") return providerNavItems;
+    if (r === "provider") return providerNavItems(user);
 
   // default to client
-    return clientNavItems;
+    return clientNavItems(user);
 }
 
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
     const user = auth?.user;
 
-    const mainNavItems = getNavItems(user?.role);
+    const mainNavItems = getNavItems(user);
 
     const logoHref = dashboard();
 
