@@ -5,6 +5,7 @@ use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\MyRequestController;
 use App\Http\Controllers\Client\OfferController;
+use App\Http\Controllers\Client\ProviderDirectoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Provider\MyServicesController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Provider\SendOfferController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Provider\ProviderVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -36,9 +38,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
  * ✅ Provider: Requests (NO /provider prefix)
  * /requests
  */
-Route::middleware(['auth', 'verified', 'role:provider'])
+Route::middleware(['auth', 'verified', 'role:provider', 'provider.verified'])
     ->name('provider.')
     ->group(function () {
+        // Verification
+        Route::get('/provider/verification', [ProviderVerificationController::class, 'show'])->name('verification.show');
+        Route::post('/provider/verification', [ProviderVerificationController::class, 'store'])->name('verification.store');
         // Services
         Route::get('/my/services', [MyServicesController::class, 'index'])->name('my.services.index');
         Route::get('/services/create', [MyServicesController::class, 'create'])->name('my.services.create');
@@ -72,6 +77,9 @@ Route::middleware(['auth', 'verified', 'role:client'])
         Route::get('/my/requests/{request}', [MyRequestController::class, 'show'])->name('my.requests.show');
         Route::get('/requests/create', [MyRequestController::class, 'create'])->name('my.requests.create');
         Route::post('/requests', [MyRequestController::class, 'store'])->name('my.requests.store');
+
+        // providers
+        Route::get('/providers', [ProviderDirectoryController::class, 'index'])->name('providers.index');
 
         // Offers
         Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');

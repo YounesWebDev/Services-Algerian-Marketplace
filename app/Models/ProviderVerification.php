@@ -10,9 +10,12 @@ class ProviderVerification extends Model
     use HasFactory;
 
     protected $fillable = [
+        'provider_id',
         'doc_type',
         'doc_number',
         'doc_path',
+        'status',
+        'reviewed_by',
     ];
 
     public function provider(){

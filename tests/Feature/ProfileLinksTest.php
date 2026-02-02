@@ -2,6 +2,7 @@
 
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Profile;
 use App\Models\Request as JobRequest;
 use App\Models\Service;
 use App\Models\User;
@@ -45,6 +46,11 @@ test('service show includes provider id for profile link', function () {
 test('provider request show includes client id for profile link', function () {
     $provider = User::factory()->create(['role' => 'provider']);
     $client = User::factory()->create(['role' => 'client']);
+
+    Profile::create([
+        'user_id' => $provider->id,
+        'verified_at' => now(),
+    ]);
 
     $category = Category::create([
         'name' => 'Cleaning',
