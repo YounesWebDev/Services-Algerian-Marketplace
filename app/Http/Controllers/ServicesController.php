@@ -108,6 +108,11 @@ class ServicesController extends Controller
             'category:id,name,slug',
             'city:id,name',
             'provider:id,name,avatar_path',
+            'reviews' => function ($q) {
+                $q->where('status', 'published')
+                    ->latest()
+                    ->with('client:id,name,avatar_path');
+            },
         ]);
 
         return Inertia::render('Public/Services/Show', [

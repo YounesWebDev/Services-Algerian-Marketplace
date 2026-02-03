@@ -17,39 +17,39 @@ class BookingController extends Controller
     {
         $user = $request->user();
 
-        $status = (string) $request->query('status' , '');
+        $status = (string) $request->query('status', '');
 
         $query = Booking::query()
-                    ->where('client_id' , $user->id)
-                    ->with([
-                        'provider:id,name,avatar_path',
-                        'offer:id,request_id,proposed_price,status',
-                        'offer.request:id,title',
-                        'service:id,title,slug',
-                        'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at',
-                    ])
-                    ->latest();
+            ->where('client_id', $user->id)
+            ->with([
+                'provider:id,name,avatar_path',
+                'offer:id,request_id,proposed_price,status',
+                'offer.request:id,title',
+                'service:id,title,slug',
+                'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at',
+            ])
+            ->latest();
 
-        if($status !== ''){
-            $query->where('status',$status);
+        if ($status !== '') {
+            $query->where('status', $status);
         }
 
         $bookings = $query->paginate(15)->withQueryString();
 
-        return Inertia::render('Client/Bookings/Index',[
+        return Inertia::render('Client/Bookings/Index', [
             'bookings' => $bookings,
             'filters' => [
                 'status' => $status,
-            ]
+            ],
         ]);
     }
 
-    public function show(Request $request , Booking $booking)
+    public function show(Request $request, Booking $booking)
     {
         $user = $request->user();
 
         // only owner client
-        if($booking->client_id !== $user->id){
+        if ($booking->client_id !== $user->id) {
             abort(403);
         }
 
@@ -57,18 +57,19 @@ class BookingController extends Controller
             'provider:id,name,avatar_path',
             'offer:id,request_id,proposed_price,status',
             'offer.request:id,title',
+            'review:id,booking_id,rating,comment,created_at',
             'service:id,title,slug',
             'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at,metadata',
         ]);
 
-        // fee settings for showing calculated values 
-        $fee = FeeSetting::query()->where('active' , 1)->latest()->first();
+        // fee settings for showing calculated values
+        $fee = FeeSetting::query()->where('active', 1)->latest()->first();
 
-        return Inertia::render('Client/Bookings/Show',[
+        return Inertia::render('Client/Bookings/Show', [
             'booking' => $booking,
             'fee' => $fee ? [
                 'commission_rate' => (string) $fee->commission_rate,
-                'fixed_fee' => $fee->fixed_fee !== null ? (string) $fee->fixed_fee : null ,
+                'fixed_fee' => $fee->fixed_fee !== null ? (string) $fee->fixed_fee : null,
             ] : null,
         ]);
     }
@@ -107,20 +108,20 @@ class BookingController extends Controller
             ->with('success', 'Booking created.');
     }
 
-    // client chooses payment type: 
+    // client chooses payment type:
     //     online => create pending payment and ask for OTP(000000) ON confirm
     //     cash create pending payment but provider must confirm later
-    public function payment(Request $request , Booking $booking)
+    public function payment(Request $request, Booking $booking)
     {
         $user = $request->user();
 
-        // only owner client 
-        if($booking->client_id !== $user->id){
+        // only owner client
+        if ($booking->client_id !== $user->id) {
             abort(403);
         }
 
-        //only pending/confirmed bookings can be paid 
-        if(!in_array($booking->status,['pending' , 'confirmed'] , true)) {
+        // only pending/confirmed bookings can be paid
+        if (! in_array($booking->status, ['pending', 'confirmed'], true)) {
             return back()->withErrors([
                 'payment' => 'This booking cannot be paid in its current status',
             ]);
@@ -141,13 +142,13 @@ class BookingController extends Controller
         ]);
 
         // if online , require the card fields
-        if($data['payment_type'] === 'online'){
-            if(
+        if ($data['payment_type'] === 'online') {
+            if (
                 empty($data['card_number']) ||
                 empty($data['expiry_month']) ||
                 empty($data['expiry_year']) ||
                 empty($data['cvc'])
-            ){
+            ) {
                 return back()->withErrors([
                     'payment' => 'All fields are required',
                 ])->withInput();
@@ -160,11 +161,14 @@ class BookingController extends Controller
 
         $amount = (float) $booking->total_amount;
         $platformFee = round(($amount * $commission) + $fixed, 2);
-        if ($platformFee < 0) $platformFee = 0;
+        if ($platformFee < 0) {
+            $platformFee = 0;
+        }
 
         $providerAmount = round($amount - $platformFee, 2);
-        if ($providerAmount < 0) $providerAmount = 0;
-
+        if ($providerAmount < 0) {
+            $providerAmount = 0;
+        }
 
         DB::transaction(function () use ($booking, $data, $amount, $platformFee, $providerAmount): void {
             // one payment per booking
@@ -176,7 +180,7 @@ class BookingController extends Controller
 
             $metadata = [];
 
-            if($data['payment_type'] === 'online'){
+            if ($data['payment_type'] === 'online') {
                 $metadata = [
                     'card_number' => $data['card_number'],
                     'expiry_month' => $data['expiry_month'],
@@ -184,7 +188,7 @@ class BookingController extends Controller
                     'cvc' => $data['cvc'],
                     'phone' => '+0000000000',
                 ];
-            }else{
+            } else {
                 $metadata = [
                     'cash_note' => 'Waiting provider confirmation',
                 ];
@@ -205,48 +209,48 @@ class BookingController extends Controller
         });
 
         // if online => go to confirm step (OTP screen)
-        //if cash => just show message
-        if($data['payment_type'] !== 'online'){
+        // if cash => just show message
+        if ($data['payment_type'] !== 'online') {
             return redirect()
-                    ->route('client.bookings.show', $booking->id)
-                    ->with('success' , 'confirmation code sent to +0000000000 . Enter it to confirm');
+                ->route('client.bookings.show', $booking->id)
+                ->with('success', 'confirmation code sent to +0000000000 . Enter it to confirm');
         }
 
         return redirect()
-                ->route('client.bookings.show', $booking->id)
-                ->with('success' , 'Waiting for provider to confirm cash payment.');
+            ->route('client.bookings.show', $booking->id)
+            ->with('success', 'Waiting for provider to confirm cash payment.');
     }
 
-    // online otp confirm 
+    // online otp confirm
     // otp always : 000000
 
-    public function confirmPayment(Request $request , Booking $booking)
+    public function confirmPayment(Request $request, Booking $booking)
     {
         $user = $request->user();
 
-        if($booking->client_id !== $user->id){
+        if ($booking->client_id !== $user->id) {
             abort(403);
         }
 
         $data = $request->validate([
-            'otp' => ['required' , 'string', 'size:6'],
+            'otp' => ['required', 'string', 'size:6'],
         ]);
 
         $payment = Payment::where('booking_id', $booking->id)->first();
 
-        if(!$payment){
+        if (! $payment) {
             return back()->withErrors([
                 'payment' => 'Payment not found for this booking',
             ]);
         }
-        
-        if($payment->payment_type !== 'online'){
+
+        if ($payment->payment_type !== 'online') {
             return back()->withErrors([
                 'payment' => 'This booking is not using online payment',
             ]);
         }
 
-        if($data['otp'] !== '000000'){
+        if ($data['otp'] !== '000000') {
             return back()->withErrors([
                 'otp' => 'Invalid code',
             ])->withInput();
@@ -258,13 +262,13 @@ class BookingController extends Controller
         ]);
 
         // auto confirm booking after successful online payment
-        if($booking->status === 'pending'){
+        if ($booking->status === 'pending') {
             $booking->update(['status' => 'confirmed']);
         }
 
         return redirect()
-                ->route('client.bookings.show' , $booking->id)
-                ->with('success' , 'Payment confirmed successfully');
+            ->route('client.bookings.show', $booking->id)
+            ->with('success', 'Payment confirmed successfully');
     }
 
     public function cancel(Request $request, Booking $booking)

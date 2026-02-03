@@ -2,7 +2,9 @@ import { Link, router, useForm, usePage } from "@inertiajs/react";
 import { Clock, CreditCard, Handshake, Pin } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/routes";
 import { show as profileShow } from "@/routes/profiles";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
@@ -14,6 +16,14 @@ type ServiceMedia = {
   path: string;
   type: string;
   position: number;
+};
+
+type Review = {
+  id: number;
+  rating: number | null;
+  comment: string | null;
+  created_at?: string | null;
+  client?: { id: number; name: string; avatar_path: string | null };
 };
 
 type Service = {
@@ -29,13 +39,39 @@ type Service = {
   category?: { id: number; name: string; slug: string };
   city?: { id: number; name: string };
   provider?: { id: number; name: string; avatar_path?: string };
+  reviews?: Review[];
 };
+
+const publicImagePath = (path?: string | null) => {
+  if (!path) return "";
+  if (path.startsWith("http") || path.startsWith("/")) return path;
+  return `/storage/${path}`;
+};
+
+function Stars({ value }: { value: number }) {
+  const full = Math.max(0, Math.min(5, Math.round(value)));
+  return (
+    <span className="font-mono text-sm">
+      {"★".repeat(full)}
+      {"☆".repeat(5 - full)}
+    </span>
+  );
+}
 
 export default function Show({ service }: { service: Service }) {
   const images = useMemo(() => service.media ?? [], [service.media]);
   const [active, setActive] = useState(0);
   const { auth } = usePage<SharedData>().props;
   const user = auth?.user ?? null;
+  const reviews = service.reviews ?? [];
+  const ratingsOnly = reviews.filter(
+    (r) => r.rating !== null && r.rating !== undefined
+  );
+  const avg =
+    ratingsOnly.length > 0
+      ? ratingsOnly.reduce((sum, r) => sum + Number(r.rating), 0) /
+        ratingsOnly.length
+      : null;
 
   const bookingForm = useForm<{ scheduled_at: string }>({
     scheduled_at: "",
@@ -251,6 +287,89 @@ export default function Show({ service }: { service: Service }) {
           Browse more
         </Button>
       </div>
+
+      {/* Reviews */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle>Reviews</CardTitle>
+
+            <div className="text-sm text-muted-foreground">
+              {avg !== null ? (
+                <div className="flex items-center gap-2">
+                  <Stars value={avg} />
+                  <span>{avg.toFixed(1)} / 5</span>
+                  <span>({ratingsOnly.length})</span>
+                </div>
+              ) : (
+                <span>No ratings yet</span>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {reviews.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No reviews yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((r) => {
+                const avatarUrl = publicImagePath(r.client?.avatar_path ?? null);
+                const initials =
+                  (r.client?.name ?? "U")
+                    .split(" ")
+                    .slice(0, 2)
+                    .map((x) => x[0]?.toUpperCase())
+                    .join("") || "U";
+
+                return (
+                  <div
+                    key={r.id}
+                    className="flex gap-3 border-b pb-4 last:border-b-0 last:pb-0"
+                  >
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        src={avatarUrl}
+                        alt={r.client?.name ?? "Client"}
+                      />
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="font-medium truncate">
+                          {r.client?.name ?? "Client"}
+                        </div>
+
+                        <div className="text-sm text-muted-foreground">
+                          {r.rating !== null && r.rating !== undefined ? (
+                            <div className="flex items-center gap-2">
+                              <Stars value={Number(r.rating)} />
+                              <span>{Number(r.rating)}/5</span>
+                            </div>
+                          ) : (
+                            <span>Comment</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {r.comment ? (
+                        <p className="text-sm text-muted-foreground whitespace-pre-line">
+                          {r.comment}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">
+                          No comment.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

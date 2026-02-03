@@ -1,21 +1,22 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\MyRequestController;
 use App\Http\Controllers\Client\OfferController;
 use App\Http\Controllers\Client\ProviderDirectoryController;
+use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Provider\MyServicesController;
 use App\Http\Controllers\Provider\ProviderBookingController;
+use App\Http\Controllers\Provider\ProviderVerificationController;
 use App\Http\Controllers\Provider\SendOfferController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\ProfileController;
-use App\Http\Controllers\Provider\ProviderVerificationController;
-use App\Http\Controllers\Admin\AdminVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -95,6 +96,12 @@ Route::middleware(['auth', 'verified', 'role:client'])
         // Payments
         Route::post('/bookings/{booking}/payment', [BookingController::class, 'payment'])->name('bookings.payment');
         Route::post('/bookings/{booking}/payment/confirm', [BookingController::class, 'confirmPayment'])->name('bookings.payment.confirm');
+
+        // reviews
+        Route::get('/bookings/{booking}/review', [ReviewController::class, 'create'])->name('bookings.review.create');
+
+        Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])->name('bookings.review.store');
+
     });
 
 /**
@@ -105,7 +112,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::resource('categories', CategoryController::class)->except(['show']);
-         // Provider verifications
+        // Provider verifications
         Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
         Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');
         Route::post('/verifications/providers/{verification}/approve', [AdminVerificationController::class, 'providersApprove'])->name('verifications.providers.approve');

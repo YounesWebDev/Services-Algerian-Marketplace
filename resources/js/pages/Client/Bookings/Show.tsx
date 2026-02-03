@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import { Button } from "@/components/ui/button";
 import { index as clientBookingsIndex, payment as bookingPayment } from "@/routes/client/bookings";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
 import { show as serviceShow } from "@/routes/services";
@@ -22,6 +23,14 @@ type Payment = {
   paid_at: string | null;
 };
 
+type Review = {
+  id: number;
+  booking_id: number;
+  rating: number | null;
+  comment: string | null;
+  created_at: string | null;
+};
+
 type BookingItem = {
   id: number;
   source: string;
@@ -29,12 +38,14 @@ type BookingItem = {
   total_amount: string;
   currency: string;
   scheduled_at: string | null;
+  service_id?: number | null;
 
   provider: Provider;
 
   service?: Service | null;
   offer?: Offer | null;
   payment?: Payment | null;
+  review?: Review | null;
 };
 
 export default function ClientBookingShow() {
@@ -206,6 +217,22 @@ export default function ClientBookingShow() {
                 {cancelForm.processing ? "Cancelling..." : "Cancel Booking"}
               </button>
             </form>
+          </div>
+        ) : null}
+
+        {booking.status === "completed" && !booking.review ? (
+          <div className="rounded-md border p-4">
+            <div className="font-medium">Review</div>
+            <p className="text-sm text-gray-600 mt-1">
+              Share your feedback about this booking.
+            </p>
+            <div className="mt-3">
+              <Button asChild>
+                <Link href={`/bookings/${booking.id}/review`}>
+                  {booking.service_id ? "Review this service" : "Review provider"}
+                </Link>
+              </Button>
+            </div>
           </div>
         ) : null}
 

@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('provider_id')->constrained('users')->cascadeOnDelete();
 
+            $table->unsignedTinyInteger('provider_rating')->nullable();
+            $table->unsignedTinyInteger('service_rating')->nullable();
             $table->unsignedTinyInteger('rating'); // 1..5
             $table->text('comment')->nullable();
             $table->string('status')->default('published'); // published|hidden|flagged
