@@ -9,6 +9,7 @@ import {
     BadgePercent,
     BookUser,
     CircleUser,
+    ShieldCheck,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -24,6 +25,8 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
+import { index as providersVerificationsIndex } from "@/routes/admin/verifications/providers";
+import { index as servicesVerificationsIndex } from "@/routes/admin/verifications/services";
 import { index as clientBookingsIndex } from "@/routes/client/bookings";
 import {index as requestsIndex} from "@/routes/client/my/requests"
 import { index as clientOffersIndex } from "@/routes/client/offers";
@@ -86,6 +89,16 @@ const providerNavItems = (user: User): NavItem[] => [
 const adminNavItems: NavItem[] = [
     { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
     { title: "Categories", href: "/admin/categories", icon: Tags },
+    {
+        title: "Provider Verifications",
+        href: providersVerificationsIndex().url,
+        icon: ShieldCheck,
+    },
+    {
+        title: "Service Approvals",
+        href: servicesVerificationsIndex().url,
+        icon: ShieldCheck,
+    },
 ];
 
 // ----------------------------

@@ -15,6 +15,7 @@ use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Provider\ProviderVerificationController;
+use App\Http\Controllers\Admin\AdminVerificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -104,6 +105,16 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::resource('categories', CategoryController::class)->except(['show']);
+         // Provider verifications
+        Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
+        Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');
+        Route::post('/verifications/providers/{verification}/approve', [AdminVerificationController::class, 'providersApprove'])->name('verifications.providers.approve');
+        Route::post('/verifications/providers/{verification}/reject', [AdminVerificationController::class, 'providersReject'])->name('verifications.providers.reject');
+        // services approvals
+        Route::get('/verifications/services', [AdminVerificationController::class, 'servicesIndex'])->name('verifications.services.index');
+        Route::get('/verifications/services/{service}', [AdminVerificationController::class, 'servicesShow'])->name('verifications.services.show');
+        Route::post('/verifications/services/{service}/approve', [AdminVerificationController::class, 'servicesApprove'])->name('verifications.services.approve');
+        Route::post('/verifications/services/{service}/reject', [AdminVerificationController::class, 'servicesReject'])->name('verifications.services.reject');
     });
 
 require __DIR__.'/settings.php';
