@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\DisputeController;
@@ -36,6 +38,9 @@ Route::get('/services/{service:slug}', [ServicesController::class, 'show'])
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/profiles/{user}', [ProfileController::class, 'show'])->name('profiles.show');
+    Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+
 });
 
 /**
@@ -134,6 +139,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/admin/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
         Route::get('/admin/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
         Route::post('/admin/disputes/{dispute}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
+        // reports
+        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/admin/reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('/admin/reports/{report}/close', [AdminReportController::class, 'close'])->name('reports.close');
     });
 
 require __DIR__.'/settings.php';

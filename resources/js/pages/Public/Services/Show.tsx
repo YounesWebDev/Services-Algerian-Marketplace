@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/routes";
+import { create as reportCreate } from "@/routes/reports";
 import { show as profileShow } from "@/routes/profiles";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { index as servicesIndex } from "@/routes/services";
@@ -286,6 +287,16 @@ export default function Show({ service }: { service: Service }) {
           className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl"
         >
           Browse more
+        </Button>
+
+        <Button variant="outline" asChild>
+          <Link
+            href={reportCreate({
+              query: { type: "service", id: service.id },
+            }).url}
+          >
+            Report this service
+          </Link>
         </Button>
       </div>
 
