@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { show as myRequestShow } from "@/routes/client/my/requests";
+import { create as reportCreate } from "@/routes/reports";
 import { show as serviceShow } from "@/routes/services";
 
 
@@ -101,9 +102,22 @@ export default function ProfileShow() {
             </div>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={dashboard().url}>Back</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" asChild>
+              <Link href={dashboard().url}>Back</Link>
+            </Button>
+            {user.role === "provider" ? null : user.role === "client" ? (
+              <Button variant="outline" asChild>
+                <Link
+                  href={reportCreate({
+                    query: { type: "provider", id: user.id },
+                  }).url}
+                >
+                  Report this provider
+                </Link>
+              </Button>
+            ) : null}
+          </div>
         </div>
 
         <Card>

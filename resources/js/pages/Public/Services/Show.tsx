@@ -6,9 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/routes";
-import { create as reportCreate } from "@/routes/reports";
 import { show as profileShow } from "@/routes/profiles";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
+import { create as reportCreate } from "@/routes/reports";
 import { index as servicesIndex } from "@/routes/services";
 import { SharedData } from "@/types";
 
@@ -289,15 +289,17 @@ export default function Show({ service }: { service: Service }) {
           Browse more
         </Button>
 
-        <Button variant="outline" asChild>
-          <Link
-            href={reportCreate({
-              query: { type: "service", id: service.id },
-            }).url}
-          >
-            Report this service
-          </Link>
-        </Button>
+        {user?.role === "client" ? (
+          <Button variant="outline" asChild>
+            <Link
+              href={reportCreate({
+                query: { type: "service", id: service.id },
+              }).url}
+            >
+              Report this service
+            </Link>
+          </Button>
+        ) : null}
       </div>
 
       {/* Reviews */}

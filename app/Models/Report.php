@@ -10,9 +10,11 @@ class Report extends Model
     use HasFactory;
 
     protected $fillable = [
+        'reporter_id',
         'target_type',
         'target_id',
         'reason',
+        'status',
     ];
 
 

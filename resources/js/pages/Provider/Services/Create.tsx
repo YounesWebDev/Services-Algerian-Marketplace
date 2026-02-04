@@ -1,5 +1,4 @@
 import { Head, Link, useForm } from "@inertiajs/react";
-import { useEffect, useState } from "react";
 
 import AppLayout from "@/layouts/app-layout";
 import {
@@ -15,9 +14,6 @@ export default function ProviderServicesCreate(props: {
   cities: City[];
 }) {
   const { categories, cities } = props;
-  const [photoPreviews, setPhotoPreviews] = useState<
-    { name: string; url: string }[]
-  >([]);
 
   const form = useForm({
     category_id: "",
@@ -38,27 +34,9 @@ export default function ProviderServicesCreate(props: {
     });
   }
 
-  useEffect(() => {
-    return () => {
-      photoPreviews.forEach((photo) => URL.revokeObjectURL(photo.url));
-    };
-  }, [photoPreviews]);
-
-  const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    form.setData("photos", files);
-
-    const previews = files.map((file) => ({
-      name: file.name,
-      url: URL.createObjectURL(file),
-    }));
-
-    setPhotoPreviews(previews);
-  };
-
   return (
     <AppLayout>
-      <Head title="Create Service"  />
+      <Head title="Create Service" />
 
       <div className="p-6 max-w-2xl space-y-4">
         <div className="flex items-center justify-between">
@@ -130,7 +108,6 @@ export default function ProviderServicesCreate(props: {
               </div>
             )}
           </div>
-
           {/* DESCRIPTION */}
           <div>
             <label className="block text-sm font-medium">Description</label>
@@ -154,9 +131,7 @@ export default function ProviderServicesCreate(props: {
               <select
                 className="mt-1 w-full rounded-4xl border p-2"
                 value={form.data.pricing_type}
-                onChange={(e) =>
-                  form.setData("pricing_type", e.target.value)
-                }
+                onChange={(e) => form.setData("pricing_type", e.target.value)}
               >
                 <option value="fixed">Fixed</option>
                 <option value="hourly">Hourly</option>
@@ -169,9 +144,7 @@ export default function ProviderServicesCreate(props: {
               <select
                 className="mt-1 w-full rounded-4xl border p-2"
                 value={form.data.payment_type}
-                onChange={(e) =>
-                  form.setData("payment_type", e.target.value)
-                }
+                onChange={(e) => form.setData("payment_type", e.target.value)}
               >
                 <option value="cash">Cash</option>
                 <option value="online">Online</option>
@@ -194,39 +167,119 @@ export default function ProviderServicesCreate(props: {
           </div>
 
           {/* PHOTOS */}
-          <div>
-            <label className="block text-sm font-medium h-20  rounded-4xl p-2">Drag and drop your Images or click to browse</label>
-            <input
-              type="file"
-              placeholder=""
+<div className="space-y-3">
+  <label className="block text-sm font-medium">
+    Photos <span className="text-muted-foreground">(PNG/JPG/WebP)</span>
+  </label>
 
-              multiple
-              accept="image/png,image/jpeg,image/webp"
-              className="mt-1 w-full rounded-4xl border p-2 border-gray-200 "
-              onChange={handlePhotosChange}
+  {/* Dropzone */}
+          <div
+    className="group relative rounded-4xl border border-dashed border-gray-300 bg-background p-4 transition hover:border-gray-400 hover:shadow-sm"
+    onDragOver={(e) => e.preventDefault()}
+    onDrop={(e) => {
+      e.preventDefault();
+      const dropped = Array.from(e.dataTransfer.files || []).filter((f) =>
+        ["image/png", "image/jpeg", "image/webp"].includes(f.type),
+      );
+      if (!dropped.length) return;
+
+      // merge with existing photos
+      const current = (form.data.photos ?? []) as File[];
+      const next = [...current, ...dropped];
+
+      form.setData("photos", next);
+    }}
+  >
+    <input
+      id="photos"
+      type="file"
+      multiple
+      accept="image/png,image/jpeg,image/webp"
+      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+      onChange={(e) => {
+        const picked = Array.from(e.target.files ?? []);
+        if (!picked.length) return;
+
+        const current = (form.data.photos ?? []) as File[];
+        const next = [...current, ...picked];
+
+        form.setData("photos", next);
+
+        // allow re-picking same file again
+        e.currentTarget.value = "";
+      }}
+    />
+
+    <div className="flex items-center justify-between gap-3">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">
+          Drag & drop images here, or click to browse
+        </p>
+        <p className="text-xs text-muted-foreground">
+          You can add multiple photos. Remove any before submitting.
+        </p>
+      </div>
+
+      <div className="shrink-0 rounded-4xl border px-3 py-2 text-xs transition group-hover:bg-foreground group-hover:text-background">
+        Add photos
+      </div>
+    </div>
+  </div>
+
+  {/* Previews */}
+  {Array.isArray(form.data.photos) && (form.data.photos as File[]).length > 0 && (
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+          {(form.data.photos as File[]).map((file, idx) => {
+        const url = URL.createObjectURL(file);
+
+        return (
+          <div
+            key={`${file.name}-${file.size}-${idx}`}
+            className="relative overflow-hidden rounded-3xl border bg-muted"
+          >
+            <img
+              src={url}
+              alt={file.name}
+              className="h-24 w-full object-cover"
+              onLoad={() => URL.revokeObjectURL(url)}
             />
-            {photoPreviews.length > 0 ? (
-              <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
-                {photoPreviews.map((photo) => (
-                  <div
-                    key={photo.url}
-                    className="overflow-hidden rounded-2xl border border-gray-200 bg-white/50"
-                  >
-                    <img
-                      src={photo.url}
-                      alt={photo.name}
-                      className="h-28 w-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="px-2 py-1 text-xs text-muted-foreground truncate">
-                      {photo.name}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </div>
 
+            {/* Remove */}
+            <button
+              type="button"
+              onClick={() => {
+                const current = (form.data.photos ?? []) as File[];
+                const next = current.filter((_, i) => i !== idx);
+                form.setData("photos", next);
+              }}
+              className="absolute right-2 top-2 rounded-full bg-background/90 px-2 py-1 text-xs shadow hover:bg-background"
+              aria-label="Remove photo"
+              title="Remove"
+            >
+              ✕
+            </button>
+
+            {/* Order badge like IG */}
+            <div className="absolute left-2 top-2 rounded-full bg-foreground/80 px-2 py-1 text-xs text-background">
+              {idx + 1}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+
+  {/* Optional: clear all */}
+  {Array.isArray(form.data.photos) && (form.data.photos as File[]).length > 0 && (
+    <button
+      type="button"
+      onClick={() => form.setData("photos", [])}
+      className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+    >
+      Remove all
+    </button>
+  )}
+</div>
           <button
             type="submit"
             disabled={form.processing}
@@ -235,7 +288,6 @@ export default function ProviderServicesCreate(props: {
             {form.processing ? "Creating..." : "Create Service"}
           </button>
         </form>
-
       </div>
     </AppLayout>
   );
