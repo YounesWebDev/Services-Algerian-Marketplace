@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
+use App\Http\Controllers\Client\DisputeController;
 use App\Http\Controllers\Client\MyRequestController;
 use App\Http\Controllers\Client\OfferController;
 use App\Http\Controllers\Client\ProviderDirectoryController;
@@ -99,8 +101,11 @@ Route::middleware(['auth', 'verified', 'role:client'])
 
         // reviews
         Route::get('/bookings/{booking}/review', [ReviewController::class, 'create'])->name('bookings.review.create');
-
         Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])->name('bookings.review.store');
+
+        // disputes
+        Route::get('/bookings/{booking}/dispute', [DisputeController::class, 'create'])->name('bookings.dispute.create');
+        Route::post('/bookings/{booking}/dispute', [DisputeController::class, 'store'])->name('bookings.dispute.store');
 
     });
 
@@ -122,6 +127,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/verifications/services/{service}', [AdminVerificationController::class, 'servicesShow'])->name('verifications.services.show');
         Route::post('/verifications/services/{service}/approve', [AdminVerificationController::class, 'servicesApprove'])->name('verifications.services.approve');
         Route::post('/verifications/services/{service}/reject', [AdminVerificationController::class, 'servicesReject'])->name('verifications.services.reject');
+        // disputes
+        Route::get('/admin/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+        Route::get('/admin/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
+        Route::post('/admin/disputes/{dispute}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
     });
 
 require __DIR__.'/settings.php';

@@ -4,6 +4,7 @@ import AppLayout from "@/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { index as clientBookingsIndex, payment as bookingPayment } from "@/routes/client/bookings";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
+import { create as disputeCreate } from "@/routes/client/bookings/dispute";
 import { show as serviceShow } from "@/routes/services";
 
 type Provider = { id: number; name: string; avatar_path: string | null };
@@ -31,6 +32,12 @@ type Review = {
   created_at: string | null;
 };
 
+type Dispute = {
+  id: number;
+  booking_id: number;
+  status: string;
+};
+
 type BookingItem = {
   id: number;
   source: string;
@@ -46,6 +53,7 @@ type BookingItem = {
   offer?: Offer | null;
   payment?: Payment | null;
   review?: Review | null;
+  dispute?: Dispute | null;
 };
 
 export default function ClientBookingShow() {
@@ -99,6 +107,7 @@ export default function ClientBookingShow() {
 
   const canPay = booking.status === "pending" || booking.status === "confirmed";
   const canCancel = booking.status === "pending" || booking.status === "confirmed";
+  const canDispute = ["confirmed", "in_progress", "completed"].includes(booking.status);
 
   const cancelForm = useForm({});
 
@@ -231,6 +240,20 @@ export default function ClientBookingShow() {
                 <Link href={`/bookings/${booking.id}/review`}>
                   {booking.service_id ? "Review this service" : "Review provider"}
                 </Link>
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {canDispute && !booking.dispute ? (
+          <div className="rounded-md border p-4">
+            <div className="font-medium">Dispute</div>
+            <p className="text-sm text-gray-600 mt-1">
+              Open a dispute if there is an issue with this booking.
+            </p>
+            <div className="mt-3">
+              <Button variant="outline" asChild>
+                <Link href={disputeCreate(booking.id).url}>Open dispute</Link>
               </Button>
             </div>
           </div>

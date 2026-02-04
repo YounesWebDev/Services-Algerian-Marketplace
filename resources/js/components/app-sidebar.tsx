@@ -10,6 +10,7 @@ import {
     BookUser,
     CircleUser,
     ShieldCheck,
+    Flag,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -25,6 +26,8 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { dashboard } from "@/routes";
+import { index as adminCategoriesIndex } from "@/routes/admin/categories";
+import { index as adminDisputesIndex } from "@/routes/admin/disputes";
 import { index as providersVerificationsIndex } from "@/routes/admin/verifications/providers";
 import { index as servicesVerificationsIndex } from "@/routes/admin/verifications/services";
 import { index as clientBookingsIndex } from "@/routes/client/bookings";
@@ -87,18 +90,11 @@ const providerNavItems = (user: User): NavItem[] => [
 // Admin nav
 // ----------------------------
 const adminNavItems: NavItem[] = [
-    { title: "Dashboard", href: "/dashboard", icon: LayoutGrid },
-    { title: "Categories", href: "/admin/categories", icon: Tags },
-    {
-        title: "Provider Verifications",
-        href: providersVerificationsIndex().url,
-        icon: ShieldCheck,
-    },
-    {
-        title: "Service Approvals",
-        href: servicesVerificationsIndex().url,
-        icon: ShieldCheck,
-    },
+    { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
+    { title: "Categories", href: adminCategoriesIndex().url, icon: Tags },
+    { title: "Provider Verifications",href: providersVerificationsIndex().url,icon: ShieldCheck },
+    { title: "Service Approvals",href: servicesVerificationsIndex().url,icon: ShieldCheck },
+    { title: "Disputes",href: adminDisputesIndex().url,icon: Flag },
 ];
 
 // ----------------------------

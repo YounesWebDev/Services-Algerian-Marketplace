@@ -155,17 +155,27 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     const loaderRef = useRef<HTMLDivElement>(null);
 
     // Slider state
+    const heroImages = [
+        "/hero/njar.jpg",
+        "/hero/mason.jpg",
+        "/hero/laptop.jpg",
+        "/hero/coding.jpg",
+    ];
     const [currentSlide, setCurrentSlide] = useState(0);
     const services = popularServices;
 
-    // Auto-rotate slides every 5 seconds
+    // Auto-rotate slides every 10 seconds
     useEffect(() => {
+        if (heroImages.length === 0) {
+            return;
+        }
+
         const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % 4);
+            setCurrentSlide((prev) => (prev + 1) % heroImages.length);
         }, 10000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [heroImages.length]);
 
     // OK: keep "clear suggestions" behavior
     const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -406,22 +416,21 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
 
        {/* Hero */}
 <div className="relative overflow-hidden h-screen">
-  {/* Background slider with 4 local images */}
-    {[
-        
-    "/hero/njar.jpg",   // Developer on laptop
-    "/hero/mason.jpg",      // Worker / handyman
-    "/hero/laptop.jpg",     // Plumber / technician
-    "/hero/coding.jpg" // Mason / construction
-    ].map((img: string, index: number) => (
+    {/* Sliding background track */}
     <div
-        key={img}
-        className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
-        index === currentSlide ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ backgroundImage: `url('${img}')` }}
-    />
-    ))}
+        className="absolute inset-0 flex h-full w-full transition-transform duration-700 ease-out"
+        style={{
+            transform: `translateX(-${currentSlide * 100}%)`,
+        }}
+    >
+        {heroImages.map((img) => (
+            <div
+                key={img}
+                className="h-full w-full shrink-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url('${img}')` }}
+            />
+        ))}
+    </div>
 
   {/* Overlay Gradient */}
     <div className="absolute inset-0 bg-linear-to-b from-black/30 to-black/50"></div>

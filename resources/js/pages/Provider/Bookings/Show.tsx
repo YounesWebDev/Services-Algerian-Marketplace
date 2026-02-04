@@ -1,7 +1,8 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { useEffect } from "react";
 
 import AppLayout from "@/layouts/app-layout";
-import { index as providerBookingsIndex } from "@/routes/provider/bookings";
+import { index as providerBookingsIndex, status as bookingStatusUpdate } from "@/routes/provider/bookings";
 import { confirm as confirmCashPayment } from "@/routes/provider/bookings/cash";
 import { show as serviceShow } from "@/routes/services";
 
@@ -79,9 +80,13 @@ export default function ProviderBookingShow() {
     status: allowed[0] ?? "",
   });
 
+  useEffect(() => {
+    statusForm.setData("status", allowed[0] ?? "");
+  }, [booking.status]);
+
   function updateStatus(e: React.FormEvent) {
     e.preventDefault();
-    statusForm.post(`/my/bookings/${booking.id}/status`, {
+    statusForm.post(bookingStatusUpdate(booking.id).url, {
       preserveScroll: true,
     });
   }

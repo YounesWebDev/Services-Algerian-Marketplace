@@ -55,6 +55,7 @@ class BookingController extends Controller
 
         $booking->load([
             'provider:id,name,avatar_path',
+            'dispute:id,booking_id,status',
             'offer:id,request_id,proposed_price,status',
             'offer.request:id,title',
             'review:id,booking_id,rating,comment,created_at',
