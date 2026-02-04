@@ -1,7 +1,7 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
-import AppLayout from "@/layouts/app-layout";
 import { Button } from "@/components/ui/button";
+import AppLayout from "@/layouts/app-layout";
 import { index as clientBookingsIndex, payment as bookingPayment } from "@/routes/client/bookings";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
 import { create as disputeCreate } from "@/routes/client/bookings/dispute";

@@ -1,12 +1,12 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link, useForm } from "@inertiajs/react";
 
+import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import InputError from "@/components/input-error";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import AppLayout from "@/layouts/app-layout";
 import { show as bookingShow } from "@/routes/client/bookings";
 import { store as reviewStore } from "@/routes/client/bookings/review";
 
