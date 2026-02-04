@@ -105,4 +105,85 @@ class MyServicesController extends Controller
         return redirect()->route('provider.my.services.index')->with('success', 'Service created (pending approval)');
         
     }
+
+    public function edit(Request $request, Service $service)
+    {
+        $user = $request->user();
+
+        if ($service->provider_id !== $user->id) {
+            abort(403);
+        }
+
+        $categories = Category::orderBy('name')->get(['id', 'name', 'slug']);
+        $cities = City::orderBy('name')->get(['id', 'name']);
+
+        $service->load(['media:id,service_id,path,type,position']);
+
+        return Inertia::render('Provider/Services/Edit', [
+            'service' => $service,
+            'categories' => $categories,
+            'cities' => $cities,
+        ]);
+    }
+
+    public function update(Request $request, Service $service)
+    {
+        $user = $request->user();
+
+        if ($service->provider_id !== $user->id) {
+            abort(403);
+        }
+
+        $data = $request->validate([
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'city_id' => ['required', 'integer', 'exists:cities,id'],
+            'title' => ['required', 'string', 'min:5', 'max:191'],
+            'description' => ['required', 'string', 'min:10'],
+            'base_price' => ['required', 'numeric', 'min:0'],
+            'pricing_type' => ['required', 'in:fixed,hourly,quote'],
+            'payment_type' => ['required', 'in:cash,online,both'],
+            'photos' => ['nullable', 'array', 'max:6'],
+            'photos.*' => ['file', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
+        ]);
+
+        $service->update([
+            'category_id' => $data['category_id'],
+            'city_id' => $data['city_id'],
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'base_price' => $data['base_price'] !== '' ? $data['base_price'] : null,
+            'pricing_type' => $data['pricing_type'],
+            'payment_type' => $data['payment_type'],
+            'status' => 'pending',
+        ]);
+
+        if (! empty($data['photos'])) {
+            $startPosition = (int) $service->media()->max('position');
+
+            foreach ($data['photos'] as $i => $file) {
+                $path = $file->store("services/{$service->id}", 'public');
+
+                $service->media()->create([
+                    'path' => $path,
+                    'type' => 'image',
+                    'position' => $startPosition + $i + 1,
+                ]);
+            }
+        }
+
+        return redirect()->route('provider.my.services.index')->with('success', 'Service updated (pending approval)');
+    }
+
+    public function destroy(Request $request, Service $service)
+    {
+        $user = $request->user();
+
+        if ($service->provider_id !== $user->id) {
+            abort(403);
+        }
+
+        $service->delete();
+
+        return redirect()->route('provider.my.services.index')->with('success', 'Service removed successfully.');
+    }
 }

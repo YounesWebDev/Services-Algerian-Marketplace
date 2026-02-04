@@ -1,12 +1,12 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link, useForm } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import AppLayout from "@/layouts/app-layout";
 import { index as disputesIndex, resolve as disputesResolve } from "@/routes/admin/disputes";
 
 type Dispute = {

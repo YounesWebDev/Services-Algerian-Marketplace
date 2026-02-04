@@ -1,9 +1,9 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link } from "@inertiajs/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AppLayout from "@/layouts/app-layout";
 import { index as disputesIndex, show as disputesShow } from "@/routes/admin/disputes";
 
 type Dispute = {
@@ -24,11 +24,13 @@ type Dispute = {
   };
 };
 
+type PaginationLink = { url: string | null; label: string; active: boolean };
+
 export default function Index({
   disputes,
   filters,
 }: {
-  disputes: { data: Dispute[]; links: any[] };
+  disputes: { data: Dispute[]; links: PaginationLink[] };
   filters: { status: string };
 }) {
   return (

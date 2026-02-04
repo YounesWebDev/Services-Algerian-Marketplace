@@ -77,10 +77,11 @@ export default function Show({ service }: { service: Service }) {
     scheduled_at: "",
   });
 
-  const cover =
+  const coverPath =
     images[active]?.path ??
     images[0]?.path ??
     "/images/service-placeholder.jpg";
+  const cover = publicImagePath(coverPath);
 
   function submitBooking(e: React.FormEvent) {
     e.preventDefault();
@@ -201,7 +202,7 @@ export default function Show({ service }: { service: Service }) {
                 title="View image"
               >
                 <img
-                  src={m.path}
+                  src={publicImagePath(m.path)}
                   alt={`media-${idx}`}
                   className="h-16 w-24 object-cover"
                 />

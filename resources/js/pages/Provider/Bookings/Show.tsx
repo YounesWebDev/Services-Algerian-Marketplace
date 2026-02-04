@@ -76,13 +76,14 @@ export default function ProviderBookingShow() {
 
   // Status update form
   const allowed = getAllowedNextStatuses(booking.status);
+  const nextStatus = allowed[0] ?? "";
   const statusForm = useForm<{ status: string }>({
-    status: allowed[0] ?? "",
+    status: nextStatus,
   });
 
   useEffect(() => {
-    statusForm.setData("status", allowed[0] ?? "");
-  }, [booking.status]);
+    statusForm.setData("status", nextStatus);
+  }, [nextStatus, statusForm]);
 
   function updateStatus(e: React.FormEvent) {
     e.preventDefault();

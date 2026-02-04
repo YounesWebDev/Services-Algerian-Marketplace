@@ -4,36 +4,62 @@ import { useEffect, useState } from "react";
 import AppLayout from "@/layouts/app-layout";
 import {
   index as providerServicesIndex,
-  store as providerServicesStore,
+  update as providerServicesUpdate,
 } from "@/routes/provider/my/services";
 
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
+type Media = {
+  id: number;
+  service_id: number;
+  path: string;
+  type: string;
+  position: number;
+};
 
-export default function ProviderServicesCreate(props: {
+type Service = {
+  id: number;
+  title: string;
+  description: string;
+  base_price: string | number | null;
+  pricing_type: string;
+  payment_type: string;
+  category_id: number;
+  city_id: number;
+  media: Media[];
+};
+
+const publicImagePath = (path?: string | null) => {
+  if (!path) return "";
+  if (path.startsWith("http") || path.startsWith("/")) return path;
+  return `/storage/${path}`;
+};
+
+export default function ProviderServicesEdit(props: {
+  service: Service;
   categories: Category[];
   cities: City[];
 }) {
-  const { categories, cities } = props;
+  const { service, categories, cities } = props;
   const [photoPreviews, setPhotoPreviews] = useState<
     { name: string; url: string }[]
   >([]);
 
   const form = useForm({
-    category_id: "",
-    city_id: "",
-    title: "",
-    description: "",
-    base_price: "",
-    pricing_type: "fixed",
-    payment_type: "cash",
+    category_id: String(service.category_id ?? ""),
+    city_id: String(service.city_id ?? ""),
+    title: service.title ?? "",
+    description: service.description ?? "",
+    base_price: service.base_price ?? "",
+    pricing_type: service.pricing_type ?? "fixed",
+    payment_type: service.payment_type ?? "cash",
     photos: [] as File[],
   });
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
 
-    form.post(providerServicesStore.url(), {
+    form.put(providerServicesUpdate(service.id).url, {
       forceFormData: true,
     });
   }
@@ -56,13 +82,17 @@ export default function ProviderServicesCreate(props: {
     setPhotoPreviews(previews);
   };
 
+  const existingMedia = service.media
+    ?.slice()
+    .sort((a, b) => a.position - b.position);
+
   return (
     <AppLayout>
-      <Head title="Create Service"  />
+      <Head title="Edit Service" />
 
       <div className="p-6 max-w-2xl space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">Create Service</h1>
+          <h1 className="text-2xl font-bold text-primary">Edit Service</h1>
           <Link href={providerServicesIndex.url()}>
             <div className="bg-foreground text-background border border-gray-200 rounded-3xl p-2 px-3 transition duration-700 hover:bg-red-600">
               Back
@@ -125,9 +155,7 @@ export default function ProviderServicesCreate(props: {
               placeholder="Example: Plumbing repair"
             />
             {form.errors.title && (
-              <div className="text-sm text-red-600 mt-1">
-                {form.errors.title}
-              </div>
+              <div className="text-sm text-red-600 mt-1">{form.errors.title}</div>
             )}
           </div>
 
@@ -154,9 +182,7 @@ export default function ProviderServicesCreate(props: {
               <select
                 className="mt-1 w-full rounded-4xl border p-2"
                 value={form.data.pricing_type}
-                onChange={(e) =>
-                  form.setData("pricing_type", e.target.value)
-                }
+                onChange={(e) => form.setData("pricing_type", e.target.value)}
               >
                 <option value="fixed">Fixed</option>
                 <option value="hourly">Hourly</option>
@@ -169,9 +195,7 @@ export default function ProviderServicesCreate(props: {
               <select
                 className="mt-1 w-full rounded-4xl border p-2"
                 value={form.data.payment_type}
-                onChange={(e) =>
-                  form.setData("payment_type", e.target.value)
-                }
+                onChange={(e) => form.setData("payment_type", e.target.value)}
               >
                 <option value="cash">Cash</option>
                 <option value="online">Online</option>
@@ -182,9 +206,7 @@ export default function ProviderServicesCreate(props: {
 
           {/* BASE PRICE */}
           <div>
-            <label className="block text-sm font-medium">
-              Base price (optional)
-            </label>
+            <label className="block text-sm font-medium">Base price (optional)</label>
             <input
               type="number"
               className="mt-1 w-full rounded-4xl border p-2"
@@ -193,13 +215,35 @@ export default function ProviderServicesCreate(props: {
             />
           </div>
 
-          {/* PHOTOS */}
+          {/* EXISTING PHOTOS */}
+          {existingMedia?.length ? (
+            <div>
+              <div className="text-sm font-medium mb-2">Current photos</div>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {existingMedia.map((photo) => (
+                  <div
+                    key={photo.id}
+                    className="overflow-hidden rounded-2xl border border-gray-200 bg-white/50"
+                  >
+                    <img
+                      src={publicImagePath(photo.path)}
+                      alt="Service media"
+                      className="h-28 w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {/* NEW PHOTOS */}
           <div>
-            <label className="block text-sm font-medium h-20  rounded-4xl p-2">Drag and drop your Images or click to browse</label>
+            <label className="block text-sm font-medium h-20 rounded-4xl p-2">
+              Add more images (optional)
+            </label>
             <input
               type="file"
-              placeholder=""
-
               multiple
               accept="image/png,image/jpeg,image/webp"
               className="mt-1 w-full rounded-4xl border p-2 border-gray-200 "
@@ -232,10 +276,9 @@ export default function ProviderServicesCreate(props: {
             disabled={form.processing}
             className="rounded-3xl bg-primary hover:bg-foreground hover:text-background transition duration-700 px-4 py-2 text-white text-sm disabled:opacity-60"
           >
-            {form.processing ? "Creating..." : "Create Service"}
+            {form.processing ? "Saving..." : "Save changes"}
           </button>
         </form>
-
       </div>
     </AppLayout>
   );

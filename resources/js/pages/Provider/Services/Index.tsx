@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import {
   BadgeCheck,
   CheckCircle2Icon,
@@ -16,6 +16,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
 import {
   create as providerServicesCreate,
+  destroy as providerServicesDestroy,
+  edit as providerServicesEdit,
   index as providerServicesIndex,
 } from "@/routes/provider/my/services";
 import { show as serviceShow } from "@/routes/services";
@@ -267,13 +269,39 @@ export default function ProviderServicesIndex() {
                           </div>
                         </div>
 
-                        {/* Public page */}
-                        <Link
-                          href={serviceShow.url(s.slug)}
-                          className="text-sm underline"
-                        >
-                          View public
-                        </Link>
+                        <div className="flex flex-col items-end gap-2">
+                          {/* Public page */}
+                          <Link
+                            href={serviceShow.url(s.slug)}
+                            className="text-sm underline"
+                          >
+                            View public
+                          </Link>
+
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={providerServicesEdit(s.id).url}
+                              className="rounded-3xl border border-gray-200 px-3 py-1 text-xs transition hover:bg-foreground hover:text-background"
+                            >
+                              Edit
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!confirm("Remove this service?")) {
+                                  return;
+                                }
+
+                                router.delete(providerServicesDestroy(s.id).url, {
+                                  preserveScroll: true,
+                                });
+                              }}
+                              className="rounded-3xl border border-red-200 px-3 py-1 text-xs text-red-600 transition hover:bg-red-600 hover:text-white"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -303,4 +331,3 @@ export default function ProviderServicesIndex() {
     </AppLayout>
   );
 }
-

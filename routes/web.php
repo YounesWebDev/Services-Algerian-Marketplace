@@ -52,6 +52,9 @@ Route::middleware(['auth', 'verified', 'role:provider', 'provider.verified'])
         Route::get('/my/services', [MyServicesController::class, 'index'])->name('my.services.index');
         Route::get('/services/create', [MyServicesController::class, 'create'])->name('my.services.create');
         Route::post('/services', [MyServicesController::class, 'store'])->name('my.services.store');
+        Route::get('/my/services/{service}/edit', [MyServicesController::class, 'edit'])->name('my.services.edit');
+        Route::put('/my/services/{service}', [MyServicesController::class, 'update'])->name('my.services.update');
+        Route::delete('/my/services/{service}', [MyServicesController::class, 'destroy'])->name('my.services.destroy');
 
         // Requests
         Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
