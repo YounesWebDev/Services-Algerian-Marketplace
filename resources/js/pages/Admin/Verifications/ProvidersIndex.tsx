@@ -1,13 +1,13 @@
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
+import PaginationLinks from "@/components/pagination-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
 import { index as providersIndex, show as providersShow } from "@/routes/admin/verifications/providers";
 import { index as servicesIndex } from "@/routes/admin/verifications/services";

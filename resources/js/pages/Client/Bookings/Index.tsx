@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from "@inertiajs/react";
 
-import AppLayout from "@/layouts/app-layout";
 import PaginationLinks from "@/components/pagination-links";
+import AppLayout from "@/layouts/app-layout";
 import { index as clientBookingsIndex, show as clientBookingsShow } from "@/routes/client/bookings";
 import { show as serviceShow } from "@/routes/services";
 

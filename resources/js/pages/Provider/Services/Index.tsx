@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import PaginationLinks from "@/components/pagination-links";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
-import PaginationLinks from "@/components/pagination-links";
 import {
   create as providerServicesCreate,
   destroy as providerServicesDestroy,

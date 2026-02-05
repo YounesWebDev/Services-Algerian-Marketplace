@@ -1,9 +1,9 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link } from "@inertiajs/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import AppLayout from "@/layouts/app-layout";
 import { index as reportsIndex, show as reportsShow } from "@/routes/admin/reports";
 
 type Report = {

@@ -1,10 +1,10 @@
 import { Head, Link } from "@inertiajs/react";
 
+import PaginationLinks from "@/components/pagination-links";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
-import PaginationLinks from "@/components/pagination-links";
 import { index as disputesIndex, show as disputesShow } from "@/routes/admin/disputes";
 
 type Dispute = {

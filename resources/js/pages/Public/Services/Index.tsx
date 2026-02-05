@@ -2,10 +2,10 @@ import { router, usePage } from "@inertiajs/react";
 import { useState } from "react";
 
 // shadcn/ui
+import PaginationLinks from "@/components/pagination-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
 import { SharedData } from "@/types";
 

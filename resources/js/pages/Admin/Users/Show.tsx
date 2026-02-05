@@ -1,9 +1,9 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
+import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import InputError from "@/components/input-error";
+import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
 
 // Wayfinder (adjust path if needed)
@@ -175,7 +175,7 @@ export default function AdminUsersShow() {
                   </Button>
                 </div>
 
-                <InputError message={(form.errors as any)?.status} />
+                <InputError message={form.errors.status} />
               </div>
             </CardContent>
           </Card>

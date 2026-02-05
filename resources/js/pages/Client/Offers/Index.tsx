@@ -1,7 +1,7 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
-import AppLayout from "@/layouts/app-layout";
 import PaginationLinks from "@/components/pagination-links";
+import AppLayout from "@/layouts/app-layout";
 import { accept as acceptOfferRoute, index as clientOffersIndex } from "@/routes/client/offers";
 
 type Provider = { id: number; name: string; avatar_path: string | null };

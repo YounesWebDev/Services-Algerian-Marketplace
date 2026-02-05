@@ -1,7 +1,8 @@
-import AppLayout from "@/layouts/app-layout";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { useMemo } from "react";
 
+import InputError from "@/components/input-error";
+import PaginationLinks from "@/components/pagination-links";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import InputError from "@/components/input-error";
-import PaginationLinks from "@/components/pagination-links";
+import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
 
 // Wayfinder (adjust import if your generated routes path differs)
@@ -45,6 +44,11 @@ type PageProps = {
     q: string;
     role: string;
     status: string;
+  };
+  errors?: {
+    q?: string;
+    role?: string;
+    status?: string;
   };
 };
 
@@ -103,7 +107,7 @@ export default function AdminUsersIndex() {
             <div className="space-y-2">
               <Label htmlFor="q">Search</Label>
               <Input id="q" name="q" placeholder="Name or email..." defaultValue={filters.q ?? ""} />
-              <InputError message={(props as any)?.errors?.q} />
+              <InputError message={props.errors?.q} />
             </div>
 
             <div className="space-y-2">
