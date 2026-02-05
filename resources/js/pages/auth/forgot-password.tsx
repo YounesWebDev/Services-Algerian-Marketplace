@@ -38,6 +38,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     autoComplete="off"
                                     autoFocus
                                     placeholder="email@example.com"
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                 />
 
                                 <InputError message={errors.email} />
@@ -45,7 +46,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="my-6 flex items-center justify-start">
                                 <Button
-                                    className="w-full"
+                                    className="w-full rounded-4xl bg-primary px-3 py-2 text-white transition duration-700 hover:bg-foreground hover:text-background"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >

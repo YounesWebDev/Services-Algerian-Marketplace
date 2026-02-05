@@ -25,7 +25,8 @@ export default function Login({
 }: LoginProps) {
     return (
         <AuthLayout
-            title="Log in to your account"
+        
+            title="Welcome back !"
             description="Enter your email and password below to log in"
         >
             <Head title="Log in" />
@@ -34,6 +35,7 @@ export default function Login({
                 {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
+                
             >
                 {({ processing, errors }) => (
                     <>
@@ -49,6 +51,7 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="email@example.com"
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -74,6 +77,7 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
+                                     className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -89,10 +93,11 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-4 w-full rounded-3xl bg-primary px-3 py-2 transition duration-700  text-white text-sm hover:bg-primaryforeground hover:text-background"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
+                               
                             >
                                 {processing && <Spinner />}
                                 Log in
@@ -112,7 +117,7 @@ export default function Login({
             </Form>
 
             {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <div className="mb-4 text-center text-sm font-medium text-primary">
                     {status}
                 </div>
             )}

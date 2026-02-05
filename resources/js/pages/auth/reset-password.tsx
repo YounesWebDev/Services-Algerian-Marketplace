@@ -31,12 +31,13 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
+                                
                                 id="email"
                                 type="email"
                                 name="email"
                                 autoComplete="email"
                                 value={email}
-                                className="mt-1 block w-full"
+                                className="mt-1 w-full rounded-3xl border-gray-200 bg-primary-foreground/30"
                                 readOnly
                             />
                             <InputError

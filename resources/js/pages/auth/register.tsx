@@ -12,7 +12,7 @@ import { store } from '@/routes/register';
 export default function Register() {
     return (
         <AuthLayout
-            title="Create an account"
+            title="Create an profinder account"
             description="Enter your details below to create your account"
         >
             <Head title="Register" />
@@ -29,7 +29,7 @@ export default function Register() {
                                 {/* Client option */}
                                 <label className="cursor-pointer">
                                     <input
-                                    className="peer sr-only"
+                                    className="peer sr-only "
                                     type="radio"
                                     name="role"
                                     value="client"
@@ -37,7 +37,7 @@ export default function Register() {
                                     required
                                     />
                                     <div
-                                    className="rounded-sm border p-5 transition
+                                    className="rounded-4xl  border p-5  transition
                                                 peer-checked:border-primary
                                                 peer-checked:ring-2 mb-3
                                                 peer-checked:ring-primary"
@@ -49,6 +49,7 @@ export default function Register() {
                                                     peer-checked:border-primary
                                                     peer-checked:bg-primary"
                                         />
+                                        
                                     </div>
 
                                     <p className="mt-2 text-sm text-muted-foreground">
@@ -66,7 +67,7 @@ export default function Register() {
                                     value="provider"
                                     />
                                     <div
-                                    className="rounded-sm border p-5 transition
+                                    className="rounded-4xl border p-5 transition
                                                 peer-checked:border-primary
                                                 peer-checked:ring-2
                                                 peer-checked:ring-primary"
@@ -93,6 +94,7 @@ export default function Register() {
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                     id="name"
                                     type="text"
                                     required
@@ -110,6 +112,7 @@ export default function Register() {
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
                                 <Input
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                     id="email"
                                     type="email"
                                     required
@@ -124,6 +127,7 @@ export default function Register() {
                             <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                     id="password"
                                     type="password"
                                     required
@@ -140,6 +144,7 @@ export default function Register() {
                                     Confirm password
                                 </Label>
                                 <Input
+                                    className='rounded-3xl border-gray-200 bg-primary-foreground/30'
                                     id="password_confirmation"
                                     type="password"
                                     required
@@ -155,7 +160,7 @@ export default function Register() {
 
                             <Button
                                 type="submit"
-                                className="mt-2 w-full"
+                                className="mt-2 w-full rounded-3xl bg-primary px-3 py-2 transition duration-700 hover:bg-foreground  text-white text-sm  hover:text-background"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
