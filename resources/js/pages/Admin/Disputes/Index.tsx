@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
+import PaginationLinks from "@/components/pagination-links";
 import { index as disputesIndex, show as disputesShow } from "@/routes/admin/disputes";
 
 type Dispute = {
@@ -108,11 +109,16 @@ export default function Index({
               </div>
             )}
 
-            {/* If you already have a pagination component, use it here.
-                Otherwise you can ignore pagination links for now. */}
+            {disputes.links?.length > 1 && (
+              <div className="pt-3">
+                <PaginationLinks links={disputes.links} />
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
     </AppLayout>
   );
 }
+
+

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
 import { index as providersIndex } from "@/routes/admin/verifications/providers";
 import {
@@ -175,28 +176,8 @@ export default function ServicesVerificationsIndex() {
         {/* Pagination */}
         {services.last_page > 1 ? (
           <Card>
-            <CardContent className="p-4 flex flex-wrap gap-2">
-              {services.links.map((l, idx) => {
-                const label = l.label.replace(/&laquo;|&raquo;/g, "").trim() || "...";
-
-                if (!l.url) {
-                  return (
-                    <Button key={idx} variant="outline" disabled>
-                      {label}
-                    </Button>
-                  );
-                }
-
-                return (
-                  <Button
-                    key={idx}
-                    variant={l.active ? "default" : "outline"}
-                    asChild
-                  >
-                    <Link href={l.url}>{label}</Link>
-                  </Button>
-                );
-              })}
+            <CardContent className="p-4">
+              <PaginationLinks links={services.links} />
             </CardContent>
           </Card>
         ) : null}
@@ -204,3 +185,5 @@ export default function ServicesVerificationsIndex() {
     </AppLayout>
   );
 }
+
+

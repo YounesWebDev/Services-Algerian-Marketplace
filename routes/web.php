@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
-use App\Http\Controllers\Admin\ReportController as AdminReportController;
-use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController; 
+use App\Http\Controllers\Admin\RequestsController as AdminRequestsController; 
+use App\Http\Controllers\Admin\ServicesController as AdminServicesController; 
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\DisputeController;
@@ -125,6 +128,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::resource('categories', CategoryController::class)->except(['show']);
+        // Users management
+        Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
+        Route::post('/users/{user}/status', [UsersController::class, 'updateStatus'])->name('users.status');
+
+        //services management
+        Route::get('/services/management', [AdminServicesController::class, 'index'])->name('services.index');
+        Route::get('/services/management/{service}', [AdminServicesController::class, 'show'])->name('services.show');
+        Route::post('/services/management/{service}/approve', [AdminServicesController::class, 'approve'])->name('services.approve');
+        Route::post('/services/management/{service}/reject', [AdminServicesController::class, 'reject'])->name('services.reject');
+
+        // Request management
+        Route::get('/requests/management', [AdminRequestsController::class, 'index'])->name('requests.index');
+        Route::get('/requests/management/{request}', [AdminRequestsController::class, 'show'])->name('requests.show');
+        Route::post('/requests/management/{request}/close', [AdminRequestsController::class, 'close'])->name('requests.close');
         // Provider verifications
         Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
         Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');

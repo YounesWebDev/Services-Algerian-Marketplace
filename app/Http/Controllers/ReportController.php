@@ -45,16 +45,14 @@ class ReportController extends Controller
             ]);
         }
 
-        public function store(Request $request){
-            $user = $request->user();
+    public function store(Request $request){
+        $user = $request->user();
 
-            $data = $request->user();
-
-            $data = $request->validate([
-                'target_type' => ['required' , 'in:service,provider,request'],
-                'target_id' => ['required' , 'integer' , 'min:1'],
-                'reason' => ['required' , 'string' , 'max:191'],
-                'description' => ['nullable' , 'string' , 'max:3000'],
+        $data = $request->validate([
+            'target_type' => ['required' , 'in:service,provider,request'],
+            'target_id' => ['required' , 'integer' , 'min:1'],
+            'reason' => ['required' , 'string' , 'max:191'],
+            'description' => ['nullable' , 'string' , 'max:3000'],
             ]);
 
             // avoid spam duplicates
@@ -76,6 +74,7 @@ class ReportController extends Controller
                 'target_type' => $data['target_type'], 
                 'target_id' => $data['target_id'], 
                 'reason' => $data['reason'], 
+                'description' => $data['description'] ?? null,
                 'status' => 'open',
             ]);
 

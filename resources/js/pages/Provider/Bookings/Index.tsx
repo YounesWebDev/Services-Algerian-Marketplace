@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import PaginationLinks from "@/components/pagination-links";
 import { index as providerBookingsIndex, show as providerBookingsShow } from "@/routes/provider/bookings";
 
 type UserLite = { id: number; name: string; avatar_path: string | null };
@@ -156,22 +157,7 @@ export default function ProviderBookingsIndex() {
           )}
         </div>
 
-        {/* Pagination */}
-        {bookings.links?.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
-            {bookings.links.map((l, idx) => (
-              <Link
-                key={idx}
-                href={l.url ?? ""}
-                preserveScroll
-                className={`px-3 py-1 rounded border text-sm ${
-                  l.active ? "bg-black text-white" : "bg-white"
-                } ${l.url === null ? "pointer-events-none opacity-40" : ""}`}
-                dangerouslySetInnerHTML={{ __html: l.label }}
-              />
-            ))}
-          </div>
-        )}
+        {bookings.links?.length > 0 && <PaginationLinks links={bookings.links} />}
       </div>
     </AppLayout>
   );

@@ -62,6 +62,7 @@ const initials = (name: string) => {
 
 export default function ProfileShow() {
   const { props } = usePage<{
+    auth?: { user?: { role?: string } | null };
     user: UserItem;
     profile: ProfileItem;
     requests?: RequestItem[] | null;
@@ -71,6 +72,7 @@ export default function ProfileShow() {
   const profile = props.profile;
   const requests = props.requests ?? [];
   const services = props.services ?? [];
+  const viewerRole = props.auth?.user?.role ?? null;
 
   const avatarUrl = publicImagePath(user.avatar_path);
 
@@ -106,7 +108,7 @@ export default function ProfileShow() {
             <Button variant="outline" asChild>
               <Link href={dashboard().url}>Back</Link>
             </Button>
-            {user.role === "provider" ? null : user.role === "client" ? (
+            {user.role === "provider" && viewerRole === "client" ? (
               <Button variant="outline" asChild>
                 <Link
                   href={reportCreate({

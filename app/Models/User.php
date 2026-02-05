@@ -53,21 +53,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function isAdmin(): bool
-    {
-        return $this->role === 'admin';
-    }
-
-    public function isProvider(): bool
-    {
-        return $this->role === 'provider';
-    }
-
-    public function isClient(): bool
-    {
-        return $this->role === 'client';
-    }
-
     public function profile()
     {
         return $this->hasOne(\App\Models\Profile::class);
@@ -81,6 +66,11 @@ class User extends Authenticatable
     public function services()
     {
         return $this->hasMany(\App\Models\Service::class, 'provider_id');
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(\App\Models\Request::class, 'client_id');
     }
 
     public function clientBookings()
@@ -101,5 +91,9 @@ class User extends Authenticatable
     public function providerChats()
     {
         return $this->hasMany(\App\Models\Chat::class, 'provider_id');
+    }
+
+    public function reportsMade(){
+        return $this->hasMany(\App\Models\Report::class,'reporter_id');
     }
 }

@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import PaginationLinks from "@/components/pagination-links";
 import { accept as acceptOfferRoute, index as clientOffersIndex } from "@/routes/client/offers";
 
 type Provider = { id: number; name: string; avatar_path: string | null };
@@ -184,22 +185,7 @@ export default function ClientOffersIndex() {
           )}
         </div>
 
-        {/* Pagination */}
-        {offers.links?.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
-            {offers.links.map((l, idx) => (
-              <Link
-                key={idx}
-                href={l.url ?? ""}
-                preserveScroll
-                className={`px-3 py-1 rounded border text-sm ${
-                  l.active ? "bg-black text-white" : "bg-white"
-                } ${l.url === null ? "pointer-events-none opacity-40" : ""}`}
-                dangerouslySetInnerHTML={{ __html: l.label }}
-              />
-            ))}
-          </div>
-        )}
+        {offers.links?.length > 0 && <PaginationLinks links={offers.links} />}
       </div>
     </AppLayout>
   );

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
+import PaginationLinks from "@/components/pagination-links";
 import {
   create as providerServicesCreate,
   destroy as providerServicesDestroy,
@@ -311,22 +312,7 @@ export default function ProviderServicesIndex() {
           )}
         </div>
 
-        {/* Pagination */}
-        {services.links?.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-2">
-            {services.links.map((l, idx) => (
-              <Link
-                key={idx}
-                href={l.url ?? ""}
-                preserveScroll
-                className={`px-3 py-1 rounded border text-sm ${
-                  l.active ? "bg-primary text-white" : "bg-white"
-                } ${l.url === null ? "pointer-events-none opacity-40" : ""}`}
-                dangerouslySetInnerHTML={{ __html: l.label }}
-              />
-            ))}
-          </div>
-        )}
+        {services.links?.length > 0 && <PaginationLinks links={services.links} />}
       </div>
     </AppLayout>
   );

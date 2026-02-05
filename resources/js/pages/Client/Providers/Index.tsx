@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppLayout from "@/layouts/app-layout";
+import PaginationLinks from "@/components/pagination-links";
 import { dashboard } from "@/routes";
 import { show as profileShow } from "@/routes/profiles";
 
@@ -186,34 +187,7 @@ export default function ProvidersIndex() {
           </div>
         )}
 
-        {/* Pagination */}
-        {providers.last_page > 1 ? (
-          <Card>
-            <CardContent className="p-4 flex flex-wrap gap-2">
-              {providers.links.map((l, idx) => {
-                const label = l.label.replace(/&laquo;|&raquo;/g, "").trim();
-
-                if (!l.url) {
-                  return (
-                    <Button key={idx} variant="outline" disabled>
-                      {label || "..."}
-                    </Button>
-                  );
-                }
-
-                return (
-                  <Button
-                    key={idx}
-                    variant={l.active ? "default" : "outline"}
-                    asChild
-                  >
-                    <Link href={l.url}>{label || "..."}</Link>
-                  </Button>
-                );
-              })}
-            </CardContent>
-          </Card>
-        ) : null}
+        {providers.links?.length > 0 && <PaginationLinks links={providers.links} />}
       </div>
     </AppLayout>
   );

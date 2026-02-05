@@ -14,6 +14,7 @@ class Report extends Model
         'target_type',
         'target_id',
         'reason',
+        'description',
         'status',
     ];
 

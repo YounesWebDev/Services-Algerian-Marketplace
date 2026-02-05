@@ -3,19 +3,10 @@ import { useState } from "react";
 
 // shadcn/ui
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
-import { cn } from "@/lib/utils";
 import { SharedData } from "@/types";
 
 // Utility to convert storage paths to accessible URLs
@@ -107,81 +98,6 @@ type Props = {
   cities: City[];
   filters: Filters;
 };
-
-function renderPagination(links: PaginationLink[]) {
-  if (!links?.length) {
-    return null;
-  }
-
-  return (
-    <Pagination>
-      <PaginationContent>
-        {links.map((link, idx) => {
-          const labelText = link.label
-            .replace(/&laquo;|&raquo;/g, "")
-            .replace(/&hellip;/g, "...")
-            .replace(/&nbsp;/g, " ")
-            .trim();
-
-          const lowerLabel = labelText.toLowerCase();
-          const isPrev = lowerLabel.includes("previous");
-          const isNext = lowerLabel.includes("next");
-          const isEllipsis = labelText === "..." || labelText === "…";
-
-          if (isEllipsis) {
-            return (
-              <PaginationItem key={`ellipsis-${idx}`}>
-                <PaginationEllipsis />
-              </PaginationItem>
-            );
-          }
-
-          if (!link.url) {
-            return (
-              <PaginationItem key={`disabled-${idx}`}>
-                <span
-                  className={cn(
-                    buttonVariants({
-                      variant: "outline",
-                      size: isPrev || isNext ? "default" : "icon",
-                    }),
-                    "pointer-events-none opacity-50",
-                  )}
-                >
-                  {isPrev ? "Previous" : isNext ? "Next" : labelText}
-                </span>
-              </PaginationItem>
-            );
-          }
-
-          if (isPrev) {
-            return (
-              <PaginationItem key={`prev-${idx}`}>
-                <PaginationPrevious href={link.url} preserveScroll />
-              </PaginationItem>
-            );
-          }
-
-          if (isNext) {
-            return (
-              <PaginationItem key={`next-${idx}`}>
-                <PaginationNext href={link.url} preserveScroll />
-              </PaginationItem>
-            );
-          }
-
-          return (
-            <PaginationItem key={`${link.url}-${idx}`}>
-              <PaginationLink href={link.url} preserveScroll isActive={link.active}>
-                {labelText}
-              </PaginationLink>
-            </PaginationItem>
-          );
-        })}
-      </PaginationContent>
-    </Pagination>
-  );
-}
 
 export default function Index({ services, categories, cities, filters }: Props) {
   // Local UI state (start with filters coming from backend)
@@ -330,7 +246,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
       </div>
 
       {/* Pagination */}
-      {services.links?.length > 0 && renderPagination(services.links)}
+      {services.links?.length > 0 && <PaginationLinks links={services.links} />}
     </div>
   </AppLayout>
   ) : (
@@ -460,7 +376,8 @@ export default function Index({ services, categories, cities, filters }: Props) 
 
 
       {/* Pagination */}
-      {services.links?.length > 0 && renderPagination(services.links)}
+      {services.links?.length > 0 && <PaginationLinks links={services.links} />}
     </div>
   );
 }
+
