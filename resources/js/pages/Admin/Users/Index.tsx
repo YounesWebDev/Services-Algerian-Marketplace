@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/select";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
-
 // Wayfinder (adjust import if your generated routes path differs)
 import { index as adminUsersIndex, show as adminUsersShow } from "@/routes/admin/users";
 
@@ -256,5 +255,6 @@ export default function AdminUsersIndex() {
     </AppLayout>
   );
 }
+
 
 

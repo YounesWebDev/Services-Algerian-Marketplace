@@ -1,8 +1,12 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { Clock, MapPin } from "lucide-react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
-import { index as providerRequestsIndex, show as providerRequestsShow } from "@/routes/provider/requests";
+import {
+  index as providerRequestsIndex,
+  show as providerRequestsShow,
+} from "@/routes/provider/requests";
 
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
@@ -32,7 +36,6 @@ const publicImagePath = (path?: string | null) => {
   return `/storage/${path}`;
 };
 
-
 export default function ProviderRequestsIndex() {
   const { props } = usePage<{
     requests: { data: RequestItem[]; links: PaginationLink[] };
@@ -47,30 +50,34 @@ export default function ProviderRequestsIndex() {
     <AppLayout>
       <Head title="Requests" />
 
-      <div className="p-6 space-y-4">
+      <div className="p-4 sm:p-6 space-y-4">
         <div>
-          <h1 className="text-xl font-semibold">Open Requests</h1>
-          <p className="text-sm text-gray-600">
+          <h1 className="text-xl font-bold text-primary">Open Requests</h1>
+          <p className="text-sm text-foreground">
             These are requests posted by clients. You can open one and send an offer.
           </p>
         </div>
 
-        {/* Filters (simple beginner-friendly) */}
-        <div className="rounded-md border p-4 space-y-3">
+        {/* Filters */}
+        <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-medium">Search</label>
               <input
                 defaultValue={filters.q}
                 id="q"
-                className="mt-1 w-full rounded-md border p-2"
-                placeholder="Search by title..."
+                className="mt-1 w-full rounded-4xl bg-primary-foreground/30 border-gray-200 border p-2"
+                placeholder=" Search by title..."
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium">City</label>
-              <select defaultValue={filters.city} id="city" className="mt-1 w-full rounded-md border p-2">
+              <select
+                defaultValue={filters.city}
+                id="city"
+                className="mt-1 w-full rounded-4xl bg-primary-foreground/30 border-gray-200 border p-2"
+              >
                 <option value="">All cities</option>
                 {cities.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -85,7 +92,7 @@ export default function ProviderRequestsIndex() {
               <select
                 defaultValue={filters.category}
                 id="category"
-                className="mt-1 w-full rounded-md border p-2"
+                className="mt-1 w-full rounded-4xl bg-primary-foreground/30 border-gray-200 border p-2"
               >
                 <option value="">All categories</option>
                 {categories.map((c) => (
@@ -97,23 +104,24 @@ export default function ProviderRequestsIndex() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              className="rounded-md bg-black px-3 py-2 text-white text-sm"
+              className="rounded-3xl bg-primary px-3 py-2 text-white text-sm transition duration-700 hover:bg-foreground hover:text-background"
               onClick={() => {
                 const q = (document.getElementById("q") as HTMLInputElement)?.value ?? "";
                 const city = (document.getElementById("city") as HTMLSelectElement)?.value ?? "";
-                const category = (document.getElementById("category") as HTMLSelectElement)?.value ?? "";
+                const category =
+                  (document.getElementById("category") as HTMLSelectElement)?.value ?? "";
                 window.location.href = providerRequestsIndex.url({ query: { q, city, category } });
               }}
             >
-              Apply
+              Search
             </button>
 
             <Link
               href={providerRequestsIndex.url()}
-              className="rounded-md border px-3 py-2 text-sm"
+              className="rounded-3xl border border-gray-200 px-3 py-2 text-sm transform transition duration-700 hover:bg-primary-foreground hover:text-background"
             >
               Reset
             </Link>
@@ -123,7 +131,7 @@ export default function ProviderRequestsIndex() {
         {/* List */}
         <div className="space-y-3">
           {requests.data.length === 0 ? (
-            <div className="rounded-md border p-4 text-sm text-gray-600">
+            <div className="rounded-md border p-4 text-sm text-foreground">
               No open requests found.
             </div>
           ) : (
@@ -132,43 +140,78 @@ export default function ProviderRequestsIndex() {
               const coverUrl = publicImagePath(cover);
 
               return (
-                <div key={r.id} className="rounded-md border p-4">
-                  <div className="flex gap-4">
+                <div
+                  key={r.id}
+                  className="rounded-4xl bg-primary-foreground/30 border border-gray-200 transition duration-700 hover:bg-primary-foreground/40 hover:shadow-2xl p-4"
+                >
+                  <div className="flex flex-col sm:flex-row gap-4">
                     {/* cover image */}
-                    <div className="w-24 h-24 shrink-0 rounded-md overflow-hidden border bg-gray-50">
+                    <div className="w-full sm:w-24 h-40 sm:h-24 shrink-0 rounded-md overflow-hidden border bg-gray-50">
                       {coverUrl ? (
                         <img src={coverUrl} alt={r.title} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                        <div className="w-full h-full flex items-center justify-center text-xs text-foreground">
                           No image
                         </div>
                       )}
                     </div>
 
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="font-medium">{r.title}</div>
-                          <div className="text-sm text-gray-600 mt-1">
-                            {r.category?.name} • {r.city?.name}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-xl sm:text-2xl break-words">{r.title}</div>
+
+                          <div className="text-sm text-foreground mt-2 rounded-3xl p-1 border border-gray-200 w-full sm:w-max flex flex-wrap items-center gap-2">
+                            <span className="break-words">{r.category?.name}</span>
+                            <div className="p-2 rounded-3xl border border-gray-200 flex items-center gap-1">
+                              <MapPin className="text-red-600" />
+                              <span className="break-words">{r.city?.name}</span>
+                            </div>
                           </div>
 
-                          <div className="text-sm text-gray-600 mt-1">
-                            Budget:{" "}
-                            <span className="font-medium">
-                              {r.budget_min ?? "—"} - {r.budget_max ?? "—"} DZD
+                          <div className="text-sm text-foreground mt-2">
+                            <span className="font-medium flex flex-col sm:flex-row sm:items-center gap-2 p-1 rounded-4xl border border-gray-200 w-full sm:w-max">
+                              <div className="font-bold flex items-center gap-1 p-1 rounded-4xl border border-gray-200 text-primary w-full sm:w-auto">
+                                Min{" "}
+                                <div className="p-2 rounded-4xl border border-gray-200 w-full sm:w-auto text-center">
+                                  {r.budget_min ?? "—"} DZD
+                                </div>
+                              </div>
+
+                              <div className="font-bold text-red-600 flex items-center gap-1 p-1 rounded-4xl border border-gray-200 w-full sm:w-auto">
+                                Max{" "}
+                                <div className="p-2 rounded-4xl border border-gray-200 w-full sm:w-auto text-center">
+                                  {r.budget_max ?? "—"} DZD
+                                </div>
+                              </div>
                             </span>
-                            {r.urgency ? (
-                              <>
-                                {" "}
-                                • Urgency: <span className="font-medium">{r.urgency}</span>
-                              </>
-                            ) : null}
+
+                            <div className="flex flex-wrap items-center gap-2 mt-2 rounded-3xl border border-gray-200 w-full sm:w-max p-1 text-sm text-foreground">
+                              {r.urgency ? (
+                                <>
+                                  Urgency{" "}
+                                  {r.urgency === "high" ? (
+                                    <span className="font-bold inline-flex items-center gap-1">
+                                      <div className="flex items-center text-red-600 rounded-3xl p-2 border border-gray-200 gap-2">
+                                        <Clock /> {r.urgency}
+                                      </div>
+                                    </span>
+                                  ) : r.urgency === "medium" ? (
+                                    <span className="flex items-center text-yellow-600 rounded-3xl p-2 border border-gray-200 gap-2">
+                                      <Clock /> {r.urgency}
+                                    </span>
+                                  ) : r.urgency === "low" ? (
+                                    <span className="text-primary rounded-3xl p-2 border border-gray-200 font-bold inline-flex items-center gap-2">
+                                      <Clock /> {r.urgency}
+                                    </span>
+                                  ) : null}
+                                </>
+                              ) : null}
+                            </div>
                           </div>
 
-                          <div className="text-sm text-gray-600 mt-1 flex items-center gap-2">
-                            <span>Client:</span>
-                            <span className="inline-flex items-center gap-2">
+                          <div className="text-sm text-foreground mt-2 flex items-center border border-gray-200 p-2 rounded-3xl gap-2 w-full sm:w-max">
+                            <span className="inline-flex items-center gap-2 min-w-0">
                               {r.client?.avatar_path ? (
                                 <img
                                   src={r.client.avatar_path}
@@ -178,20 +221,23 @@ export default function ProviderRequestsIndex() {
                               ) : (
                                 <span className="w-6 h-6 rounded-full border bg-gray-100" />
                               )}
-                              <span className="font-medium">{r.client?.name}</span>
+                              <span className="font-medium truncate max-w-[220px] sm:max-w-none">
+                                {r.client?.name}
+                              </span>
                             </span>
                           </div>
                         </div>
 
                         <Link
                           href={providerRequestsShow.url(r.id)}
-                          className="text-sm underline"
+                          className="text-sm text-foreground rounded-3xl bg-primary transition duration-700 hover:bg-foreground hover:text-background px-3 py-2 sm:py-1 w-full sm:w-auto text-center"
                         >
                           Open
                         </Link>
                       </div>
 
-                      <div className="text-sm text-gray-700 mt-2 line-clamp-2">
+                      <div className="text-sm text-foreground mt-3 rounded-4xl border border-gray-200 p-2 line-clamp-2">
+                        <div className="font-bold">Description</div>
                         {r.description}
                       </div>
                     </div>
@@ -207,4 +253,3 @@ export default function ProviderRequestsIndex() {
     </AppLayout>
   );
 }
-

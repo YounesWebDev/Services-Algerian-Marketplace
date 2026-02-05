@@ -10,7 +10,7 @@ import {
   Pin,
   Wallet,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import PaginationLinks from "@/components/pagination-links";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -63,9 +63,41 @@ export default function ProviderServicesIndex() {
 
   const { services, filters, flash } = props;
 
-  // ✅ MOD: show alert with animation for 8s when flash.success exists
   const [showAlert, setShowAlert] = useState(false);
   const [animate, setAnimate] = useState(false);
+
+  const alertContent = useMemo(() => {
+    const msg = flash?.success?.trim() ?? "";
+    const lower = msg.toLowerCase();
+
+    const isDelete =
+      lower.includes("remove") ||
+      lower.includes("removed") ||
+      lower.includes("delete") ||
+      lower.includes("deleted");
+
+    const isUpdate =
+      lower.includes("update") ||
+      lower.includes("updated") ||
+      lower.includes("edit") ||
+      lower.includes("edited");
+
+    const title = isDelete
+      ? "Service removed successfully"
+      : isUpdate
+      ? "Service updated successfully"
+      : "Service created successfully";
+
+    const description =
+      msg ||
+      (isDelete
+        ? "Your service has been removed successfully."
+        : isUpdate
+        ? "Your service has been updated successfully."
+        : "Your service has been created successfully, waiting for admin approval.");
+
+    return { title, description };
+  }, [flash?.success]);
 
   useEffect(() => {
     if (!flash?.success) return;
@@ -77,29 +109,19 @@ export default function ProviderServicesIndex() {
 
     animationFrameId = requestAnimationFrame(() => {
       setShowAlert(true);
-
-      // allow DOM paint before animating in
       showAnimationFrameId = requestAnimationFrame(() => setAnimate(true));
     });
 
     hideTimer = setTimeout(() => {
-      setAnimate(false); // slide out to the right
-      removeTimer = setTimeout(() => setShowAlert(false), 300); // wait for animation end
-    }, 8000); // ✅ MOD: 8 seconds
+      setAnimate(false);
+      removeTimer = setTimeout(() => setShowAlert(false), 300);
+    }, 8000);
 
     return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-      if (showAnimationFrameId) {
-        cancelAnimationFrame(showAnimationFrameId);
-      }
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-      }
-      if (removeTimer) {
-        clearTimeout(removeTimer);
-      }
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (showAnimationFrameId) cancelAnimationFrame(showAnimationFrameId);
+      if (hideTimer) clearTimeout(hideTimer);
+      if (removeTimer) clearTimeout(removeTimer);
     };
   }, [flash?.success]);
 
@@ -107,8 +129,8 @@ export default function ProviderServicesIndex() {
     <AppLayout>
       <Head title="My Services " />
 
-      <div className="p-6 space-y-4">
-        <div className="flex items-start justify-between gap-4">
+      <div className="p-4 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-xl text-primary font-semibold">My Services</h1>
             <p className="text-sm text-card-foreground/70 mt-1 max-w-md">
@@ -119,7 +141,7 @@ export default function ProviderServicesIndex() {
 
           <Link
             href={providerServicesCreate.url()}
-            className="rounded-3xl  bg-primary px-3 py-2 transition duration-700  text-white text-sm hover:bg-foreground hover:text-background "
+            className="rounded-3xl bg-primary px-3 py-2 transition duration-700 text-white text-sm hover:bg-foreground hover:text-background w-full sm:w-auto text-center"
           >
             Create Service
           </Link>
@@ -136,14 +158,11 @@ export default function ProviderServicesIndex() {
               }
             `}
           >
-            <Alert className="bg-primary/5 backdrop-blur-sm">
+            <Alert className="bg-primary/5 backdrop-blur-sm max-w-[92vw] sm:max-w-md">
               <CheckCircle2Icon className="text-primary" />
-              <AlertTitle className="text-primary">
-                Service created successfully
-              </AlertTitle>
+              <AlertTitle className="text-primary">{alertContent.title}</AlertTitle>
               <AlertDescription className="text-foreground">
-                your service has been created successfully waiting for admin
-                approval.
+                {alertContent.description}
               </AlertDescription>
             </Alert>
           </div>
@@ -153,22 +172,26 @@ export default function ProviderServicesIndex() {
         <div className="flex flex-wrap gap-2">
           <Link
             href={providerServicesIndex.url()}
-            className={`px-3 py-1 rounded-3xl  text-sm border   ${
-              filters.status === "" ? "bg-primary text-foreground" : "bg-foreground/40 border border-gray-200"
+            className={`px-3 py-1 rounded-3xl text-sm border ${
+              filters.status === ""
+                ? "bg-primary text-foreground"
+                : "bg-foreground/40 border border-gray-200"
             }`}
           >
             All
           </Link>
 
-          {["pending", "approved", "rejected"].map((s) => (
+          {["pending", "approved", "rejected"].map((st) => (
             <Link
-              key={s}
-              href={providerServicesIndex.url({ query: { status: s } })}
+              key={st}
+              href={providerServicesIndex.url({ query: { status: st } })}
               className={`px-3 py-1 rounded-3xl text-sm border ${
-                filters.status === s ? "bg-primary text-foreground " : "bg-foreground/40 border border-gray-200"
+                filters.status === st
+                  ? "bg-primary text-foreground"
+                  : "bg-primary-foreground/30 hover:bg-primary-foreground/40 hover:shadow-2xl border border-gray-200"
               }`}
             >
-              {s}
+              {st}
             </Link>
           ))}
         </div>
@@ -176,29 +199,23 @@ export default function ProviderServicesIndex() {
         {/* List */}
         <div className="space-y-3">
           {services.data.length === 0 ? (
-            <div className="rounded-3xl bg-foreground/30 border border-gray-200 p-4 text-sm ">
+            <div className="rounded-3xl bg-primary-foreground/30 hover:shadow-2xl border border-gray-200 p-4 text-sm">
               No services yet.
             </div>
           ) : (
             services.data.map((s) => {
-              const cover = s.media
-                ?.slice()
-                .sort((a, b) => a.position - b.position)[0]?.path;
+              const cover = s.media?.slice().sort((a, b) => a.position - b.position)[0]?.path;
               const coverUrl = publicImagePath(cover);
 
               return (
                 <div
                   key={s.id}
-                  className="rounded-4xl border border-gray-200  bg-foreground/40 hover:bg-foreground/60 p-4 transition duration-300 ease-in-out text-card-foreground"
+                  className="rounded-4xl border border-gray-200 bg-primary-foreground/30 hover:bg-primary-foreground/40 hover:shadow p-4 transition duration-300 ease-in-out text-card-foreground"
                 >
-                  <div className="flex gap-4">
-                    <div className="w-24 h-24  shrink-0 rounded-md overflow-hidden border bg-gray-50">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="w-full sm:w-24 h-40 sm:h-24 shrink-0 rounded-md overflow-hidden border bg-gray-50">
                       {coverUrl ? (
-                        <img
-                          src={coverUrl}
-                          alt={s.title}
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={coverUrl} alt={s.title} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs">
                           No image
@@ -206,21 +223,22 @@ export default function ProviderServicesIndex() {
                       )}
                     </div>
 
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <div className="font-bold text-primary ">{s.title}</div>
-                          <div className=" flex items-center  gap-1 text-sm  mt-1 border border-gray-200 w-max px-2 py-1 rounded-3xl">
-                            {s.category?.name}{" "}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-bold text-primary break-words">{s.title}</div>
+
+                          <div className="flex flex-wrap items-center gap-2 text-sm mt-2 border border-gray-200 w-full sm:w-max px-2 py-1 rounded-3xl">
+                            <span className="break-words">{s.category?.name}</span>
                             <div className="flex items-center gap-1 border border-gray-200 rounded-3xl p-2">
-                              <MapPin /> {s.city?.name}
+                              <MapPin /> <span className="break-words">{s.city?.name}</span>
                             </div>
                           </div>
 
-                          <div className="text-sm  mt-1 flex items-center gap-1">
-                            Status:{" "}
+                          <div className="text-sm mt-2 flex flex-wrap items-center gap-2">
+                            <span> Status:</span>
                             {s.status === "approved" ? (
-                              <span className=" font-medium text-primary flex items-center gap-1">
+                              <span className="font-medium text-primary flex items-center gap-1">
                                 <BadgeCheck className="w-4 h-4" /> {s.status}
                               </span>
                             ) : s.status === "rejected" ? (
@@ -234,22 +252,29 @@ export default function ProviderServicesIndex() {
                             )}
                           </div>
 
-                          <div className="flex justify-between gap-5 ">
-                            <div className="text-sm  mt-1 p-1 border border-gray-200 rounded-3xl flex items-center gap-1">
+                          <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-2 mt-2">
+                            <div className="text-sm p-1 border border-gray-200 rounded-3xl flex flex-wrap items-center gap-2 w-full md:w-auto">
                               Pricing{" "}
                               {s.pricing_type === "fixed" ? (
-                                <span className="font-medium flex items-center gap-1 text-red-600 p-2 rounded-3xl border border-gray-200"><Pin className="w-4 h-4 mr-1" /> {s.pricing_type}</span>
+                                <span className="font-medium flex items-center gap-1 text-red-600 p-2 rounded-3xl border border-gray-200">
+                                  <Pin className="w-4 h-4 mr-1" /> {s.pricing_type}
+                                </span>
                               ) : s.pricing_type === "quote" ? (
-                                <span className="font-medium flex items-center gap-1 text-primary p-2 rounded-3xl border border-gray-200"><Handshake className="w-4 h-4 mr-1" /> {s.pricing_type}</span>
+                                <span className="font-medium flex items-center gap-1 text-primary p-2 rounded-3xl border border-gray-200">
+                                  <Handshake className="w-4 h-4 mr-1" /> {s.pricing_type}
+                                </span>
                               ) : s.pricing_type === "hourly" ? (
-                                <span className="font-medium flex items-center gap-1 text-amber-400 p-2 rounded-3xl border border-gray-200"><Clock className="w-4 h-4 mr-1" /> {s.pricing_type}</span>
+                                <span className="font-medium flex items-center gap-1 text-amber-400 p-2 rounded-3xl border border-gray-200">
+                                  <Clock className="w-4 h-4 mr-1" /> {s.pricing_type}
+                                </span>
                               ) : null}
                             </div>
-                            <div className="p-1 border border-gray-200 rounded-3xl flex items-center gap-1 text-sm  mt-1">
+
+                            <div className="p-1 border border-gray-200 rounded-3xl flex flex-wrap items-center gap-2 text-sm w-full md:w-auto">
                               Payment{" "}
                               {s.payment_type === "cash" ? (
-                                <span className=" p-2 rounded-3xl border border-gray-200 font-medium text-primary flex items-center gap-1 ">
-                                 <Wallet className="w-4 h-4 mr-1" /> {s.payment_type}
+                                <span className="p-2 rounded-3xl border border-gray-200 font-medium text-primary flex items-center gap-1">
+                                  <Wallet className="w-4 h-4 mr-1" /> {s.payment_type}
                                 </span>
                               ) : s.payment_type === "online" ? (
                                 <span className="p-2 rounded-3xl border border-gray-200 font-medium text-primary flex items-center gap-1">
@@ -257,11 +282,12 @@ export default function ProviderServicesIndex() {
                                 </span>
                               ) : s.payment_type === "both" ? (
                                 <span className="p-2 rounded-3xl border border-gray-200 font-medium text-primary flex items-center gap-1">
-                                 <Wallet className="w-4 h-4 mr-1" /> {s.payment_type}
+                                  <Wallet className="w-4 h-4 mr-1" /> {s.payment_type}
                                 </span>
                               ) : null}
                             </div>
-                            <div className="text-sm  mt-1 p-1 border border-gray-200 rounded-3xl text-primary flex items-center gap-1">
+
+                            <div className="text-sm p-1 border border-gray-200 rounded-3xl text-primary flex flex-wrap items-center gap-2 w-full md:w-auto">
                               price{" "}
                               <span className="font-medium p-2 rounded-3xl border border-gray-200">
                                 {s.base_price ?? "—"} DZD
@@ -270,34 +296,34 @@ export default function ProviderServicesIndex() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col items-end gap-2">
-                          {/* Public page */}
-                          <Link
-                            href={serviceShow.url(s.slug)}
-                            className="text-sm underline"
-                          >
+                        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2 w-full lg:w-auto">
+                          <Link href={serviceShow.url(s.slug)} className="text-sm underline text-center sm:text-left">
                             View public
                           </Link>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
                             <Link
                               href={providerServicesEdit(s.id).url}
-                              className="rounded-3xl border border-gray-200 px-3 py-1 text-xs transition hover:bg-foreground hover:text-background"
+                              className="rounded-3xl border border-gray-200 px-3 py-2 sm:py-1 text-xs transition hover:bg-foreground hover:text-background w-full sm:w-auto text-center"
                             >
                               Edit
                             </Link>
+
                             <button
                               type="button"
                               onClick={() => {
-                                if (!confirm("Remove this service?")) {
-                                  return;
-                                }
+                                if (!confirm("Remove this service?")) return;
 
+                                // ✅ TS-safe + supports preserveScroll
                                 router.delete(providerServicesDestroy(s.id).url, {
                                   preserveScroll: true,
+                                  onSuccess: () => {
+                                    // optional: if your backend doesn't flash, you can force show alert here,
+                                    // but leaving it as-is to not change your logic.
+                                  },
                                 });
                               }}
-                              className="rounded-3xl border border-red-200 px-3 py-1 text-xs text-red-600 transition hover:bg-red-600 hover:text-white"
+                              className="rounded-3xl border border-red-200 px-3 py-2 sm:py-1 text-xs text-red-600 transition hover:bg-red-600 hover:text-white w-full sm:w-auto"
                             >
                               Remove
                             </button>
