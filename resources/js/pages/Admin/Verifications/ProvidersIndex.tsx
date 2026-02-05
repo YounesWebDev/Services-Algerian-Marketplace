@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppLayout from "@/layouts/app-layout";
 import { index as providersIndex, show as providersShow } from "@/routes/admin/verifications/providers";
-import { index as servicesIndex } from "@/routes/admin/verifications/services";
 
 type ProviderLite = {
   id: number;
@@ -90,13 +89,7 @@ export default function ProvidersVerificationsIndex() {
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href={servicesIndex().url}>
-                Service approvals
-              </Link>
-            </Button>
-          </div>
+          <div />
         </div>
 
         <Card>

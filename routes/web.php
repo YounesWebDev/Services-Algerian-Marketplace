@@ -2,12 +2,11 @@
 
 use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
-use App\Http\Controllers\Admin\ReportController as AdminReportController; 
-use App\Http\Controllers\Admin\RequestsController as AdminRequestsController; 
-use App\Http\Controllers\Admin\ServicesController as AdminServicesController; 
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\RequestsController as AdminRequestsController;
+use App\Http\Controllers\Admin\ServicesController as AdminServicesController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\DisputeController;
@@ -21,18 +20,47 @@ use App\Http\Controllers\Provider\MyServicesController;
 use App\Http\Controllers\Provider\ProviderBookingController;
 use App\Http\Controllers\Provider\ProviderVerificationController;
 use App\Http\Controllers\Provider\SendOfferController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/suggestions', [HomeController::class, 'suggestions'])->name('home.suggestions');
+// Admin Routes
+Route::middleware(['auth', 'verified', 'role:admin'])
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('categories', CategoryController::class)->except(['show']);
+        // Users management
+        Route::get('/users', [UsersController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
+        Route::post('/users/{user}/status', [UsersController::class, 'updateStatus'])->name('users.status');
 
-Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
-Route::get('/services/{service:slug}', [ServicesController::class, 'show'])
-    ->where('service', '^(?!create$).+')
-    ->name('services.show');
+        // services management
+        Route::get('/services/management', [AdminServicesController::class, 'index'])->name('services.index');
+        Route::get('/services/management/{service}', [AdminServicesController::class, 'show'])->name('services.show');
+        Route::post('/services/management/{service}/approve', [AdminServicesController::class, 'approve'])->name('services.approve');
+        Route::post('/services/management/{service}/reject', [AdminServicesController::class, 'reject'])->name('services.reject');
+        Route::post('/services/management/{service}/hide', [AdminServicesController::class, 'hide'])->name('services.hide');
+
+        // Request management
+        Route::get('/requests/management', [AdminRequestsController::class, 'index'])->name('requests.index');
+        Route::get('/requests/management/{request}', [AdminRequestsController::class, 'show'])->name('requests.show');
+        Route::post('/requests/management/{request}/close', [AdminRequestsController::class, 'close'])->name('requests.close');
+        // Provider verifications
+        Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
+        Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');
+        Route::post('/verifications/providers/{verification}/approve', [AdminVerificationController::class, 'providersApprove'])->name('verifications.providers.approve');
+        Route::post('/verifications/providers/{verification}/reject', [AdminVerificationController::class, 'providersReject'])->name('verifications.providers.reject');
+        // disputes
+        Route::get('/admin/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+        Route::get('/admin/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
+        Route::post('/admin/disputes/{dispute}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
+        // reports
+        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/admin/reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('/admin/reports/{report}/close', [AdminReportController::class, 'close'])->name('reports.close');
+    });
 
 /**
  * ✅ Dashboard (same URL for all roles)
@@ -120,47 +148,11 @@ Route::middleware(['auth', 'verified', 'role:client'])
 
     });
 
-/**
- * ✅ Admin: Categories (NO /admin prefix)
- * /categories
- */
-Route::middleware(['auth', 'verified', 'role:admin'])
-    ->name('admin.')
-    ->group(function () {
-        Route::resource('categories', CategoryController::class)->except(['show']);
-        // Users management
-        Route::get('/users', [UsersController::class, 'index'])->name('users.index');
-        Route::get('/users/{user}', [UsersController::class, 'show'])->name('users.show');
-        Route::post('/users/{user}/status', [UsersController::class, 'updateStatus'])->name('users.status');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/suggestions', [HomeController::class, 'suggestions'])->name('home.suggestions');
 
-        //services management
-        Route::get('/services/management', [AdminServicesController::class, 'index'])->name('services.index');
-        Route::get('/services/management/{service}', [AdminServicesController::class, 'show'])->name('services.show');
-        Route::post('/services/management/{service}/approve', [AdminServicesController::class, 'approve'])->name('services.approve');
-        Route::post('/services/management/{service}/reject', [AdminServicesController::class, 'reject'])->name('services.reject');
-
-        // Request management
-        Route::get('/requests/management', [AdminRequestsController::class, 'index'])->name('requests.index');
-        Route::get('/requests/management/{request}', [AdminRequestsController::class, 'show'])->name('requests.show');
-        Route::post('/requests/management/{request}/close', [AdminRequestsController::class, 'close'])->name('requests.close');
-        // Provider verifications
-        Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
-        Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');
-        Route::post('/verifications/providers/{verification}/approve', [AdminVerificationController::class, 'providersApprove'])->name('verifications.providers.approve');
-        Route::post('/verifications/providers/{verification}/reject', [AdminVerificationController::class, 'providersReject'])->name('verifications.providers.reject');
-        // services approvals
-        Route::get('/verifications/services', [AdminVerificationController::class, 'servicesIndex'])->name('verifications.services.index');
-        Route::get('/verifications/services/{service}', [AdminVerificationController::class, 'servicesShow'])->name('verifications.services.show');
-        Route::post('/verifications/services/{service}/approve', [AdminVerificationController::class, 'servicesApprove'])->name('verifications.services.approve');
-        Route::post('/verifications/services/{service}/reject', [AdminVerificationController::class, 'servicesReject'])->name('verifications.services.reject');
-        // disputes
-        Route::get('/admin/disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
-        Route::get('/admin/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
-        Route::post('/admin/disputes/{dispute}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
-        // reports
-        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('reports.index');
-        Route::get('/admin/reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
-        Route::post('/admin/reports/{report}/close', [AdminReportController::class, 'close'])->name('reports.close');
-    });
-
+Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
+Route::get('/services/{service:slug}', [ServicesController::class, 'show'])
+    ->where('service', '^(?!create$|management$).+')
+    ->name('services.show');
 require __DIR__.'/settings.php';
