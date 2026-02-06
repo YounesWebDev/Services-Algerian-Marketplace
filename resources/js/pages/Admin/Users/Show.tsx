@@ -1,4 +1,5 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,8 @@ import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
 
 // Wayfinder (adjust path if needed)
+import { index as adminRequestsIndex } from "@/routes/admin/requests";
+import { index as adminServicesIndex } from "@/routes/admin/services";
 import { index as adminUsersIndex, status as adminUsersStatus } from "@/routes/admin/users";
 
 type User = {
@@ -186,32 +189,51 @@ export default function AdminUsersShow() {
                 <CardTitle>Quick stats</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm text-muted-foreground">Services</div>
-                    <div className="text-2xl font-semibold">{stats.servicesCount}</div>
-                  </div>
+                {user.role === "provider" ? (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Services</div>
+                      <Link
+                        href={adminServicesIndex({ query: { q: user.name } }).url}
+                        className="text-2xl font-semibold underline"
+                      >
+                        {stats.servicesCount}
+                      </Link>
+                    </div>
 
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm text-muted-foreground">Requests</div>
-                    <div className="text-2xl font-semibold">{stats.requestsCount}</div>
-                  </div>
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Bookings (as provider)</div>
+                      <div className="text-2xl font-semibold">{stats.bookingsAsProviderCount}</div>
+                    </div>
 
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm text-muted-foreground">Bookings (as client)</div>
-                    <div className="text-2xl font-semibold">{stats.bookingsAsClientCount}</div>
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Reports made</div>
+                      <div className="text-2xl font-semibold">{stats.reportsMadeCount}</div>
+                    </div>
                   </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Requests</div>
+                      <Link
+                        href={adminRequestsIndex({ query: { q: user.name } }).url}
+                        className="text-2xl font-semibold underline"
+                      >
+                        {stats.requestsCount}
+                      </Link>
+                    </div>
 
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm text-muted-foreground">Bookings (as provider)</div>
-                    <div className="text-2xl font-semibold">{stats.bookingsAsProviderCount}</div>
-                  </div>
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Bookings (as client)</div>
+                      <div className="text-2xl font-semibold">{stats.bookingsAsClientCount}</div>
+                    </div>
 
-                  <div className="rounded-lg border p-4">
-                    <div className="text-sm text-muted-foreground">Reports made</div>
-                    <div className="text-2xl font-semibold">{stats.reportsMadeCount}</div>
+                    <div className="rounded-lg border p-4">
+                      <div className="text-sm text-muted-foreground">Reports made</div>
+                      <div className="text-2xl font-semibold">{stats.reportsMadeCount}</div>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -273,4 +295,3 @@ export default function AdminUsersShow() {
     </AppLayout>
   );
 }
-

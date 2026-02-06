@@ -15,7 +15,6 @@ class ServicesController extends Controller
         $status = (string) $request->query('status', '');
         $paymentType = (string) $request->query('payment_type', '');
         $pricingType = (string) $request->query('pricing_type', '');
-        $providerId = (string) $request->query('provider_id', '');
 
         $query = Service::query()
             ->with([
@@ -29,7 +28,11 @@ class ServicesController extends Controller
         if ($q !== '') {
             $query->where(function ($w) use ($q) {
                 $w->where('title', 'like', "%{$q}%")
-                    ->orWhere('slug', 'like', "%{$q}%");
+                    ->orWhere('slug', 'like', "%{$q}%")
+                    ->orWhereHas('provider', function ($p) use ($q) {
+                        $p->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%");
+                    });
             });
         }
 
@@ -45,9 +48,6 @@ class ServicesController extends Controller
             $query->where('pricing_type', $pricingType);
         }
 
-        if ($providerId !== '') {
-            $query->where('provider_id', $providerId);
-        }
 
         $services = $query->paginate(12)->withQueryString();
 
@@ -58,7 +58,6 @@ class ServicesController extends Controller
                 'status' => $status,
                 'payment_type' => $paymentType,
                 'pricing_type' => $pricingType,
-                'provider_id' => $providerId,
             ],
         ]);
     }

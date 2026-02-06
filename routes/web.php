@@ -45,8 +45,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])
 
         // Request management
         Route::get('/requests/management', [AdminRequestsController::class, 'index'])->name('requests.index');
-        Route::get('/requests/management/{request}', [AdminRequestsController::class, 'show'])->name('requests.show');
-        Route::post('/requests/management/{request}/close', [AdminRequestsController::class, 'close'])->name('requests.close');
+        Route::get('/requests/management/{requestModel}', [AdminRequestsController::class, 'show'])->name('requests.show');
+        Route::post('/requests/management/{requestModel}/close', [AdminRequestsController::class, 'close'])->name('requests.close');
+        Route::post('/requests/management/{requestModel}/reopen', [AdminRequestsController::class, 'reopen'])->name('requests.reopen');
         // Provider verifications
         Route::get('/verifications/providers', [AdminVerificationController::class, 'providersIndex'])->name('verifications.providers.index');
         Route::get('/verifications/providers/{verification}', [AdminVerificationController::class, 'providersShow'])->name('verifications.providers.show');

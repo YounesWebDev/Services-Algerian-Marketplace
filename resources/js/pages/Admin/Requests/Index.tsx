@@ -15,44 +15,42 @@ import {
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
 
-// Wayfinder (adjust if your generated path differs)
+// Wayfinder (adjust import path if your generated routes differ)
 import {
-  index as adminServicesIndex,
-  show as adminServicesShow,
-} from "@/routes/admin/services";
+  index as adminRequestsIndex,
+  show as adminRequestsShow,
+} from "@/routes/admin/requests";
 
-type ServiceMedia = {
-  id: number;
-  path: string;
-  type: string;
-  position: number;
-};
+type Category = { id: number; name: string; slug: string };
+type City = { id: number; name: string };
 
-type ProviderMini = {
+type Media = { id: number; path: string; type: string; position: number };
+
+type ClientMini = {
   id: number;
   name: string;
   email: string;
-  status: "active" | "inactive";
   avatar_path?: string | null;
+  status: "active" | "inactive";
+  role: string;
 };
 
-type CategoryMini = { id: number; name: string; slug: string };
-type CityMini = { id: number; name: string };
-
-type ServiceRow = {
+type RequestRow = {
   id: number;
   title: string;
-  slug: string;
-  status: "pending" | "approved" | "rejected" | "hidden";
-  pricing_type: "fixed" | "hourly" | "quote";
-  payment_type: "cash" | "online" | "both";
-  base_price?: number | string | null;
-  created_at?: string | null;
+  description: string;
+  status: string; // open/assigned/closed/cancelled...
+  budget_min?: number | string | null;
+  budget_max?: number | string | null;
+  urgency?: string | null;
 
-  provider: ProviderMini;
-  category: CategoryMini;
-  city: CityMini;
-  media?: ServiceMedia[];
+  category: Category;
+  city: City;
+  client: ClientMini;
+  media?: Media[];
+
+  offers_count: number;
+  created_at?: string | null;
 };
 
 type Paginated<T> = {
@@ -64,12 +62,14 @@ type Paginated<T> = {
 };
 
 type PageProps = {
-  services: Paginated<ServiceRow>;
+  requests: Paginated<RequestRow>;
+  categories: Category[];
+  cities: City[];
   filters: {
     q: string;
     status: string;
-    payment_type: string;
-    pricing_type: string;
+    city: string;
+    category: string;
   };
 };
 
@@ -108,33 +108,32 @@ function Badge({
   );
 }
 
-export default function AdminServicesIndex() {
+export default function AdminRequestsIndex() {
   const { props } = usePage<PageProps>();
-  const { services, filters } = props;
+  const { requests, categories, cities, filters } = props;
 
   return (
     <AppLayout>
-      <Head title="Services Management" />
+      <Head title="Requests Management" />
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Services management</h1>
+          <h1 className="text-2xl font-semibold">Requests management</h1>
           <p className="text-sm text-muted-foreground">
-            Approve or reject provider services. Use filters to quickly find pending ones.
+            Moderate client requests: review details, offers count, and close/reopen when needed.
           </p>
         </div>
 
-        {/* Filters */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Filters</CardTitle>
           </CardHeader>
           <CardContent>
-            <form method="get" action={adminServicesIndex().url} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-5">
+            <form method="get" action={adminRequestsIndex().url} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-6">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="q">Search</Label>
-                  <Input id="q" name="q" placeholder="Title or slug..." defaultValue={filters.q ?? ""} />
+                  <Input id="q" name="q" placeholder="Title or description..." defaultValue={filters.q ?? ""} />
                 </div>
 
                 <div className="space-y-2">
@@ -152,163 +151,160 @@ export default function AdminServicesIndex() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__all">All</SelectItem>
-                      <SelectItem value="pending">pending</SelectItem>
-                      <SelectItem value="approved">approved</SelectItem>
-                      <SelectItem value="rejected">rejected</SelectItem>
-                      <SelectItem value="hidden">hidden</SelectItem>
+                      <SelectItem value="open">open</SelectItem>
+                      <SelectItem value="in_discussion">in_discussion</SelectItem>
+                      <SelectItem value="assigned">assigned</SelectItem>
+                      <SelectItem value="closed">closed</SelectItem>
+                      <SelectItem value="cancelled">cancelled</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Payment</Label>
-                  <input type="hidden" name="payment_type" value={filters.payment_type ?? ""} />
+                  <Label>City</Label>
+                  <input type="hidden" name="city" value={filters.city ?? ""} />
                   <Select
-                    defaultValue={filters.payment_type ?? ""}
+                    defaultValue={filters.city ?? ""}
                     onValueChange={(v) => {
-                      const input = document.querySelector<HTMLInputElement>('input[name="payment_type"]');
+                      const input = document.querySelector<HTMLInputElement>('input[name="city"]');
                       if (input) input.value = v === "__all" ? "" : v;
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All" />
+                      <SelectValue placeholder="All cities" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__all">All</SelectItem>
-                      <SelectItem value="cash">cash</SelectItem>
-                      <SelectItem value="online">online</SelectItem>
-                      <SelectItem value="both">both</SelectItem>
+                      {cities.map((c) => (
+                        <SelectItem key={c.id} value={String(c.id)}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Pricing</Label>
-                  <input type="hidden" name="pricing_type" value={filters.pricing_type ?? ""} />
+                  <Label>Category</Label>
+                  <input type="hidden" name="category" value={filters.category ?? ""} />
                   <Select
-                    defaultValue={filters.pricing_type ?? ""}
+                    defaultValue={filters.category ?? ""}
                     onValueChange={(v) => {
-                      const input = document.querySelector<HTMLInputElement>('input[name="pricing_type"]');
+                      const input = document.querySelector<HTMLInputElement>('input[name="category"]');
                       if (input) input.value = v === "__all" ? "" : v;
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All" />
+                      <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__all">All</SelectItem>
-                      <SelectItem value="fixed">fixed</SelectItem>
-                      <SelectItem value="hourly">hourly</SelectItem>
-                      <SelectItem value="quote">quote</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={String(cat.id)}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
+
               </div>
 
-              <div className="flex items-end gap-2 md:col-span-5">
-                  <Button type="submit">Apply</Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => (window.location.href = adminServicesIndex().url)}
-                  >
-                    Reset
-                  </Button>
+              <div className="flex items-center gap-2">
+                <Button type="submit">Apply</Button>
+                <Button type="button" variant="outline" onClick={() => (window.location.href = adminRequestsIndex().url)}>
+                  Reset
+                </Button>
 
-                  <div className="ml-auto text-sm text-muted-foreground">
-                    Total: <span className="font-medium text-foreground">{services.total}</span>
-                  </div>
+                <div className="ml-auto text-sm text-muted-foreground">
+                  Total: <span className="font-medium text-foreground">{requests.total}</span>
+                </div>
               </div>
             </form>
           </CardContent>
         </Card>
 
-        {/* List */}
         <div className="rounded-lg border bg-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-muted/50">
                 <tr className="text-left">
-                  <th className="px-4 py-3 font-medium">Service</th>
-                  <th className="px-4 py-3 font-medium">Provider</th>
+                  <th className="px-4 py-3 font-medium">Request</th>
+                  <th className="px-4 py-3 font-medium">Client</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Payment</th>
-                  <th className="px-4 py-3 font-medium">Pricing</th>
+                  <th className="px-4 py-3 font-medium">Offers</th>
                   <th className="px-4 py-3 font-medium text-right">Action</th>
                 </tr>
               </thead>
 
               <tbody>
-                {services.data.length === 0 ? (
+                {requests.data.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-6 text-muted-foreground">
-                      No services found.
+                    <td colSpan={5} className="px-4 py-6 text-muted-foreground">
+                      No requests found.
                     </td>
                   </tr>
                 ) : (
-                  services.data.map((s) => {
-                    const cover = (s.media ?? []).slice().sort((a, b) => a.position - b.position)[0]?.path;
+                  requests.data.map((r) => {
+                    const cover = (r.media ?? []).slice().sort((a, b) => a.position - b.position)[0]?.path;
                     const coverUrl = publicImagePath(cover);
 
-                    const statusVariant =
-                      s.status === "approved"
+                    const variant =
+                      r.status === "open"
                         ? "success"
-                        : s.status === "rejected"
+                        : r.status === "assigned"
+                        ? "warning"
+                        : r.status === "closed" || r.status === "cancelled"
                         ? "danger"
-                        : s.status === "hidden"
-                        ? "muted"
-                        : "warning";
+                        : "muted";
 
                     return (
-                      <tr key={s.id} className="border-t">
+                      <tr key={r.id} className="border-t">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="h-14 w-14 shrink-0 rounded-md overflow-hidden border bg-muted">
                               {coverUrl ? (
-                                <img src={coverUrl} alt={s.title} className="h-full w-full object-cover" />
+                                <img src={coverUrl} alt={r.title} className="h-full w-full object-cover" />
                               ) : (
                                 <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">
                                   No image
                                 </div>
                               )}
                             </div>
+
                             <div className="min-w-0">
-                              <div className="font-medium truncate">{s.title}</div>
+                              <div className="font-medium truncate">{r.title}</div>
                               <div className="text-xs text-muted-foreground truncate">
-                                {s.category?.name} • {s.city?.name}
+                                {r.category?.name} • {r.city?.name}
                               </div>
-                              <div className="text-xs text-muted-foreground truncate">slug: {s.slug}</div>
+                              <div className="text-xs text-muted-foreground truncate">
+                                budget:{" "}
+                                {r.budget_min || r.budget_max
+                                  ? `${r.budget_min ?? "—"} - ${r.budget_max ?? "—"} DZD`
+                                  : "—"}
+                              </div>
                             </div>
                           </div>
                         </td>
 
                         <td className="px-4 py-3">
                           <div className="min-w-0">
-                            <div className="font-medium truncate">{s.provider?.name}</div>
-                            <div className="text-xs text-muted-foreground truncate">{s.provider?.email}</div>
-                            <div className="mt-1">
-                              <Badge variant={s.provider?.status === "active" ? "success" : "danger"}>
-                                provider {s.provider?.status}
-                              </Badge>
-                            </div>
+                            <div className="font-medium truncate">{r.client?.name}</div>
+                            <div className="text-xs text-muted-foreground truncate">{r.client?.email}</div>
                           </div>
                         </td>
 
                         <td className="px-4 py-3">
-                          <Badge variant={statusVariant}>{s.status}</Badge>
+                          <Badge variant={variant}>{r.status}</Badge>
                         </td>
 
                         <td className="px-4 py-3">
-                          <Badge variant="muted">{s.payment_type}</Badge>
-                        </td>
-
-                        <td className="px-4 py-3">
-                          <Badge variant="muted">{s.pricing_type}</Badge>
+                          <Badge variant="muted">{r.offers_count}</Badge>
                         </td>
 
                         <td className="px-4 py-3 text-right">
                           <Button asChild variant="outline" size="sm">
-                            <Link href={adminServicesShow(s.id).url}>View</Link>
+                            <Link href={adminRequestsShow(r.id).url}>View</Link>
                           </Button>
                         </td>
                       </tr>
@@ -319,10 +315,9 @@ export default function AdminServicesIndex() {
             </table>
           </div>
 
-          {/* Pagination */}
-          {services.links?.length > 1 && (
+          {requests.links?.length > 1 && (
             <div className="border-t p-3">
-              <PaginationLinks links={services.links} />
+              <PaginationLinks links={requests.links} />
             </div>
           )}
         </div>

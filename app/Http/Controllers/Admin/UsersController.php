@@ -9,28 +9,31 @@ use Inertia\Inertia;
 
 class UsersController extends Controller
 {
-    public function index(Request $request){
-        $q = (string) $request->query('q' , '');
-        $role = (string) $request->query('role' , '');
-        $status = (string) $request->query('status' , '');
+    public function index(Request $request)
+    {
+        $q = (string) $request->query('q', '');
+        $role = (string) $request->query('role', '');
+        $status = (string) $request->query('status', '');
 
         $query = User::query()
-        ->select(['id','name' , 'email' , 'role' , 'status' , 'avatar_path' , 'created_at'])
-        ->whereIn('role', ['provider', 'client'])
-        ->latest();
+            ->select(['id', 'name', 'email', 'role', 'status', 'avatar_path', 'created_at'])
+            ->whereIn('role', ['provider', 'client'])
+            ->latest();
 
-        if($q !== ''){
-            $query->where(function ($w) use ($q){
-                $w->where('name' , 'like' , "%{$q}%")
-                ->orWhere('email' , 'like' , "%{$q}%");
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $w->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
             });
         }
 
-        if($role !== '' && in_array($role, ['provider', 'client'], true))
-            $query->where('role' , $role);
-        
-        if($status !== '')
-            $query->where('status' , $status);
+        if ($role !== '' && in_array($role, ['provider', 'client'], true)) {
+            $query->where('role', $role);
+        }
+
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
 
         $users = $query->paginate(12)->withQueryString();
 
@@ -44,11 +47,11 @@ class UsersController extends Controller
         ]);
     }
 
-    public function show(User $user){
+    public function show(User $user)
+    {
         if ($user->role === 'admin') {
             abort(404);
         }
-
         // Basic counts
         $servicesCount = $user->services()->count();
         $requestsCount = $user->requests()->count();

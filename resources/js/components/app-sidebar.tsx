@@ -30,6 +30,7 @@ import { dashboard } from "@/routes";
 import { index as adminCategoriesIndex } from "@/routes/admin/categories";
 import { index as adminDisputesIndex } from "@/routes/admin/disputes";
 import { index as adminReportsIndex } from "@/routes/admin/reports";
+import { index as adminRequestsIndex } from "@/routes/admin/requests";
 import { index as adminServicesIndex } from "@/routes/admin/services";
 import { index as adminUsersIndex } from "@/routes/admin/users";
 import { index as providersVerificationsIndex } from "@/routes/admin/verifications/providers";
@@ -96,6 +97,7 @@ const adminNavItems: NavItem[] = [
     { title: "Dashboard", href: dashboard(), icon: LayoutGrid },
     { title: "Users", href: adminUsersIndex().url, icon: userIcon },
     { title: "Services", href: adminServicesIndex().url, icon: Briefcase },
+    { title: "Requests", href: adminRequestsIndex().url, icon: BookOpen },
     { title: "Categories", href: adminCategoriesIndex().url, icon: Tags },
     { title: "Provider Verifications",href: providersVerificationsIndex().url,icon: ShieldCheck },
     { title: "Disputes",href: adminDisputesIndex().url,icon: Flag },

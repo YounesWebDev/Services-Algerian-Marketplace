@@ -125,7 +125,6 @@ export default function AdminUsersIndex() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__all">All roles</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="provider">Provider</SelectItem>
                   <SelectItem value="client">Client</SelectItem>
                 </SelectContent>
@@ -255,6 +254,5 @@ export default function AdminUsersIndex() {
     </AppLayout>
   );
 }
-
 
 
