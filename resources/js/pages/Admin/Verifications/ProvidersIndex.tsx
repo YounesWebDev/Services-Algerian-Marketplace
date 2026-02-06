@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as providersIndex, show as providersShow } from "@/routes/admin/verifications/providers";
-
 type ProviderLite = {
   id: number;
   name: string;
@@ -77,7 +77,12 @@ export default function ProvidersVerificationsIndex() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Provider Verifications", href: providersIndex().url },
+      ]}
+    >
       <Head title="Provider verifications" />
 
       <div className="p-6 max-w-6xl space-y-4">

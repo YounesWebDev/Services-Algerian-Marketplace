@@ -2,9 +2,9 @@ import { Link, usePage } from "@inertiajs/react";
 import React from "react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as clientBookingsIndex } from "@/routes/client/bookings";
 import { index as clientOffersIndex } from "@/routes/client/offers";
-
 type Stats = {
   total_bookings: number;
   pending_bookings: number;
@@ -20,7 +20,7 @@ export default function Dashboard() {
   const { stats } = usePage<PageProps>().props;
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <div className="p-4 max-w-full mx-auto ">
         <h1 className="text-2xl font-bold mb-6 text-primary">Client Dashboard</h1>
 

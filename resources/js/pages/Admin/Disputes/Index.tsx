@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as disputesIndex, show as disputesShow } from "@/routes/admin/disputes";
-
 type Dispute = {
   id: number;
   reason: string;
@@ -35,7 +35,12 @@ export default function Index({
   filters: { status: string };
 }) {
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Disputes", href: disputesIndex().url },
+      ]}
+    >
       <Head title="Disputes" />
 
       <div className="max-w-6xl mx-auto space-y-4">

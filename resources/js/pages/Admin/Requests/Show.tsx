@@ -1,9 +1,10 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
-
+import { dashboard } from "@/routes";
 // Wayfinder (adjust import if needed)
 import {
   index as adminRequestsIndex,
@@ -110,7 +111,13 @@ export default function AdminRequestsShow() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Requests", href: adminRequestsIndex().url },
+        { title: request.title, href: adminRequestsIndex().url },
+      ]}
+    >
       <Head title={`Request: ${request.title}`} />
 
       <div className="space-y-6">

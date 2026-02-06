@@ -1,7 +1,8 @@
-﻿import { Head, Link, usePage } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import {
   create as myRequestsCreate,
   index as myRequestsIndex,
@@ -33,7 +34,12 @@ export default function ClientRequestsIndex() {
   }>().props;
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "My Requests", href: myRequestsIndex().url },
+      ]}
+    >
       <Head title="My Requests" />
 
       <div className="p-6 space-y-4">

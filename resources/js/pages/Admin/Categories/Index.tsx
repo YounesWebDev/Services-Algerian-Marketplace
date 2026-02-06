@@ -3,8 +3,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
+import { index as adminCategoriesIndex } from "@/routes/admin/categories";
 import type { SharedData } from "@/types";
-
 type Flash = {
   success?: string;
   error?: string;
@@ -73,7 +74,12 @@ export default function Index({ categories, parents }: Props) {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Categories", href: adminCategoriesIndex().url },
+      ]}
+    >
       <Head title="Categories" />
 
       <div className="p-6 space-y-6">

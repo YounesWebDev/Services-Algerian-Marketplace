@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
-
+import { dashboard } from "@/routes";
 type Verification = {
     id: number;
     provider_id: number;
@@ -49,7 +49,7 @@ export default function Dashboard({
     };
 }) {
     return (
-<AppLayout breadcrumbs={[{ title: "Admin Dashboard", href: "/admin/dashboard" }]}>
+<AppLayout breadcrumbs={[{ title: "Admin Dashboard", href: dashboard().url }]}>
 
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
         <div className="space-y-1">

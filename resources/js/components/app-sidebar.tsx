@@ -29,6 +29,8 @@ import {
 import { dashboard } from "@/routes";
 import { index as adminCategoriesIndex } from "@/routes/admin/categories";
 import { index as adminDisputesIndex } from "@/routes/admin/disputes";
+import { index as adminPaymentsIndex } from "@/routes/admin/payments";
+import { index as adminPayoutsIndex } from "@/routes/admin/payouts";
 import { index as adminReportsIndex } from "@/routes/admin/reports";
 import { index as adminRequestsIndex } from "@/routes/admin/requests";
 import { index as adminServicesIndex } from "@/routes/admin/services";
@@ -43,6 +45,7 @@ import { index as providerBookingsIndex } from "@/routes/provider/bookings";
 import {
     index as providerServicesIndex,
 } from "@/routes/provider/my/services";
+import { index as providerPayoutsIndex } from "@/routes/provider/payouts";
 import { show as providerVerificationShow } from "@/routes/provider/verification";
 import { index as servicesIndex } from "@/routes/services";
 import { type NavItem, type SharedData, type User } from "@/types";
@@ -87,6 +90,7 @@ const providerNavItems = (user: User): NavItem[] => [
     { title: "Browse Requests", href: "/requests", icon: Briefcase },
     { title: "Verification", href: providerVerificationShow().url, icon: CircleUser },
     { title: "Bookings", href: providerBookingsIndex.url(), icon: BookOpen },
+    { title: "Payouts", href: providerPayoutsIndex().url, icon: BadgePercent },
     { title: "Profile", href: profileShow(user.id).url, icon: userIcon },
 ];
 
@@ -98,6 +102,8 @@ const adminNavItems: NavItem[] = [
     { title: "Users", href: adminUsersIndex().url, icon: userIcon },
     { title: "Services", href: adminServicesIndex().url, icon: Briefcase },
     { title: "Requests", href: adminRequestsIndex().url, icon: BookOpen },
+    { title: "Payments", href: adminPaymentsIndex().url, icon: BadgePercent },
+    { title: "Payouts", href: adminPayoutsIndex().url, icon: BadgePercent },
     { title: "Categories", href: adminCategoriesIndex().url, icon: Tags },
     { title: "Provider Verifications",href: providersVerificationsIndex().url,icon: ShieldCheck },
     { title: "Disputes",href: adminDisputesIndex().url,icon: Flag },

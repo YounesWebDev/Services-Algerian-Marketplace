@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as reportsIndex, show as reportsShow } from "@/routes/admin/reports";
-
 type Report = {
   id: number;
   target_type: "service" | "provider" | "request";
@@ -29,7 +29,12 @@ export default function Index({
     t === "service" ? "Service" : t === "provider" ? "Provider" : "Request";
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Reports", href: reportsIndex().url },
+      ]}
+    >
       <Head title="Reports" />
 
       <div className="max-w-6xl mx-auto space-y-4">

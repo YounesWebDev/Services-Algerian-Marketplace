@@ -1,10 +1,11 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
-
+import { dashboard } from "@/routes";
 // Wayfinder (adjust if needed)
 import {
   index as adminServicesIndex,
@@ -121,7 +122,13 @@ export default function AdminServicesShow() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Services", href: adminServicesIndex().url },
+        { title: service.title, href: adminServicesIndex().url },
+      ]}
+    >
       <Head title={`Service: ${service.title}`} />
 
       <div className="space-y-6">

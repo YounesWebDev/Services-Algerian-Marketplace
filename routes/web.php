@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminPaymentController;
+use App\Http\Controllers\Admin\AdminPayoutsController;
 use App\Http\Controllers\Admin\AdminVerificationController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Provider\MyServicesController;
+use App\Http\Controllers\Provider\PayoutController;
 use App\Http\Controllers\Provider\ProviderBookingController;
 use App\Http\Controllers\Provider\ProviderVerificationController;
 use App\Http\Controllers\Provider\SendOfferController;
@@ -58,9 +61,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::get('/admin/disputes/{dispute}', [AdminDisputeController::class, 'show'])->name('disputes.show');
         Route::post('/admin/disputes/{dispute}/resolve', [AdminDisputeController::class, 'resolve'])->name('disputes.resolve');
         // reports
-        Route::get('/admin/reports', [AdminReportController::class, 'index'])->name('reports.index');
-        Route::get('/admin/reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
-        Route::post('/admin/reports/{report}/close', [AdminReportController::class, 'close'])->name('reports.close');
+        Route::get('/reports/management', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/management/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+        Route::post('/reports/management/{report}/close', [AdminReportController::class, 'close'])->name('reports.close');
+        // payments
+        Route::get('/payments/management', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/management/{payment}', [AdminPaymentController::class, 'show'])->name('payments.show');
+        // payouts
+        Route::get('/payouts/management', [AdminPayoutsController::class, 'index'])->name('payouts.index');
+        Route::get('/payouts/management/{payout}', [AdminPayoutsController::class, 'show'])->name('payouts.show');
+        Route::post('/payouts/management/{payout}/mark-sent', [AdminPayoutsController::class, 'markSent'])->name('payouts.markSent');
+
     });
 
 /**
@@ -106,6 +117,10 @@ Route::middleware(['auth', 'verified', 'role:provider', 'provider.verified'])
         Route::post('/my/bookings/{booking}/status', [ProviderBookingController::class, 'updateStatus'])->name('bookings.status');
         // offers
         Route::post('/requests/{request}/offers', SendOfferController::class)->name('requests.offers.store');
+        // payouts
+        Route::get('/payouts', [PayoutController::class, 'index'])->name('payouts.index');
+        Route::get('/payouts/{payout}', [PayoutController::class, 'show'])->name('payouts.show');
+
     });
 
 /**
@@ -156,4 +171,5 @@ Route::get('/services', [ServicesController::class, 'index'])->name('services.in
 Route::get('/services/{service:slug}', [ServicesController::class, 'show'])
     ->where('service', '^(?!create$|management$).+')
     ->name('services.show');
+
 require __DIR__.'/settings.php';

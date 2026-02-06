@@ -1,4 +1,5 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { CircleCheckBig, Download, IdCard } from "lucide-react";
 
 import InputError from "@/components/input-error";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -11,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { store as providerVerificationStore } from "@/routes/provider/verification";
-import { CircleCheckBig, Download, IdCard } from "lucide-react";
 
 type Verification = {
   id: number;

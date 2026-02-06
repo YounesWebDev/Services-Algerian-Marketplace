@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\Payout;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -107,6 +108,10 @@ class ProviderBookingController extends Controller
             'status' => $newStatus,
         ]);
 
+        if ($newStatus === 'completed') {
+            $this->createPendingPayout($booking);
+        }
+
         if ($newStatus === 'cancelled' && $booking->source === 'request_offer') {
             $booking->loadMissing(['offer.request']);
 
@@ -161,5 +166,38 @@ class ProviderBookingController extends Controller
         }
 
         return back()->with('success' , 'Cash payment confirmed successfully');
+    }
+
+    protected function createPendingPayout(Booking $booking): void
+    {
+        $payment = Payment::where('booking_id', $booking->id)->first();
+
+        if (! $payment || $payment->status !== 'paid') {
+            return;
+        }
+
+        if ($payment->payment_type !== 'online') {
+            return;
+        }
+
+        $exists = Payout::query()
+            ->where('provider_id', $booking->provider_id)
+            ->where('metadata->booking_id', $booking->id)
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        Payout::create([
+            'provider_id' => $booking->provider_id,
+            'amount' => $payment->provider_amount,
+            'status' => 'pending',
+            'sent_at' => null,
+            'method' => null,
+            'metadata' => [
+                'note' => 'Awaiting admin payout details',
+            ],
+        ]);
     }
 }

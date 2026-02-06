@@ -7,9 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { show as bookingShow } from "@/routes/client/bookings";
 import { store as disputeStore } from "@/routes/client/bookings/dispute";
-
 type Booking = {
   id: number;
   source: "service" | "request_offer";
@@ -54,7 +54,13 @@ export default function Create({ booking }: { booking: Booking }) {
       : booking.offer?.request?.title ?? "Request booking";
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Bookings", href: bookingShow(booking.id).url },
+        { title: "Open dispute", href: bookingShow(booking.id).url },
+      ]}
+    >
       <Head title="Open dispute" />
 
       <div className="max-w-2xl mx-auto space-y-4">

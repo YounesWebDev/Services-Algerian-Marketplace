@@ -1,10 +1,11 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
-
+import { dashboard } from "@/routes";
 // Wayfinder (adjust path if needed)
 import { index as adminRequestsIndex } from "@/routes/admin/requests";
 import { index as adminServicesIndex } from "@/routes/admin/services";
@@ -93,7 +94,13 @@ export default function AdminUsersShow() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Users", href: adminUsersIndex().url },
+        { title: user.name, href: adminUsersIndex().url },
+      ]}
+    >
       <Head title={`User: ${user.name}`} />
 
       <div className="space-y-6">

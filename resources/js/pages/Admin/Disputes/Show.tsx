@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as disputesIndex, resolve as disputesResolve } from "@/routes/admin/disputes";
-
 type Dispute = {
   id: number;
   reason: string;
@@ -54,7 +54,13 @@ export default function Show({ dispute }: { dispute: Dispute }) {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Disputes", href: disputesIndex().url },
+        { title: `Dispute #${dispute.id}`, href: disputesIndex().url },
+      ]}
+    >
       <Head title={`Dispute #${dispute.id}`} />
 
       <div className="max-w-3xl mx-auto space-y-4">

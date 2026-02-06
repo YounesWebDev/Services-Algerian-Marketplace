@@ -1,7 +1,8 @@
-﻿import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEvent } from "react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import {
   index as myRequestsIndex,
   store as myRequestsStore,
@@ -35,7 +36,13 @@ export default function ClientRequestsCreate(props: {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "My Requests", href: myRequestsIndex().url },
+        { title: "Create", href: myRequestsIndex().url },
+      ]}
+    >
       <Head title="Create Request" />
 
       <div className="p-6 max-w-2xl space-y-4">

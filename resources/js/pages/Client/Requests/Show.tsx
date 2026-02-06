@@ -1,10 +1,10 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as myRequestsIndex } from "@/routes/client/my/requests";
 import { accept as clientOffersAccept } from "@/routes/client/offers";
 import { show as profileShow } from "@/routes/profiles";
-
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
 
@@ -76,7 +76,13 @@ export default function ClientRequestShow() {
   const canAccept = job.status === "open"; // only open requests can accept offers
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "My Requests", href: myRequestsIndex().url },
+        { title: job.title, href: myRequestsIndex().url },
+      ]}
+    >
       <Head title={`My Request: ${job.title}`} />
 
       <div className="p-6 max-w-4xl space-y-4">

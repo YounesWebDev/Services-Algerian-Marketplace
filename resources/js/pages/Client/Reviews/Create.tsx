@@ -7,9 +7,9 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { show as bookingShow } from "@/routes/client/bookings";
 import { store as reviewStore } from "@/routes/client/bookings/review";
-
 type Booking = {
   id: number;
   status: string;
@@ -52,7 +52,13 @@ export default function Create({ booking }: { booking: Booking }) {
   };
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Bookings", href: bookingShow(booking.id).url },
+        { title: "Review", href: bookingShow(booking.id).url },
+      ]}
+    >
       <Head title="Write a review" />
 
       <div className="max-w-2xl mx-auto space-y-4">

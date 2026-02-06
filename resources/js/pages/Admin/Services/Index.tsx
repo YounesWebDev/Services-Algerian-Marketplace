@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from "@inertiajs/react";
 import { useMemo } from "react";
+
 import PaginationLinks from "@/components/pagination-links";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
-
+import { dashboard } from "@/routes";
 // Wayfinder (adjust if your generated path differs)
 import {
   index as adminServicesIndex,
@@ -113,7 +114,12 @@ export default function AdminServicesIndex() {
   const { services, filters } = props;
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Services", href: adminServicesIndex().url },
+      ]}
+    >
       <Head title="Services Management" />
 
       <div className="space-y-6">

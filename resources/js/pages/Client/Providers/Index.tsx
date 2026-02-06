@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
+import { index as clientProvidersIndex } from "@/routes/client/providers";
 import { show as profileShow } from "@/routes/profiles";
-
 type ProviderProfile = {
   bio: string | null;
   address: string | null;
@@ -79,7 +79,12 @@ export default function ProvidersIndex() {
   }, [providers.data]);
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Providers", href: clientProvidersIndex().url },
+      ]}
+    >
       <Head title="Providers" />
 
       <div className="p-6 max-w-6xl space-y-4">

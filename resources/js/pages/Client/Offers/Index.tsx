@@ -2,8 +2,8 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { accept as acceptOfferRoute, index as clientOffersIndex } from "@/routes/client/offers";
-
 type Provider = { id: number; name: string; avatar_path: string | null };
 type City = { id: number; name: string };
 type Category = { id: number; name: string; slug: string };
@@ -49,7 +49,12 @@ export default function ClientOffersIndex() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Offers", href: clientOffersIndex().url },
+      ]}
+    >
       <Head title="Offers" />
 
       <div className="p-6 space-y-4">

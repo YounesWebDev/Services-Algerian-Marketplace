@@ -2,9 +2,9 @@ import { Head, Link, usePage } from "@inertiajs/react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as clientBookingsIndex, show as clientBookingsShow } from "@/routes/client/bookings";
 import { show as serviceShow } from "@/routes/services";
-
 type Provider = { id: number; name: string; avatar_path: string | null };
 
 type Service = { id: number; title: string; slug: string };
@@ -45,7 +45,12 @@ export default function ClientBookingsIndex() {
   const { bookings, filters, flash } = props;
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Bookings", href: clientBookingsIndex().url },
+      ]}
+    >
       <Head title="Bookings" />
 
       <div className="p-6 space-y-4">

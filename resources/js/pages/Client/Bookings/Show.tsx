@@ -2,11 +2,11 @@ import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import { index as clientBookingsIndex, payment as bookingPayment } from "@/routes/client/bookings";
 import { create as disputeCreate } from "@/routes/client/bookings/dispute";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
 import { show as serviceShow } from "@/routes/services";
-
 type Provider = { id: number; name: string; avatar_path: string | null };
 type Service = { id: number; title: string; slug: string };
 type RequestItem = { id: number; title: string };
@@ -119,7 +119,13 @@ export default function ClientBookingShow() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Bookings", href: clientBookingsIndex().url },
+        { title: `Booking #${booking.id}`, href: clientBookingsIndex().url },
+      ]}
+    >
       <Head title={`Booking #${booking.id}`} />
 
       <div className="p-6 max-w-3xl space-y-4">

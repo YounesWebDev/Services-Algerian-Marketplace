@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from "@/routes";
 import {
   approve as approveProvider,
   index as providersIndex,
@@ -78,7 +79,13 @@ export default function ProvidersVerificationsShow() {
   const avatar = publicImagePath(v.provider.avatar_path);
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Provider Verifications", href: providersIndex().url },
+        { title: `Verification #${verification.id}`, href: providersIndex().url },
+      ]}
+    >
       <Head title="Provider verification" />
 
       <div className="p-6 max-w-4xl space-y-4">

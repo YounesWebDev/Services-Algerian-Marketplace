@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";
+import { dashboard } from "@/routes";
 // Wayfinder (adjust import if your generated routes path differs)
 import { index as adminUsersIndex, show as adminUsersShow } from "@/routes/admin/users";
 
@@ -89,7 +90,12 @@ export default function AdminUsersIndex() {
   const { users, filters } = props;
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "Users", href: adminUsersIndex().url },
+      ]}
+    >
       <Head title="Users Management" />
 
       <div className="space-y-6">
@@ -254,5 +260,4 @@ export default function AdminUsersIndex() {
     </AppLayout>
   );
 }
-
 
