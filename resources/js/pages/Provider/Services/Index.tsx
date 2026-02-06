@@ -4,10 +4,13 @@ import {
   CheckCircle2Icon,
   Clock,
   CreditCard,
+  Eye,
   Handshake,
   MapPin,
   OctagonAlert,
+  Pen,
   Pin,
+  Trash2,
   Wallet,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -298,7 +301,7 @@ export default function ProviderServicesIndex() {
 
                         <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2 w-full lg:w-auto">
                           <Link href={serviceShow.url(s.slug)} className="text-sm underline text-center sm:text-left">
-                            View public
+                            <Eye className="text-primary transition hover:text-foreground"/>
                           </Link>
 
                           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -306,7 +309,7 @@ export default function ProviderServicesIndex() {
                               href={providerServicesEdit(s.id).url}
                               className="rounded-3xl border border-gray-200 px-3 py-2 sm:py-1 text-xs transition hover:bg-foreground hover:text-background w-full sm:w-auto text-center"
                             >
-                              Edit
+                              <Pen className="w-4 h-4" />
                             </Link>
 
                             <button
@@ -325,7 +328,7 @@ export default function ProviderServicesIndex() {
                               }}
                               className="rounded-3xl border border-red-200 px-3 py-2 sm:py-1 text-xs text-red-600 transition hover:bg-red-600 hover:text-white w-full sm:w-auto"
                             >
-                              Remove
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>

@@ -53,7 +53,7 @@ export default function ProviderServicesCreate(props: {
           <div>
             <label className="block text-sm font-medium">Category</label>
             <select
-              className="mt-1 w-full rounded-4xl border p-2"
+              className="mt-1 w-full rounded-4xl border p-2 bg-primary-foreground/30 border-gray-200"
               value={form.data.category_id}
               onChange={(e) => form.setData("category_id", e.target.value)}
             >
@@ -75,7 +75,7 @@ export default function ProviderServicesCreate(props: {
           <div>
             <label className="block text-sm font-medium">City</label>
             <select
-              className="mt-1 w-full rounded-4xl border p-2"
+              className="mt-1 w-full rounded-4xl border p-2 bg-primary-foreground/30 border-gray-200"
               value={form.data.city_id}
               onChange={(e) => form.setData("city_id", e.target.value)}
             >
@@ -97,7 +97,7 @@ export default function ProviderServicesCreate(props: {
           <div>
             <label className="block text-sm font-medium">Title</label>
             <input
-              className="mt-1 w-full rounded-4xl border p-2"
+              className="mt-1 w-full rounded-4xl border p-2 bg-primary-foreground/30 border-gray-200"
               value={form.data.title}
               onChange={(e) => form.setData("title", e.target.value)}
               placeholder="Example: Plumbing repair"
@@ -112,7 +112,7 @@ export default function ProviderServicesCreate(props: {
           <div>
             <label className="block text-sm font-medium">Description</label>
             <textarea
-              className="mt-1 w-full rounded-4xl border p-2"
+              className="mt-1 w-full rounded-4xl  border p-2 bg-primary-foreground/30 border-gray-200"
               rows={5}
               value={form.data.description}
               onChange={(e) => form.setData("description", e.target.value)}
@@ -129,7 +129,7 @@ export default function ProviderServicesCreate(props: {
             <div>
               <label className="block text-sm font-medium">Pricing type</label>
               <select
-                className="mt-1 w-full rounded-4xl border p-2"
+                className="mt-1 w-full rounded-4xl  border p-2 bg-primary-foreground/30 border-gray-200"
                 value={form.data.pricing_type}
                 onChange={(e) => form.setData("pricing_type", e.target.value)}
               >
@@ -142,7 +142,7 @@ export default function ProviderServicesCreate(props: {
             <div>
               <label className="block text-sm font-medium">Payment type</label>
               <select
-                className="mt-1 w-full rounded-4xl border p-2"
+                className="mt-1 w-full rounded-4xl  border p-2 bg-primary-foreground/30 border-gray-200"
                 value={form.data.payment_type}
                 onChange={(e) => form.setData("payment_type", e.target.value)}
               >
@@ -160,7 +160,7 @@ export default function ProviderServicesCreate(props: {
             </label>
             <input
               type="number"
-              className="mt-1 w-full rounded-4xl border p-2"
+              className="mt-1 w-full rounded-4xl  border p-2 bg-primary-foreground/30 border-gray-200"
               value={form.data.base_price}
               onChange={(e) => form.setData("base_price", e.target.value)}
             />
