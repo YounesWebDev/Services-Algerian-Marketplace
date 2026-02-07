@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, SquareArrowOutUpRight } from "lucide-react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
@@ -161,8 +161,23 @@ export default function ProviderRequestsIndex() {
                         <div className="min-w-0">
                           <div className="font-bold text-xl sm:text-2xl break-words">{r.title}</div>
 
-                          <div className="text-sm text-foreground mt-2 rounded-3xl p-1 border border-gray-200 w-full sm:w-max flex flex-wrap items-center gap-2">
-                            <span className="break-words">{r.category?.name}</span>
+                          <div className="text-sm text-foreground mt-2 rounded-3xl p-1 border border-gray-200 w-full  sm:w-max flex flex-wrap  items-center gap-2">
+                            <span className="break-words"> <div className="text-sm text-foreground mt-2 flex items-center justify-center rounded-3xl mb-2 gap-2 w-full sm:w-max">
+                            <span className="inline-flex items-center gap-2 min-w-0">
+                              {r.client?.avatar_path ? (
+                                <img
+                                  src={r.client.avatar_path}
+                                  alt={r.client.name}
+                                  className="w-6 h-6 rounded-full object-cover border"
+                                />
+                              ) : (
+                                <span className="w-6 h-6 " />
+                              )}
+                              <span className="font-medium truncate max-w-[220px] sm:max-w-none">
+                                {r.client?.name}
+                              </span>
+                            </span>
+                          </div>  </span>
                             <div className="p-2 rounded-3xl border border-gray-200 flex items-center gap-1">
                               <MapPin className="text-red-600" />
                               <span className="break-words">{r.city?.name}</span>
@@ -173,14 +188,14 @@ export default function ProviderRequestsIndex() {
                             <span className="font-medium flex flex-col sm:flex-row sm:items-center gap-2 p-1 rounded-4xl border border-gray-200 w-full sm:w-max">
                               <div className="font-bold flex items-center gap-1 p-1 rounded-4xl border border-gray-200 text-primary w-full sm:w-auto">
                                 Min{" "}
-                                <div className="p-2 rounded-4xl border border-gray-200 w-full sm:w-auto text-center">
+                                <div className="p-2 rounded-4xl  w-full sm:w-auto text-center">
                                   {r.budget_min ?? "—"} DZD
                                 </div>
                               </div>
 
                               <div className="font-bold text-red-600 flex items-center gap-1 p-1 rounded-4xl border border-gray-200 w-full sm:w-auto">
                                 Max{" "}
-                                <div className="p-2 rounded-4xl border border-gray-200 w-full sm:w-auto text-center">
+                                <div className="p-2  w-full sm:w-auto text-center">
                                   {r.budget_max ?? "—"} DZD
                                 </div>
                               </div>
@@ -210,29 +225,14 @@ export default function ProviderRequestsIndex() {
                             </div>
                           </div>
 
-                          <div className="text-sm text-foreground mt-2 flex items-center border border-gray-200 p-2 rounded-3xl gap-2 w-full sm:w-max">
-                            <span className="inline-flex items-center gap-2 min-w-0">
-                              {r.client?.avatar_path ? (
-                                <img
-                                  src={r.client.avatar_path}
-                                  alt={r.client.name}
-                                  className="w-6 h-6 rounded-full object-cover border"
-                                />
-                              ) : (
-                                <span className="w-6 h-6 rounded-full border bg-gray-100" />
-                              )}
-                              <span className="font-medium truncate max-w-[220px] sm:max-w-none">
-                                {r.client?.name}
-                              </span>
-                            </span>
-                          </div>
+                          
                         </div>
 
                         <Link
                           href={providerRequestsShow.url(r.id)}
-                          className="text-sm text-foreground rounded-3xl bg-primary transition duration-700 hover:bg-foreground hover:text-background px-3 py-2 sm:py-1 w-full sm:w-auto text-center"
+                          className="text-sm text-primary  transition duration-700 hover:text-foreground px-3 py-2 sm:py-1 w-full sm:w-auto text-center"
                         >
-                          Open
+                          <SquareArrowOutUpRight/>
                         </Link>
                       </div>
 

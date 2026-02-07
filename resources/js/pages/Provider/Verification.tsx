@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { store as providerVerificationStore } from "@/routes/provider/verification";
+import { CircleCheckBig, Download, IdCard } from "lucide-react";
 
 type Verification = {
   id: number;
@@ -91,9 +92,11 @@ export default function ProviderVerification() {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={dashboard().url}>Skip for now</Link>
-          </Button>
+          {!isVerified ? (
+            <Button variant="outline" asChild>
+              <Link href={dashboard().url} className="rounded-3xl text-white ">Skip for now</Link>
+            </Button>
+          ) : null}
         </div>
 
         {middlewareError ? (
@@ -113,9 +116,13 @@ export default function ProviderVerification() {
         {/* Current status card */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center  justify-between gap-3">
               <div className="font-medium">Current status</div>
-              {isVerified ? <Badge>Verified</Badge> : <Badge variant="outline">Not verified</Badge>}
+              {isVerified ? (
+                <div className="text-primary flex items-center gap-2 border border-gray-200 p-2 rounded-3xl"><CircleCheckBig className="w-4 h-4"/> Verified</div>
+              ) : (
+                <Badge variant="outline">Not verified</Badge>
+              )}
             </div>
           </CardHeader>
 
@@ -127,9 +134,9 @@ export default function ProviderVerification() {
                   {statusBadge(verification.status)}
                 </div>
 
-                <div>
-                  <span className="text-muted-foreground">Document type:</span>{" "}
-                  <span className="font-medium">{verification.doc_type}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground ">Document type:</span>{" "}
+                  <span className="font-medium flex items-center gap-2"><IdCard/> {verification.doc_type}</span>
                 </div>
 
                 <div>
@@ -139,13 +146,11 @@ export default function ProviderVerification() {
 
                 {docUrl ? (
                   <div>
-                    <span className="text-muted-foreground">Uploaded file:</span>{" "}
-                    <a className="underline" href={docUrl} target="_blank" rel="noreferrer">
-                      View
-                    </a>
-                    <span className="text-muted-foreground"> / </span>
-                    <a className="underline" href={docUrl} download>
-                      Download
+                    <span className="text-muted-foreground flex items-center">Uploaded file:</span>{" "}
+                    
+                    <span className="text-muted-foreground flex items-center">  </span>
+                    <a className="text-foreground transition duration-700 hover:text-primary flex items-center" href={docUrl} download>
+                      <Download className="w-4 h-4 inline mr-1" /> Download
                     </a>
                   </div>
                 ) : null}
@@ -185,7 +190,7 @@ export default function ProviderVerification() {
         <Separator />
 
         {/* Submit form */}
-        <Card>
+      {canSubmit && (<Card>
           <CardHeader>
             <div className="font-medium">Submit verification</div>
           </CardHeader>
@@ -243,9 +248,7 @@ export default function ProviderVerification() {
               </div>
 
               <div className="flex gap-2">
-                <Button disabled={!canSubmit || form.processing}>
-                  Submit
-                </Button>
+                <Button disabled={!canSubmit || form.processing}>Submit</Button>
 
                 <Button
                   type="button"
@@ -258,7 +261,7 @@ export default function ProviderVerification() {
               </div>
             </form>
           </CardContent>
-        </Card>
+        </Card>)}
       </div>
     </AppLayout>
   );
