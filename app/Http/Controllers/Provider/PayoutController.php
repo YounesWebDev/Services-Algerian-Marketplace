@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payout;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -32,11 +33,33 @@ class PayoutController extends Controller
 
         $payouts = $query->paginate(12)->withQueryString();
 
+        $earningsQuery = Payment::query()
+            ->where('status', 'paid')
+            ->whereHas('booking', function ($qq) use ($user) {
+                $qq->where('provider_id', $user->id)
+                   ->where('status', 'completed');
+            });
+
+        $onlineEarnings = (clone $earningsQuery)
+            ->where('payment_type', 'online')
+            ->sum('provider_amount');
+
+        $cashEarnings = (clone $earningsQuery)
+            ->where('payment_type', 'cash')
+            ->sum('provider_amount');
+
+        $totalEarnings = $onlineEarnings + $cashEarnings;
+
         return Inertia::render('Provider/Payouts/Index'  , [
             'payouts' => $payouts,
             'filters' => [
                 'status' => $status,
                 'q' => $q,
+            ],
+            'earnings' => [
+                'online' => $onlineEarnings,
+                'cash' => $cashEarnings,
+                'total' => $totalEarnings,
             ],
         ]);
     }

@@ -35,6 +35,11 @@ type Props = {
     status?: string;
     q?: string;
   };
+  earnings: {
+    online: number;
+    cash: number;
+    total: number;
+  };
 };
 
 const money = (v: unknown) => {
@@ -50,7 +55,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   return <Badge variant="outline">{status}</Badge>;
 };
 
-export default function ProviderPayoutsIndex({ payouts: list, filters }: Props) {
+export default function ProviderPayoutsIndex({ payouts: list, filters, earnings }: Props) {
   const q = filters?.q ?? "";
   const status = filters?.status ?? "";
 
@@ -73,6 +78,33 @@ export default function ProviderPayoutsIndex({ payouts: list, filters }: Props) 
       <Head title="Payouts" />
 
       <div className="space-y-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Online earnings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-semibold">{money(earnings.online)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Cash earnings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-semibold">{money(earnings.cash)}</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total earnings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-semibold">{money(earnings.total)}</div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card>
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Your Payouts</CardTitle>

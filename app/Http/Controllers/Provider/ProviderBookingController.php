@@ -182,7 +182,7 @@ class ProviderBookingController extends Controller
 
         $exists = Payout::query()
             ->where('provider_id', $booking->provider_id)
-            ->where('metadata->booking_id', $booking->id)
+            ->where('booking_id', $booking->id)
             ->exists();
 
         if ($exists) {
@@ -191,6 +191,7 @@ class ProviderBookingController extends Controller
 
         Payout::create([
             'provider_id' => $booking->provider_id,
+            'booking_id' => $booking->id,
             'amount' => $payment->provider_amount,
             'status' => 'pending',
             'sent_at' => null,

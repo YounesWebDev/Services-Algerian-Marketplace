@@ -142,6 +142,9 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={markSent} className="grid gap-4 md:grid-cols-2">
+                    {errors.payout && (
+                      <div className="md:col-span-2 text-sm text-destructive">{errors.payout}</div>
+                    )}
                     <div className="grid gap-2">
                       <Label htmlFor="method">Method</Label>
                       <select

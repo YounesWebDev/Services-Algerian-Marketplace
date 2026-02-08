@@ -11,6 +11,7 @@ class Payout extends Model
 
     protected $fillable = [
         'provider_id',
+        'booking_id',
         'amount',
         'status',
         'sent_at',
@@ -26,5 +27,10 @@ class Payout extends Model
     public function provider()
     {
         return $this->belongsTo(User::class, 'provider_id');
+    }
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
     }
 }

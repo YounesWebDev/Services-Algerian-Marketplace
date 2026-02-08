@@ -609,13 +609,23 @@ class InitialSeeder extends Seeder
                 Payout::updateOrCreate(
                     [
                         'provider_id' => $booking->provider_id,
+                        'booking_id' => $booking->id,
                         'amount' => $providerAmount,
                     ],
                     [
                         'status' => $payoutStatus,
                         'sent_at' => $payoutStatus === 'sent' ? now()->subHours(6) : null,
                         'method' => $payoutStatus === 'sent' ? 'bank_transfer' : null,
-                        'metadata' => ['seed' => true, 'booking_id' => $booking->id],
+                        'metadata' => $payoutStatus === 'sent'
+                            ? [
+                                'seed' => true,
+                                'account_name' => 'Demo Provider',
+                                'account_number' => '0000000000',
+                            ]
+                            : [
+                                'seed' => true,
+                                'note' => 'Awaiting admin payout details',
+                            ],
                     ]
                 );
             }

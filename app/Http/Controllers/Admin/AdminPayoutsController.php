@@ -55,8 +55,15 @@ class AdminPayoutsController extends Controller
             return back();
         }
 
+        $payout->loadMissing(['booking.dispute']);
+        if ($payout->booking && $payout->booking->dispute && $payout->booking->dispute->status === 'open') {
+            return back()->withErrors([
+                'payout' => 'This payout is frozen until the dispute is resolved.',
+            ]);
+        }
+
         $data = $request->validate([
-            'method' => ['required', 'string', 'in:bank_transfer,ccp,cash'],
+            'method' => ['required', 'string', 'in:bank_transfer,ccp'],
             'account_name' => ['nullable', 'string', 'max:191'],
             'account_number' => ['nullable', 'string', 'max:191'],
             'cle' => ['nullable', 'string', 'max:191'],
