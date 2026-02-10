@@ -1,7 +1,8 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Clock, MapPin } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import AppLayout from "@/layouts/app-layout";
-import { show as profileShow } from "@/routes/profiles";
 import { index as providerRequestsIndex } from "@/routes/provider/requests";
 import { store as providerRequestsOffersStore } from "@/routes/provider/requests/offers";
 
@@ -41,7 +42,10 @@ export default function ProviderRequestsShow() {
 
   const r = props.request;
 
-  const images = (r.media ?? []).slice().sort((a, b) => a.position - b.position);
+  const images = useMemo(
+    () => (r.media ?? []).slice().sort((a, b) => a.position - b.position),
+    [r.media]
+  );
 
   const form = useForm({
     message: "",
@@ -60,10 +64,13 @@ export default function ProviderRequestsShow() {
     <AppLayout>
       <Head title={r.title} />
 
-      <div className="p-6 space-y-4 max-w-3xl">
+      <div className="p-6 space-y-4 max-w-3xl bg-primary-foreground/30 rounded-4xl">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{r.title}</h1>
-          <Link href={providerRequestsIndex.url()} className="text-sm underline">
+          <Link
+            href={providerRequestsIndex.url()}
+            className="text-sm rounded-3xl text-red-600 px-3 py-2 border border-gray-200 hover:bg-red-600 hover:text-white transition duration-700"
+          >
             Back
           </Link>
         </div>
@@ -82,63 +89,97 @@ export default function ProviderRequestsShow() {
           </div>
         ) : null}
 
-        <div className="rounded-md border p-4 space-y-2">
-          <div className="text-sm text-gray-600">
-            {r.category?.name} • {r.city?.name}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-bold text-xl sm:text-2xl break-words">{r.title}</div>
+
+              <div className="text-sm text-foreground mt-2 rounded-3xl p-1 border border-gray-200 w-full sm:w-max flex flex-wrap items-center gap-2">
+                <span className="break-words">
+                  <div className="text-sm text-foreground mt-2 flex items-center justify-center rounded-3xl mb-2 gap-2 w-full sm:w-max">
+                    <span className="inline-flex items-center gap-2 min-w-0">
+                      {r.client?.avatar_path ? (
+                        <img
+                          src={r.client.avatar_path}
+                          alt={r.client.name}
+                          className="w-6 h-6 rounded-full object-cover border"
+                        />
+                      ) : (
+                        <span className="w-6 h-6 " />
+                      )}
+                      <span className="font-medium truncate max-w-[220px] sm:max-w-none">
+                        {r.client?.name}
+                      </span>
+                    </span>
+                  </div>
+                </span>
+
+                <div className="p-2 rounded-3xl border border-gray-200 flex items-center gap-1">
+                  <MapPin className="text-red-600" />
+                  <span className="break-words">{r.city?.name}</span>
+                </div>
+              </div>
+
+              <div className="text-sm text-foreground mt-2">
+                <span className="font-medium flex flex-col sm:flex-row sm:items-center gap-2 p-1 rounded-4xl border border-gray-200 w-full sm:w-max">
+                  <div className="font-bold flex items-center gap-1 p-1 rounded-4xl border border-gray-200 text-primary w-full sm:w-auto">
+                    Min{" "}
+                    <div className="p-2 rounded-4xl w-full sm:w-auto text-center">
+                      {r.budget_min ?? "—"} DZD
+                    </div>
+                  </div>
+
+                  <div className="font-bold text-red-600 flex items-center gap-1 p-1 rounded-4xl border border-gray-200 w-full sm:w-auto">
+                    Max{" "}
+                    <div className="p-2 w-full sm:w-auto text-center">
+                      {r.budget_max ?? "—"} DZD
+                    </div>
+                  </div>
+                </span>
+
+                <div className="flex flex-wrap items-center gap-2 mt-2 rounded-3xl border border-gray-200 w-full sm:w-max p-1 text-sm text-foreground">
+                  {r.urgency ? (
+                    <>
+                      Urgency{" "}
+                      {r.urgency === "high" ? (
+                        <span className="font-bold inline-flex items-center gap-1">
+                          <div className="flex items-center text-red-600 rounded-3xl p-2 border border-gray-200 gap-2">
+                            <Clock /> {r.urgency}
+                          </div>
+                        </span>
+                      ) : r.urgency === "medium" ? (
+                        <span className="flex items-center text-yellow-600 rounded-3xl p-2 border border-gray-200 gap-2">
+                          <Clock /> {r.urgency}
+                        </span>
+                      ) : r.urgency === "low" ? (
+                        <span className="text-primary rounded-3xl p-2 border border-gray-200 font-bold inline-flex items-center gap-2">
+                          <Clock /> {r.urgency}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="text-sm text-gray-600">
-            Budget:{" "}
-            <span className="font-medium">
-              {r.budget_min ?? "—"} - {r.budget_max ?? "—"} DZD
-            </span>
-            {r.urgency ? (
-              <>
-                {" "}
-                • Urgency: <span className="font-medium">{r.urgency}</span>
-              </>
-            ) : null}
-          </div>
-
-          <div className="text-sm text-gray-600 flex items-center gap-2">
-            <span>Client:</span>
-            <span className="inline-flex items-center gap-2">
-              {r.client?.avatar_path ? (
-                <img
-                  src={publicImagePath(r.client.avatar_path)}
-                  alt={r.client.name}
-                  className="w-7 h-7 rounded-full object-cover border"
-                />
-              ) : (
-                <span className="w-7 h-7 rounded-full border bg-gray-100" />
-              )}
-              <span className="font-medium">{r.client?.name}</span>
-            </span>
-            {r.client ? (
-              <Link href={profileShow(r.client.id).url} className="text-xs underline">
-                View profile
-              </Link>
-            ) : null}
+          <div className="text-sm text-foreground mt-3 rounded-4xl border border-gray-200 p-2 line-clamp-2">
+            <div className="font-bold">Description</div>
+            {r.description}
           </div>
         </div>
 
-        <div className="rounded-md border p-4">
-          <h2 className="font-medium">Description</h2>
-          <p className="text-sm text-gray-700 mt-2 whitespace-pre-line">{r.description}</p>
-        </div>
-
+        {/* ✅ Photos (manual slider + thumbnails bottom) */}
         <div className="rounded-md border p-4">
           <h2 className="font-medium">Photos</h2>
+
           {images.length === 0 ? (
-            <p className="text-sm text-gray-600 mt-2">No photos.</p>
+            <p className="text-sm text-foreground mt-2">No photos.</p>
           ) : (
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              {images.map((m) => (
-                <div key={m.id} className="rounded-md overflow-hidden border bg-gray-50">
-                  <img src={publicImagePath(m.path)} alt="Request" className="w-full h-44 object-cover" />
-                </div>
-              ))}
-            </div>
+            <MarketplacePhotoSlider
+              images={images}
+              publicImagePath={publicImagePath}
+            />
           )}
         </div>
 
@@ -146,12 +187,12 @@ export default function ProviderRequestsShow() {
         <div className="rounded-md border p-4">
           <h2 className="font-medium">Send an Offer</h2>
           {props.has_offer ? (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground mt-1">
               You already sent an offer for this request.
             </p>
           ) : (
             <>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-foreground mt-1">
                 Fill these fields and click <span className="font-medium">Send Offer</span>.
               </p>
 
@@ -203,7 +244,7 @@ export default function ProviderRequestsShow() {
                 <button
                   type="submit"
                   disabled={form.processing}
-                  className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
+                  className="rounded-3xl bg-primary px-4 py-2 text-white text-sm"
                 >
                   {form.processing ? "Sending..." : "Send Offer"}
                 </button>
@@ -213,5 +254,109 @@ export default function ProviderRequestsShow() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+function MarketplacePhotoSlider({
+  images,
+  publicImagePath,
+}: {
+  images: { id: number; path: string }[];
+  publicImagePath: (p: string) => string;
+}) {
+  const [active, setActive] = useState(0);
+
+  const canPrev = active > 0;
+  const canNext = active < images.length - 1;
+
+  const prev = () => canPrev && setActive((i) => i - 1);
+  const next = () => canNext && setActive((i) => i + 1);
+
+  // center-ish thumbnails when many
+  const thumbWidth = 72;
+  const thumbGap = 8;
+  const thumbStripLeft = useMemo(() => {
+    const x = active * (thumbWidth + thumbGap);
+    return Math.max(0, x - 2 * (thumbWidth + thumbGap));
+  }, [active]);
+
+  return (
+    <div className="mt-3 space-y-3">
+      {/* Main viewer */}
+      <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-primary-foreground/30">
+        <img
+          src={publicImagePath(images[active].path)}
+          alt={`Photo ${active + 1}`}
+          className="w-full h-[260px] sm:h-[340px] md:h-[420px] object-cover select-none"
+          draggable={false}
+        />
+
+        {/* Counter */}
+        <div className="absolute top-3 right-3 rounded-full bg-black/55 text-white text-xs px-3 py-1">
+          {active + 1} / {images.length}
+        </div>
+
+        {/* Prev */}
+        <button
+          type="button"
+          onClick={prev}
+          disabled={!canPrev}
+          className={`absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/40 text-white w-10 h-10 grid place-items-center transition ${
+            canPrev ? "hover:bg-black/55" : "opacity-40 cursor-not-allowed"
+          }`}
+          aria-label="Previous photo"
+        >
+          ‹
+        </button>
+
+        {/* Next */}
+        <button
+          type="button"
+          onClick={next}
+          disabled={!canNext}
+          className={`absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/40 text-white w-10 h-10 grid place-items-center transition ${
+            canNext ? "hover:bg-black/55" : "opacity-40 cursor-not-allowed"
+          }`}
+          aria-label="Next photo"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* Thumbnails bottom */}
+      <div className="rounded-xl border border-gray-200 bg-primary-foreground/30 p-2">
+        <div className="overflow-x-auto">
+          <div
+            className="flex gap-2"
+            style={{ transform: `translateX(-${thumbStripLeft}px)` }}
+          >
+            {images.map((img, idx) => {
+              const isActive = idx === active;
+
+              return (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setActive(idx)}
+                  className={`relative shrink-0 rounded-lg overflow-hidden border transition ${
+                    isActive
+                      ? "border-primary ring-2 ring-primary/40"
+                      : "border-gray-200 hover:border-primary/60"
+                  }`}
+                  aria-label={`Select photo ${idx + 1}`}
+                >
+                  <img
+                    src={publicImagePath(img.path)}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-[72px] h-[56px] object-cover"
+                    draggable={false}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
