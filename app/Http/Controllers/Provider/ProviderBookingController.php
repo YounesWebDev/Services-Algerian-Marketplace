@@ -11,28 +11,29 @@ use Inertia\Inertia;
 
 class ProviderBookingController extends Controller
 {
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $user = $request->user();
 
-        $status = (string) $request->query('status' , '');
+        $status = (string) $request->query('status', '');
 
         $query = Booking::query()
-                ->where('provider_id' , $user->id)
-                ->with([
-                    'client:id,name,avatar_path',
-                    'service:id,title,slug',
-                    'offer:id,request_id,proposed_price,status',
-                    'offer.request:id,title',
-                    'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at',
-                ])
-                ->latest();
-        if($status !== ''){
-            $query->where('status' , $status);
+            ->where('provider_id', $user->id)
+            ->with([
+                'client:id,name,avatar_path',
+                'service:id,title,slug',
+                'offer:id,request_id,proposed_price,status',
+                'offer.request:id,title',
+                'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at',
+            ])
+            ->latest();
+        if ($status !== '') {
+            $query->where('status', $status);
         }
 
         $bookings = $query->paginate(12)->withQueryString();
 
-        return Inertia::render('Provider/Bookings/Index' , [
+        return Inertia::render('Provider/Bookings/Index', [
             'bookings' => $bookings,
             'filters' => [
                 'status' => $status,
@@ -40,11 +41,12 @@ class ProviderBookingController extends Controller
         ]);
     }
 
-    public function show(Request $request , Booking $booking){
+    public function show(Request $request, Booking $booking)
+    {
         $user = $request->user();
 
         // only owner provider
-        if($booking->provider_id !== $user->id){
+        if ($booking->provider_id !== $user->id) {
             abort(403);
         }
 
@@ -57,23 +59,24 @@ class ProviderBookingController extends Controller
             'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at,metadata',
         ]);
 
-        return Inertia::render('Provider/Bookings/Show',[
+        return Inertia::render('Provider/Bookings/Show', [
             'booking' => $booking,
         ]);
     }
 
     // provider pudates booking status
     // allowed transition : pending -> confirmed or cancelled       confirmed -> in progress or cancelled    in progress -> completed
-    public function updateStatus(Request $request , Booking $booking){
+    public function updateStatus(Request $request, Booking $booking)
+    {
         $user = $request->user();
 
-        // only booking provider 
-        if($booking->provider_id !== $user->id){
+        // only booking provider
+        if ($booking->provider_id !== $user->id) {
             abort(403);
         }
 
         $data = $request->validate([
-            'status' => ['required' , 'in:confirmed,in_progress,completed,cancelled'],
+            'status' => ['required', 'in:confirmed,in_progress,completed,cancelled'],
         ]);
 
         $newStatus = $data['status'];
@@ -81,14 +84,14 @@ class ProviderBookingController extends Controller
 
         // Allowed transitions
         $allowed = [
-            'pending' => ['confirmed' , 'cancelled'],
-            'confirmed' => ['in_progress' , 'cancelled'],
+            'pending' => ['confirmed', 'cancelled'],
+            'confirmed' => ['in_progress', 'cancelled'],
             'in_progress' => ['completed'],
             'completed' => [],
             'cancelled' => [],
         ];
 
-        if(!isset($allowed[$current]) || !in_array($newStatus , $allowed[$current] , true)){
+        if (! isset($allowed[$current]) || ! in_array($newStatus, $allowed[$current], true)) {
             return back()->withErrors([
                 'status' => "You can't change status from {$current} to {$newStatus}",
             ]);
@@ -122,33 +125,34 @@ class ProviderBookingController extends Controller
             }
         }
 
-        return back()->with('success' , 'Booking status updated');
+        return back()->with('success', 'Booking status updated');
     }
 
     // provider confirms cash payment
-    public function confirmCash(Request $request , Booking $booking){
+    public function confirmCash(Request $request, Booking $booking)
+    {
         $user = $request->user();
 
         // only booking provider
-        if($booking->provider_id !== $user->id){
+        if ($booking->provider_id !== $user->id) {
             abort(403);
         }
 
-        $payment = Payment::where('booking_id' , $booking->id)->first();
+        $payment = Payment::where('booking_id', $booking->id)->first();
 
-        if(!$payment){
+        if (! $payment) {
             return back()->withErrors([
                 'payment' => 'Payment not found for this booking.',
             ]);
         }
 
-        if($payment->payment_type !== 'cash'){
+        if ($payment->payment_type !== 'cash') {
             return back()->withErrors([
                 'payment' => 'This booking is not using cash payment',
             ]);
         }
 
-        if($payment->status !== 'pending') {
+        if ($payment->status !== 'pending') {
             return back()->withErrors([
                 'payment' => 'This cash payment is already confirmed',
             ]);
@@ -159,13 +163,13 @@ class ProviderBookingController extends Controller
             'paid_at' => now(),
         ]);
 
-        if($booking->status === 'pending') {
+        if ($booking->status === 'pending') {
             $booking->update([
                 'status' => 'confirmed',
             ]);
         }
 
-        return back()->with('success' , 'Cash payment confirmed successfully');
+        return back()->with('success', 'Cash payment confirmed successfully');
     }
 
     protected function createPendingPayout(Booking $booking): void

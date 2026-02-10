@@ -50,6 +50,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'last_seen_at' => 'datetime',
+
         ];
     }
 
@@ -93,7 +95,8 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Chat::class, 'provider_id');
     }
 
-    public function reportsMade(){
-        return $this->hasMany(\App\Models\Report::class,'reporter_id');
+    public function reportsMade()
+    {
+        return $this->hasMany(\App\Models\Report::class, 'reporter_id');
     }
 }

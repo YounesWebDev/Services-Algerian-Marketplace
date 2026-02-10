@@ -16,7 +16,7 @@ class AcceptOfferController extends Controller
         // load request for ownership
         $offer->load('request');
 
-        if (!$offer->request) {
+        if (! $offer->request) {
             abort(404);
         }
         // only the owner client can accept offers
@@ -59,6 +59,7 @@ class AcceptOfferController extends Controller
                 'total_amount' => $offer->proposed_price,
                 'currency' => 'DZD',
             ]);
+
         });
 
         return back()->with('success', 'Offer accepted Booking created!');

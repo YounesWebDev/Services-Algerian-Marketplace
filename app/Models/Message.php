@@ -11,15 +11,26 @@ class Message extends Model
 
     protected $fillable = [
         'chat_id',
+        'sender_id',
         'body',
         'attachment_path',
+        'read_at',
     ];
 
-    public function chat(){
+    protected function casts(): array
+    {
+        return [
+            'read_at' => 'datetime',
+        ];
+    }
+
+    public function chat()
+    {
         return $this->belongsTo(\App\Models\Chat::class);
     }
 
-    public function sender(){
+    public function sender()
+    {
         return $this->belongsTo(\App\Models\User::class, 'sender_id');
     }
 }

@@ -12,6 +12,7 @@ import {
     ShieldCheck,
     Flag,
     FileWarning,
+    MessageSquare,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -40,6 +41,7 @@ import { index as clientBookingsIndex } from "@/routes/client/bookings";
 import {index as requestsIndex} from "@/routes/client/my/requests"
 import { index as clientOffersIndex } from "@/routes/client/offers";
 import {index as ProvidersProfiles} from "@/routes/client/providers"
+import { index as myChatsIndex } from "@/routes/my/chats";
 import { show as profileShow } from "@/routes/profiles";
 import { index as providerBookingsIndex } from "@/routes/provider/bookings";
 import {
@@ -78,6 +80,7 @@ const clientNavItems = (user: User): NavItem[] => [
     { title: "Providers", href: ProvidersProfiles.url(), icon: CircleUser },
     { title: "Offers", href: clientOffersIndex.url(), icon: BadgePercent },
     { title: "Bookings", href: clientBookingsIndex.url(), icon: BookOpen },
+    { title: "Chats", href: myChatsIndex.url(), icon: MessageSquare },
     { title: "Profile", href: profileShow(user.id).url, icon: userIcon },
 ];
 
@@ -90,6 +93,7 @@ const providerNavItems = (user: User): NavItem[] => [
     { title: "Browse Requests", href: "/requests", icon: Briefcase },
     { title: "Verification", href: providerVerificationShow().url, icon: CircleUser },
     { title: "Bookings", href: providerBookingsIndex.url(), icon: BookOpen },
+    { title: "Chats", href: myChatsIndex.url(), icon: MessageSquare },
     { title: "Payouts", href: providerPayoutsIndex().url, icon: BadgePercent },
     { title: "Profile", href: profileShow(user.id).url, icon: userIcon },
 ];

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\RequestsController as AdminRequestsController;
 use App\Http\Controllers\Admin\ServicesController as AdminServicesController;
 use App\Http\Controllers\Admin\UsersController;
+use App\Http\Controllers\Chat\ChatController;
 use App\Http\Controllers\Client\AcceptOfferController;
 use App\Http\Controllers\Client\BookingController;
 use App\Http\Controllers\Client\DisputeController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Client\ProviderDirectoryController;
 use App\Http\Controllers\Client\ReviewController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\Provider\MyServicesController;
 use App\Http\Controllers\Provider\PayoutController;
 use App\Http\Controllers\Provider\ProviderBookingController;
@@ -79,11 +81,21 @@ Route::middleware(['auth', 'verified', 'role:admin'])
  * /dashboard
  */
 Route::middleware(['auth', 'verified'])->group(function () {
+    // dashboard
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    // profile
     Route::get('/profiles/{user}', [ProfileController::class, 'show'])->name('profiles.show');
+    // reports
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
-
+    // chats
+    Route::get('/my/chats', [ChatController::class, 'index'])->name('my.chats.index');
+    Route::get('/my/chats/{chat}', [ChatController::class, 'show'])->name('my.chats.show');
+    Route::post('/my/chats/{chat}/messages', [ChatController::class, 'store'])->name('my.chats.messages.store');
+    // presence
+    Route::post('/presence/ping', [PresenceController::class, 'ping'])->name('presence.ping');
+    Route::get('/presence/users/{user}', [PresenceController::class, 'show'])->name('presence.show');
+    Route::post('/presence/offline', [PresenceController::class, 'offline'])->name('presence.offline');
 });
 
 /**
@@ -148,6 +160,7 @@ Route::middleware(['auth', 'verified', 'role:client'])
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
         Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
         Route::post('/services/{service:slug}/book', [BookingController::class, 'storeFromService'])->name('services.book');
+        Route::post('/services/{service:slug}/contact', [ChatController::class, 'contactFromService'])->name('services.contact');
         Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 
         // Payments

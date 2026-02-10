@@ -11,28 +11,35 @@ class Chat extends Model
 
     protected $fillable = [
         'type',
+        'client_id',
+        'provider_id',
         'service_id',
         'request_id',
         'last_message_at',
     ];
 
-    public function client(){
-        return $this->belongsTo(\App\Models\User::class,'client_id');
+    public function client()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'client_id');
     }
 
-    public function provider(){
-        return $this->belongsTo(\App\Models\User::class,'provider_id');
+    public function provider()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'provider_id');
     }
 
-    public function service(){
+    public function service()
+    {
         return $this->belongsTo(\App\Models\Service::class);
     }
 
-    public function request(){
+    public function request()
+    {
         return $this->belongsTo(\App\Models\Request::class);
     }
 
-    public function messages(){
+    public function messages()
+    {
         return $this->hasMany(\App\Models\Message::class);
     }
 }

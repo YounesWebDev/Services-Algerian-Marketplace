@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { login } from "@/routes";
+import { book as clientServiceBook, contact as clientServiceContact } from "@/routes/client/services";
 import { show as profileShow } from "@/routes/profiles";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { create as reportCreate } from "@/routes/reports";
@@ -86,9 +87,13 @@ export default function Show({ service }: { service: Service }) {
 
   function submitBooking(e: React.FormEvent) {
     e.preventDefault();
-    bookingForm.post(`/services/${service.slug}/book`, {
+    bookingForm.post(clientServiceBook.url(service.slug), {
       preserveScroll: true,
     });
+  }
+
+  function contactProvider() {
+    router.post(clientServiceContact.url(service.slug));
   }
 
   return (
@@ -267,13 +272,29 @@ export default function Show({ service }: { service: Service }) {
         )}
       </div>
 
-      {/* CTA (placeholder for later weeks) */}
+      {/* CTA */}
       <div className="flex gap-3">
-        <Button
-          onClick={() => alert("Later: create/open chat with provider")}
-          className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
-          Contact provider
-        </Button>
+        {!user ? (
+          <Button asChild className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
+            <Link href={login()}>
+              Contact provider
+            </Link>
+          </Button>
+        ) : user.role !== "client" ? (
+          <Button
+            disabled
+            className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl"
+          >
+            Contact provider
+          </Button>
+        ) : (
+          <Button
+            onClick={contactProvider}
+            className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl"
+          >
+            Contact provider
+          </Button>
+        )}
 
         <Button
           variant="outline"
