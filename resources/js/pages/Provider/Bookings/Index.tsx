@@ -208,7 +208,7 @@ export default function ProviderBookingsIndex() {
 
                     {/* right actions: row on mobile, column on sm+ */}
                     <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 sm:gap-2 shrink-0">
-                      <span className="text-xs text-foreground-muted">Booking #{b.id}</span>
+                     
 
                       <Link
                         href={providerBookingsShow.url(b.id)}

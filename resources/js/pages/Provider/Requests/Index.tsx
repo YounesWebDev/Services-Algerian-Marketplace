@@ -78,9 +78,9 @@ export default function ProviderRequestsIndex() {
                 id="city"
                 className="mt-1 w-full rounded-4xl bg-primary-foreground/30 border-gray-200 border p-2"
               >
-                <option value="">All cities</option>
+                <option value="" className="text-background">All cities</option>
                 {cities.map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c.id} value={c.id} className="text-background ">
                     {c.name}
                   </option>
                 ))}
@@ -96,7 +96,7 @@ export default function ProviderRequestsIndex() {
               >
                 <option value="">All categories</option>
                 {categories.map((c) => (
-                  <option key={c.id} value={c.slug}>
+                  <option key={c.id} value={c.slug} className="text-background">
                     {c.name}
                   </option>
                 ))}

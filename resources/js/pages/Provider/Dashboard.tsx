@@ -63,7 +63,7 @@ export default function Dashboard() {
       const offset = c - (percent / 100) * c;
 
       return (
-        <div className="rounded-4xl border border-gray-200 p-4  transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl">
+        <div className="rounded-4xl border border-gray-200 p-4 text-primary  transition duration-700 bg-primary/10 hover:bg-primary-foreground/20 hover:shadow-xl">
           <div className="flex items-center gap-4">
             <div className="relative h-30 w-30 shrink-0">
               <svg width={size} height={size} className="-rotate-90">
