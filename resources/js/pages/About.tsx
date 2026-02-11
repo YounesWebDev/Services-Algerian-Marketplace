@@ -1,0 +1,56 @@
+import { Link } from "@inertiajs/react";
+
+import { home as homeRoute } from "@/routes";
+import { index as servicesIndex } from "@/routes/services";
+
+export default function About() {
+    return (
+        <div className="min-h-screen bg-background text-foreground">
+            <div className="mx-auto max-w-4xl px-6 py-12 space-y-8">
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold">About PROfinder</h1>
+                    <div className="flex gap-3">
+                        <Link
+                            href={homeRoute.url()}
+                            className="rounded-full border px-4 py-2 text-sm hover:bg-muted transition"
+                        >
+                            Home
+                        </Link>
+                        <Link
+                            href={servicesIndex.url()}
+                            className="rounded-full border px-4 py-2 text-sm hover:bg-muted transition"
+                        >
+                            Services
+                        </Link>
+                    </div>
+                </div>
+
+                <p className="text-sm leading-7 text-muted-foreground">
+                    PROfinder is a local services marketplace that helps clients find trusted providers faster.
+                    Clients can browse services, chat in real-time, and manage bookings from one dashboard.
+                </p>
+
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="rounded-2xl border p-4">
+                        <h2 className="font-semibold">For Clients</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            Find providers, compare offers, chat instantly, and track your booking status.
+                        </p>
+                    </div>
+                    <div className="rounded-2xl border p-4">
+                        <h2 className="font-semibold">For Providers</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            Publish services, receive requests, and build reputation with verified reviews.
+                        </p>
+                    </div>
+                    <div className="rounded-2xl border p-4">
+                        <h2 className="font-semibold">For Safety</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                            Reporting, verification, and transparent status updates are built into the platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

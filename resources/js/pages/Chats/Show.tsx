@@ -2,7 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
-import { leaveChannel, listenPrivate } from '@/lib/echo';
+import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
 import { index as myChatsIndex } from '@/routes/my/chats';
 import { store as myChatMessagesStore } from '@/routes/my/chats/messages';
 import { show as presenceShow } from '@/routes/presence';
@@ -116,15 +116,7 @@ export default function ChatsShow() {
     const channelName = useMemo(() => `private-chat.${chat.id}`, [chat.id]);
     const boxRef = useRef<HTMLDivElement | null>(null);
 
-    function getCsrfToken(): string | null {
-        const metaToken = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content');
-
-        if (metaToken) {
-            return metaToken;
-        }
-
+    function getXsrfToken(): string | null {
         const cookieMatch = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
 
         if (!cookieMatch) {
@@ -144,9 +136,9 @@ export default function ChatsShow() {
             return;
         }
 
-        const csrfToken = getCsrfToken();
+        const xsrfToken = getXsrfToken();
 
-        if (!csrfToken) {
+        if (!xsrfToken) {
             setBodyError('Security token is missing. Please refresh the page.');
             return;
         }
@@ -172,8 +164,8 @@ export default function ChatsShow() {
 
         try {
             const form = new URLSearchParams();
-            form.set('_token', csrfToken);
             form.set('body', cleanBody);
+            const socketId = getSocketId();
 
             const response = await fetch(myChatMessagesStore.url(chat.id), {
                 method: 'POST',
@@ -181,12 +173,20 @@ export default function ChatsShow() {
                     Accept: 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-XSRF-TOKEN': csrfToken,
+                    'X-XSRF-TOKEN': xsrfToken,
+                    ...(socketId ? { 'X-Socket-ID': socketId } : {}),
                 },
                 body: form,
                 credentials: 'same-origin',
             });
+
+            if (response.status === 419) {
+                setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+                setBodyError('Session expired. Refreshing page...');
+                setBody(cleanBody);
+                window.location.reload();
+                return;
+            }
 
             if (response.status === 422) {
                 const payload = (await response.json()) as { errors?: { body?: string[] } };
@@ -198,7 +198,7 @@ export default function ChatsShow() {
 
             if (!response.ok) {
                 setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-                setBodyError('Could not send message. Please try again.');
+                setBodyError(`Could not send message (HTTP ${response.status}).`);
                 setBody(cleanBody);
                 return;
             }
@@ -207,11 +207,13 @@ export default function ChatsShow() {
 
             if (payload.message) {
                 setMessages((prev) => {
-                    return prev.map((m) =>
-                        m.id === optimisticId
-                            ? payload.message!
-                            : m,
-                    );
+                    const withoutOptimistic = prev.filter((message) => message.id !== optimisticId);
+
+                    if (withoutOptimistic.some((message) => message.id === payload.message!.id)) {
+                        return withoutOptimistic;
+                    }
+
+                    return [...withoutOptimistic, payload.message!];
                 });
             }
         } catch {
@@ -237,6 +239,24 @@ export default function ChatsShow() {
             setMessages((prev) => {
                 if (prev.some((m) => m.id === eventData.id)) {
                     return prev;
+                }
+
+                // If this tab already has an optimistic copy of my own message,
+                // replace it instead of appending a duplicate.
+                if (eventData.sender_id === me.id) {
+                    const optimisticIndex = prev.findIndex(
+                        (message) =>
+                            message.id < 0 &&
+                            message.sender_id === me.id &&
+                            message.body === eventData.body,
+                    );
+
+                    if (optimisticIndex !== -1) {
+                        const next = [...prev];
+                        next[optimisticIndex] = eventData;
+
+                        return next;
+                    }
                 }
 
                 return [...prev, eventData];

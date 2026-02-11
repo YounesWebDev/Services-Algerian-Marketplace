@@ -9,6 +9,7 @@ type EchoPrivateChannel = {
 type EchoClient = {
     private: (channelName: string) => EchoPrivateChannel;
     leave: (channelName: string) => void;
+    socketId?: () => string | undefined;
 };
 
 function getEcho(): EchoClient | null {
@@ -61,4 +62,15 @@ export function leaveChannel(channelName: string): void {
     }
 
     echoClient.leave(channelName);
+}
+
+// Current websocket socket id used by Laravel broadcast()->toOthers().
+export function getSocketId(): string | null {
+    const echoClient = getEcho();
+
+    if (!echoClient || !echoClient.socketId) {
+        return null;
+    }
+
+    return echoClient.socketId() ?? null;
 }

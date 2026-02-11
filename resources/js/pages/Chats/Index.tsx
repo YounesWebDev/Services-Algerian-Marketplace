@@ -11,7 +11,9 @@ type ChatRow = {
     id: number;
     type: string;
     last_message_at: string | null;
+    last_message_id?: number | null;
     last_message_preview: string | null;
+    unread_count: number;
     other_user: {
         id: number;
         name: string;
@@ -20,7 +22,6 @@ type ChatRow = {
 };
 
 type ChatListRow = ChatRow & {
-    unread_count: number;
     last_message_id?: number;
 };
 
@@ -43,7 +44,8 @@ export default function ChatsIndex() {
     const { props } = usePage<{ chats: ChatRow[] } & SharedData>();
     const initialChats: ChatListRow[] = (props.chats ?? []).map((chat) => ({
         ...chat,
-        unread_count: 0,
+        last_message_id: chat.last_message_id ?? undefined,
+        unread_count: chat.unread_count ?? 0,
     }));
     const userId = props.auth.user.id;
 

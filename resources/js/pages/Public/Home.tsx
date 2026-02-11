@@ -35,7 +35,7 @@
 
     import GlassIcons from "@/components/GlassIcons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { dashboard, home as homeRoute, login, register } from "@/routes";
+import { about, contact, dashboard, home as homeRoute, login, register, terms } from "@/routes";
 import { suggestions as homeSuggestions } from "@/routes/home";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { index as providerRequestsIndex } from "@/routes/provider/requests";
@@ -293,7 +293,7 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
                         </Link>
                     )}
                     { !user && (
-                        <Link className="hover:text-primary    p-1 transition" href="/about">
+                        <Link className="hover:text-primary    p-1 transition" href={about.url()}>
                             About
                         </Link>
                     )}
@@ -373,7 +373,7 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
                         </Link>
                     )}
                     { !user && (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 transition" href="/about">
+                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 transition" href={about.url()}>
                            <Info/> About
                         </Link>
                     )}
@@ -705,15 +705,15 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
                 <div className="mx-auto max-w-6xl px-6 py-6 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
                 <div>(c) {new Date().getFullYear()} profinder</div>
                 <div className="flex gap-4">
-                    <a className="hover:underline" href="/about">
+                    <Link className="hover:underline" href={about.url()}>
                     About
-                    </a>
-                    <a className="hover:underline" href="/contact">
+                    </Link>
+                    <Link className="hover:underline" href={contact.url()}>
                     Contact
-                    </a>
-                    <a className="hover:underline" href="/terms">
+                    </Link>
+                    <Link className="hover:underline" href={terms.url()}>
                     Terms
-                    </a>
+                    </Link>
                 </div>
                 </div>
             </div>

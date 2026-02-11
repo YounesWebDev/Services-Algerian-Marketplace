@@ -29,6 +29,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\Settings\ProfileController;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
 // Admin Routes
@@ -121,6 +122,7 @@ Route::middleware(['auth', 'verified', 'role:provider', 'provider.verified'])
         Route::get('/requests/{requestModel}', [RequestController::class, 'show'])
             ->whereNumber('requestModel')
             ->name('requests.show');
+        Route::post('/requests/{requestModel}/contact', [ChatController::class, 'contactFromRequest'])->name('requests.contact');
 
         // provider bookings
         Route::get('/my/bookings', [ProviderBookingController::class, 'index'])->name('bookings.index');
@@ -155,6 +157,7 @@ Route::middleware(['auth', 'verified', 'role:client'])
         // Offers
         Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
         Route::post('/offers/{offer}/accept', AcceptOfferController::class)->name('offers.accept');
+        Route::post('/offers/{offer}/contact', [ChatController::class, 'contactFromOffer'])->name('offers.contact');
 
         // Bookings
         Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
@@ -179,6 +182,9 @@ Route::middleware(['auth', 'verified', 'role:client'])
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/suggestions', [HomeController::class, 'suggestions'])->name('home.suggestions');
+Route::get('/about', fn () => Inertia::render('About'))->name('about');
+Route::get('/contact', fn () => Inertia::render('Contact'))->name('contact');
+Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
 
 Route::get('/services', [ServicesController::class, 'index'])->name('services.index');
 Route::get('/services/{service:slug}', [ServicesController::class, 'show'])

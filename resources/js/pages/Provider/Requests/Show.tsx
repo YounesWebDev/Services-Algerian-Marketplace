@@ -1,8 +1,9 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import { Clock, MapPin } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import AppLayout from "@/layouts/app-layout";
+import { contact as providerRequestsContact } from "@/routes/provider/requests";
 import { index as providerRequestsIndex } from "@/routes/provider/requests";
 import { store as providerRequestsOffersStore } from "@/routes/provider/requests/offers";
 
@@ -58,6 +59,10 @@ export default function ProviderRequestsShow() {
     form.post(providerRequestsOffersStore.url(r.id), {
       preserveScroll: true,
     });
+  }
+
+  function contactClient() {
+    router.post(providerRequestsContact.url(r.id));
   }
 
   return (
@@ -185,7 +190,16 @@ export default function ProviderRequestsShow() {
 
         {/* Offer form */}
         <div className="rounded-md border p-4">
-          <h2 className="font-medium">Send an Offer</h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="font-medium">Send an Offer</h2>
+            <button
+              type="button"
+              onClick={contactClient}
+              className="rounded-3xl border border-gray-200 px-4 py-2 text-sm transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl"
+            >
+              Contact client
+            </button>
+          </div>
           {props.has_offer ? (
             <p className="text-sm text-foreground mt-1">
               You already sent an offer for this request.

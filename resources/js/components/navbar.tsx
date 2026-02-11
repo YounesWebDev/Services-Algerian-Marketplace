@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/react";
 import { Menu, X, House, GitPullRequest, Flag, SquareAsterisk, UsersRound, Info } from "lucide-react";
 import { useState } from "react";
 
-import { dashboard, home as homeRoute, login, register } from "@/routes";
+import { about, dashboard, home as homeRoute, login, register } from "@/routes";
 import { index as providerServicesIndex } from "@/routes/provider/my/services";
 import { index as providerRequestsIndex } from "@/routes/provider/requests";
 import { index as servicesIndex } from "@/routes/services";
@@ -59,7 +59,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
           )}
 
           {!user && (
-            <Link className="hover:text-primary transition" href="/about">
+            <Link className="hover:text-primary transition" href={about.url()}>
               About
             </Link>
           )}
@@ -143,7 +143,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
           )}
 
           {!user && (
-            <Link className="flex gap-3 items-center p-2" href="/about">
+            <Link className="flex gap-3 items-center p-2" href={about.url()}>
               <Info /> About
             </Link>
           )}

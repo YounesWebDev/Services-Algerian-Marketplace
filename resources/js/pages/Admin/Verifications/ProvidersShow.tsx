@@ -83,7 +83,7 @@ export default function ProvidersVerificationsShow() {
       breadcrumbs={[
         { title: "Dashboard", href: dashboard().url },
         { title: "Provider Verifications", href: providersIndex().url },
-        { title: `Verification #${verification.id}`, href: providersIndex().url },
+        { title: `Verification #${v.id}`, href: providersIndex().url },
       ]}
     >
       <Head title="Provider verification" />

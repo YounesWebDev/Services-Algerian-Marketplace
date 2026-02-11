@@ -9,6 +9,8 @@ use App\Events\NewMessageAlert;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\Offer;
+use App\Models\Request as JobRequest;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -50,6 +52,76 @@ class ChatController extends Controller
         return to_route('my.chats.show', $chat);
     }
 
+    // create/open chat from a provider request page
+    public function contactFromRequest(Request $request, JobRequest $requestModel)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'provider') {
+            abort(403);
+        }
+
+        if ((int) $requestModel->client_id === (int) $user->id) {
+            abort(403);
+        }
+
+        $chat = Chat::query()
+            ->where('client_id', $requestModel->client_id)
+            ->where('provider_id', $user->id)
+            ->orderByDesc('last_message_at')
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $chat) {
+            $chat = Chat::query()->create([
+                'type' => 'request',
+                'service_id' => null,
+                'request_id' => $requestModel->id,
+                'client_id' => $requestModel->client_id,
+                'provider_id' => $user->id,
+                'last_message_at' => null,
+            ]);
+        }
+
+        return to_route('my.chats.show', $chat);
+    }
+
+    // create/open chat from a client offer row
+    public function contactFromOffer(Request $request, Offer $offer)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'client') {
+            abort(403);
+        }
+
+        $offer->load('request:id,client_id');
+
+        if (! $offer->request || (int) $offer->request->client_id !== (int) $user->id) {
+            abort(403);
+        }
+
+        $chat = Chat::query()
+            ->where('client_id', $user->id)
+            ->where('provider_id', $offer->provider_id)
+            ->orderByDesc('last_message_at')
+            ->orderByDesc('id')
+            ->first();
+
+        if (! $chat) {
+            $chat = Chat::query()->create([
+                'type' => 'request',
+                'service_id' => null,
+                'request_id' => $offer->request_id,
+                'client_id' => $user->id,
+                'provider_id' => $offer->provider_id,
+                'last_message_at' => null,
+            ]);
+        }
+
+        return to_route('my.chats.show', $chat);
+    }
+
     // chat list page
     public function index(Request $request)
     {
@@ -65,6 +137,12 @@ class ChatController extends Controller
                 'provider:id,name,avatar_path',
                 'messages' => function ($query) {
                     $query->latest()->limit(1);
+                },
+            ])
+            ->withCount([
+                'messages as unread_count' => function ($query) use ($user) {
+                    $query->where('sender_id', '!=', $user->id)
+                        ->whereNull('read_at');
                 },
             ])
             ->orderByDesc('last_message_at')
@@ -89,7 +167,9 @@ class ChatController extends Controller
                     'id' => $chat->id,
                     'type' => $chat->type,
                     'last_message_at' => $chat->last_message_at,
+                    'last_message_id' => $last?->id,
                     'last_message_preview' => $last?->body,
+                    'unread_count' => (int) $chat->unread_count,
                     'other_user' => $other ? [
                         'id' => $other->id,
                         'name' => $other->name,

@@ -1,9 +1,9 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { index as myRequestsIndex } from "@/routes/client/my/requests";
-import { accept as clientOffersAccept } from "@/routes/client/offers";
+import { accept as clientOffersAccept, contact as clientOffersContact } from "@/routes/client/offers";
 import { show as profileShow } from "@/routes/profiles";
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
@@ -71,6 +71,10 @@ export default function ClientRequestShow() {
     acceptForm.post(clientOffersAccept.url(offerId), {
       preserveScroll: true,
     });
+  }
+
+  function contactProvider(offerId: number) {
+    router.post(clientOffersContact.url(offerId));
   }
 
   const canAccept = job.status === "open"; // only open requests can accept offers
@@ -220,14 +224,23 @@ export default function ClientRequestShow() {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <button
-                          type="button"
-                          onClick={() => acceptOffer(o.id)}
-                          disabled={!canAcceptThis || acceptForm.processing}
-                          className="rounded-md bg-black px-3 py-2 text-white text-sm disabled:opacity-60"
-                        >
-                          {acceptForm.processing ? "Working..." : "Accept"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => contactProvider(o.id)}
+                            className="rounded-md border px-3 py-2 text-sm"
+                          >
+                            Contact
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => acceptOffer(o.id)}
+                            disabled={!canAcceptThis || acceptForm.processing}
+                            className="rounded-md bg-black px-3 py-2 text-white text-sm disabled:opacity-60"
+                          >
+                            {acceptForm.processing ? "Working..." : "Accept"}
+                          </button>
+                        </div>
 
                         {!canAcceptThis ? (
                           <span className="text-xs text-gray-500">

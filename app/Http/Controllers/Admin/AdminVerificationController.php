@@ -46,7 +46,8 @@ class AdminVerificationController extends Controller
     {
         $verification->load([
             'provider:id,name,email,avatar_path',
-            'provider:id,name',
+            'provider.profile:id,user_id,verified_at',
+            'reviewer:id,name',
         ]);
 
         return Inertia::render('Admin/Verifications/ProvidersShow', [
@@ -62,11 +63,11 @@ class AdminVerificationController extends Controller
                     'name' => $verification->provider->name,
                     'email' => $verification->provider->email,
                     'avatar_path' => $verification->provider->avatar_path,
-                    'is_verified' => (bool) optional($verification->profile)->verified_at,
+                    'is_verified' => (bool) optional($verification->provider->profile)->verified_at,
                 ],
                 'reviewer' => $verification->reviewer ? [
-                    'id' => $verification->id,
-                    'name' => $verification->name,
+                    'id' => $verification->reviewer->id,
+                    'name' => $verification->reviewer->name,
                 ] : null,
             ],
         ]);

@@ -30,15 +30,7 @@ export default function AppSidebarLayout({
     const userChannelName = useMemo(() => `private-user.${myUserId}`, [myUserId]);
 
     useEffect(() => {
-        const getCsrfToken = () => {
-            const metaToken = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute('content');
-
-            if (metaToken) {
-                return metaToken;
-            }
-
+        const getXsrfToken = () => {
             const cookieMatch = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
 
             if (!cookieMatch) {
@@ -53,24 +45,19 @@ export default function AppSidebarLayout({
                 return;
             }
 
-            const csrfToken = getCsrfToken();
+            const xsrfToken = getXsrfToken();
 
-            if (!csrfToken) {
+            if (!xsrfToken) {
                 return;
             }
-
-            const form = new URLSearchParams();
-            form.set('_token', csrfToken);
 
             void fetch(ping.url(), {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-XSRF-TOKEN': csrfToken,
+                    'X-XSRF-TOKEN': xsrfToken,
                 },
-                body: form,
                 credentials: 'same-origin',
             }).catch(() => {
                 // Ignore transient network issues for heartbeat.
@@ -78,16 +65,23 @@ export default function AppSidebarLayout({
         };
 
         const markOffline = () => {
-            const csrfToken = getCsrfToken();
+            const xsrfToken = getXsrfToken();
 
-            if (!csrfToken) {
+            if (!xsrfToken) {
                 return;
             }
-
-            const form = new URLSearchParams();
-            form.set('_token', csrfToken);
-
-            navigator.sendBeacon(offline.url(), form);
+            void fetch(offline.url(), {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken,
+                },
+                credentials: 'same-origin',
+                keepalive: true,
+            }).catch(() => {
+                // Ignore unload errors.
+            });
         };
 
         sendPing();
