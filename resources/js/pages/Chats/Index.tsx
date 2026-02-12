@@ -1,6 +1,9 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { leaveChannel, listenPrivate } from '@/lib/echo';
 import { show as myChatsShow } from '@/routes/my/chats';
@@ -39,6 +42,26 @@ type PresenceInfo = {
     last_seen_at: string | null;
     offline_for_seconds: number | null;
 };
+
+function toStorageUrl(path: string | null): string {
+    if (!path) {
+        return '';
+    }
+
+    if (path.startsWith('http') || path.startsWith('/')) {
+        return path;
+    }
+
+    if (path.startsWith('storage/')) {
+        return `/${path}`;
+    }
+
+    return `/storage/${path}`;
+}
+
+function getInitial(name: string | null | undefined): string {
+    return (name ?? 'U').charAt(0).toUpperCase();
+}
 
 export default function ChatsIndex() {
     const { props } = usePage<{ chats: ChatRow[] } & SharedData>();
@@ -206,9 +229,11 @@ export default function ChatsIndex() {
                 <h1 className="text-xl font-semibold">My Chats</h1>
 
                 {chats.length === 0 ? (
-                    <div className="rounded-md border p-4 text-sm text-gray-600">
-                        No chats yet.
-                    </div>
+                    <Card>
+                        <CardContent className="p-4 text-sm text-muted-foreground">
+                            No chats yet.
+                        </CardContent>
+                    </Card>
                 ) : (
                     <div className="space-y-3">
                         {chats.map((chat) => {
@@ -228,46 +253,75 @@ export default function ChatsIndex() {
                                         ),
                                     );
                                 }}
-                                className="block rounded-md border p-4 hover:bg-gray-50"
+                                className="block"
                             >
-                                <div className="flex items-center justify-between gap-3">
-                                    <div>
-                                        <div className={chat.unread_count > 0 ? 'font-semibold' : 'font-medium'}>
-                                            {chat.other_user?.name ?? 'Unknown User'}
-                                        </div>
-                                        {presence ? (
-                                            presence.is_online ? (
-                                                <div className="mt-1 flex items-center gap-1 text-xs text-green-600">
-                                                    <span className="h-2 w-2 rounded-full bg-green-500" />
-                                                    <span>Online</span>
-                                                </div>
-                                            ) : (
-                                                <div className="mt-1 text-xs text-gray-500">
-                                                    {formatOfflineSince(presence.offline_for_seconds)}
-                                                </div>
-                                            )
-                                        ) : null}
-                                        {chat.unread_count > 1 ? (
-                                            <div className="mt-1 text-sm font-semibold text-blue-600">
-                                                {formatUnreadCount(chat.unread_count)}
-                                            </div>
-                                        ) : (
-                                            <div
-                                                className={
-                                                    chat.unread_count === 1
-                                                        ? 'text-sm font-semibold text-gray-900'
-                                                        : 'text-sm text-gray-600'
-                                                }
-                                            >
-                                                {chat.last_message_preview ?? 'No messages yet.'}
-                                            </div>
-                                        )}
-                                    </div>
+                                <Card className="gap-0 py-0 transition-colors hover:bg-accent/30">
+                                    <CardContent className="flex items-center justify-between gap-3 p-4">
+                                        <div className="flex min-w-0 items-start gap-3">
+                                            <Avatar className="h-10 w-10 border">
+                                                <AvatarImage
+                                                    src={toStorageUrl(chat.other_user?.avatar_path ?? null)}
+                                                    alt={chat.other_user?.name ?? 'Unknown User'}
+                                                />
+                                                <AvatarFallback>
+                                                    {getInitial(chat.other_user?.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
 
-                                    <div className="text-xs text-gray-500">
-                                        {chat.last_message_at ?? '-'}
-                                    </div>
-                                </div>
+                                            <div className="min-w-0">
+                                                <div
+                                                    className={
+                                                        chat.unread_count > 0
+                                                            ? 'font-semibold'
+                                                            : 'font-medium'
+                                                    }
+                                                >
+                                                    {chat.other_user?.name ?? 'Unknown User'}
+                                                </div>
+
+                                                {presence ? (
+                                                    presence.is_online ? (
+                                                        <div className="mt-1">
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className="gap-1 text-green-700"
+                                                            >
+                                                                <span className="h-2 w-2 rounded-full bg-green-500" />
+                                                                <span>Online</span>
+                                                            </Badge>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="mt-1 text-xs text-muted-foreground">
+                                                            {formatOfflineSince(presence.offline_for_seconds)}
+                                                        </div>
+                                                    )
+                                                ) : null}
+
+                                                {chat.unread_count > 1 ? (
+                                                    <div className="mt-1">
+                                                        <Badge className="font-semibold">
+                                                            {formatUnreadCount(chat.unread_count)}
+                                                        </Badge>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className={
+                                                            chat.unread_count === 1
+                                                                ? 'mt-1 truncate text-sm font-semibold'
+                                                                : 'mt-1 truncate text-sm text-muted-foreground'
+                                                        }
+                                                    >
+                                                        {chat.last_message_preview ?? 'No messages yet.'}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="shrink-0 text-xs text-muted-foreground">
+                                            {chat.last_message_at ?? '-'}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             </Link>
                             );
                         })}
