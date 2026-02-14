@@ -229,7 +229,7 @@ export default function ProviderServicesIndex() {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="font-bold text-primary break-words">{s.title}</div>
+                          <div className="font-bold text-foreground text-xl break-words">{s.title}</div>
 
                           <div className="flex flex-wrap items-center gap-2 text-sm mt-2 border border-gray-200 w-full sm:w-max px-2 py-1 rounded-3xl">
                             <span className="break-words">{s.category?.name}</span>

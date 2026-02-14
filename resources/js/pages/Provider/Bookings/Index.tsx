@@ -82,20 +82,20 @@ export default function ProviderBookingsIndex() {
             className={`px-3 py-1 rounded-3xl text-sm border border-gray-200 ${
               filters.status === ""
                 ? "bg-primary text-foreground"
-                : "bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover-shadow-lg"
+                : "bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover:shadow-lg"
             }`}
           >
             All
           </Link>
 
-          {["pending", "confirmed", "in progress", "completed", "cancelled"].map((s) => (
+          {["pending", "confirmed", "in_progress", "completed", "cancelled"].map((s) => (
             <Link
               key={s}
               href={providerBookingsIndex.url({ query: { status: s } })}
               className={`px-3 py-1 rounded-3xl text-sm border border-gray-200 ${
                 filters.status === s
                   ? "bg-primary text-foreground"
-                  : "bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover-shadow-lg"
+                  : "bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover:shadow-lg"
               }`}
             >
               {s}
@@ -157,7 +157,7 @@ export default function ProviderBookingsIndex() {
                             <span className="font-medium p-2 text-primary flex items-center gap-2">
                               <CircleCheckBig className="h-5 w-5" /> {b.status}
                             </span>
-                          ) : b.status === "in progress" ? (
+                          ) : b.status === "in_progress" ? (
                             <span className="font-medium p-2 text-amber-400 flex items-center gap-2">
                               <Briefcase className="h-5 w-5" /> {b.status}
                             </span>

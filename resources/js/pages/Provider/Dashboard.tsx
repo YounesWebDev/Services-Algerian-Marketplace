@@ -19,7 +19,7 @@ export default function Dashboard() {
     <AppLayout>
     <Head title="Provider Dashboard" />
 <div className="p-4 max-w-full mx-auto">
-  <h1 className="text-2xl font-bold mb-6 text-primary">Provider Dashboard</h1>
+  <h1 className="text-2xl font-bold mb-6 text-foreground">Provider Dashboard</h1>
 
   {(() => {
     const pending = Number(stats.pending_bookings ?? 0);
@@ -63,7 +63,7 @@ export default function Dashboard() {
       const offset = c - (percent / 100) * c;
 
       return (
-        <div className="rounded-4xl border border-gray-200 p-4 text-primary  transition duration-700 bg-primary/10 hover:bg-primary-foreground/20 hover:shadow-xl">
+        <div className="rounded-4xl border border-gray-200 p-4 text-primary  transition duration-700 bg-primary/10 hover:bg-primary/20 hover:shadow-xl">
           <div className="flex items-center gap-4">
             <div className="relative h-30 w-30 shrink-0">
               <svg width={size} height={size} className="-rotate-90">
