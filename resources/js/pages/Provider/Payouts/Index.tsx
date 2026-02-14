@@ -1,8 +1,7 @@
 ﻿import { Head, Link, router } from "@inertiajs/react";
-import { ExternalLink } from "lucide-react";
+import { BadgeCheck, ExternalLink } from "lucide-react";
 import { useRef } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -51,13 +50,6 @@ const money = (v: unknown) => {
   const n = typeof v === "number" ? v : Number(v ?? NaN);
   if (Number.isFinite(n)) return `${n.toFixed(2)} DZD`;
   return `${v ?? ""} DZD`;
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const s = status?.toLowerCase();
-  if (s === "sent") return <Badge>Sent</Badge>;
-  if (s === "pending") return <Badge variant="secondary">Pending</Badge>;
-  return <Badge variant="outline">{status}</Badge>;
 };
 
 export default function ProviderPayoutsIndex({
@@ -184,7 +176,7 @@ export default function ProviderPayoutsIndex({
             {list.data.length === 0 ? (
               <div className="text-sm text-muted-foreground">No payouts yet.</div>
             ) : (
-              <div className="divide-y rounded-md border">
+              <div className="divide-y rounded-3xl  border border-gray-200">
                 {list.data.map((p) => {
                   const ref =
                     p?.metadata && typeof p.metadata === "object" && p.metadata
@@ -199,25 +191,40 @@ export default function ProviderPayoutsIndex({
                       className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={p.status} />
-                          <div className="text-sm font-medium">{money(p.amount)}</div>
-                        </div>
+                       <div className="flex items-center gap-2">
+  <div className="flex items-center">
+    {p.status === "sent" ? (
+      <div className="text-primary flex items-center gap-1">
+        <BadgeCheck className="h-4 w-4" />
+        {p.status}
+      </div>
+    ) : (
+      <div className="text-muted-foreground">
+        {p.status}
+      </div>
+    )}
+  </div>
 
-                        <div className="text-xs text-muted-foreground">
+  <div className="text-sm font-medium">
+    {money(p.amount)}
+  </div>
+</div>
+
+
+                        <div className="text-xs text-foreground p-2 border border-gray-200 rounded-2xl w-max">
                           {p.method ? `Method: ${p.method}` : "Method: -"}
                           {ref ? ` • Ref: ${ref}` : ""}
                         </div>
 
-                        <div className="text-xs text-muted-foreground">
-                          Created: {p.created_at ?? "-"}
-                          {p.sent_at ? ` • Sent: ${p.sent_at}` : ""}
+                        <div className="text-xs text-foreground flex flex-col gap-2 p-2 rounded-2xl w-max">
+                        <div className="border border-gray-200 p-2 rounded-3xl"> Created: {p.created_at?.slice(0, 16)}</div>
+                         <div className="border border-gray-200 p-2 rounded-3xl"> {p.sent_at ? `  Sent: ${p.sent_at?.slice(0, 16)}` : ""}</div>
                         </div>
                       </div>
 
                       <div className="flex gap-2">
                         <Link className="inline-flex" href={providerPayoutsShow(p.id).url}>
-                          <Button variant="outline" size="sm"><ExternalLink className="h-4 w-4 text-primary transition duration-700 "  /></Button>
+                          <button  ><ExternalLink className="h-6 w-6 text-primary transition duration-700 hover:text-foreground "  /></button>
                         </Link>
                       </div>
                     </div>

@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { Star, StarHalf } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +60,30 @@ const initials = (name: string) => {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase()).join("");
 };
+function Stars({ value }: { value: number }) {
+  const rating = Number.isFinite(value) ? Math.max(0, Math.min(5, value)) : 0;
+
+  const full = Math.floor(rating);
+  const hasHalf = rating % 1 !== 0; // if between a number and a number => half star
+  const empty = 5 - full - (hasHalf ? 1 : 0);
+
+  return (
+    <span className="inline-flex items-center gap-1">
+      {Array.from({ length: full }).map((_, i) => (
+        <Star key={`f-${i}`} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+      ))}
+
+      {hasHalf && (
+        <StarHalf className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+      )}
+
+      {Array.from({ length: empty }).map((_, i) => (
+        <Star key={`e-${i}`} className="h-4 w-4 text-muted-foreground" />
+      ))}
+    </span>
+  );
+}
+
 
 export default function ProfileShow() {
   const { props } = usePage<{
@@ -150,12 +175,16 @@ export default function ProfileShow() {
                     </span>
                   </div>
 
-                  <div>
-                    Rating:{" "}
-                    <span className="text-foreground font-medium">
-                      {profile?.rating_avg ?? "0.00"} ({profile?.rating_count ?? 0})
-                    </span>
-                  </div>
+                 <div className="flex items-center gap-2">
+  <span className="text-sm text-muted-foreground">Rating:</span>
+
+  <Stars value={Number(profile?.rating_avg ?? 0)} />
+
+  <span className="text-foreground font-medium">
+    {Number(profile?.rating_avg ?? 0).toFixed(2)} ({profile?.rating_count ?? 0})
+  </span>
+</div>
+
 
                   <div>
                     Verified:{" "}
