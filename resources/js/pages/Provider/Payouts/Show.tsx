@@ -1,7 +1,6 @@
 ﻿import { Head, Link } from "@inertiajs/react";
+import { BadgeCheck } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
@@ -27,13 +26,6 @@ const money = (v: unknown) => {
   const n = typeof v === "number" ? v : Number(v ?? NaN);
   if (Number.isFinite(n)) return `${n.toFixed(2)} DZD`;
   return `${v ?? ""} DZD`;
-};
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const s = status?.toLowerCase();
-  if (s === "sent") return <Badge>Sent</Badge>;
-  if (s === "pending") return <Badge variant="secondary">Pending</Badge>;
-  return <Badge variant="outline">{status}</Badge>;
 };
 
 export default function ProviderPayoutShow({ payout }: Props) {
@@ -69,8 +61,19 @@ export default function ProviderPayoutShow({ payout }: Props) {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <StatusBadge status={payout.status} />
-              <h1 className="text-lg font-semibold">Payout #{payout.id}</h1>
+               <div className="flex items-center">
+                  {payout.status === "sent" ? (
+                    <div className="text-primary flex items-center gap-1">
+                      <BadgeCheck className="h-4 w-4" />
+                      {payout.status}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground">
+                      {payout.status}
+                    </div>
+                  )}
+                </div>
+              <h1 className="text-lg font-semibold">Payout </h1>
             </div>
             <div className="text-sm text-muted-foreground">
               Amount: <span className="font-medium text-foreground">{money(payout.amount)}</span>
@@ -78,41 +81,41 @@ export default function ProviderPayoutShow({ payout }: Props) {
           </div>
 
           <Link href={providerPayoutsIndex().url}>
-            <Button variant="outline">Back</Button>
+            <button className="rounded-3xl border border-gray-200 text-red-600  p-2 transition duration-700 hover:text-white hover:bg-red-600">Back</button>
           </Link>
         </div>
 
-        <Card>
+        <Card className="rounded-3xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Details</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Status</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Status :</div>
               <div className="font-medium">{payout.status}</div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Method</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Method :</div>
               <div className="font-medium">{payout.method ?? "-"}</div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Reference</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Reference :</div>
               <div className="font-medium">{referenceText}</div>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Account name</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Account name :</div>
               <div className="font-medium">{accountName ? String(accountName) : "-"}</div>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Account number</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Account number :</div>
               <div className="font-medium">{accountNumber ? String(accountNumber) : "-"}</div>
             </div>
             {payout.method === "ccp" && (
-              <div className="flex items-center justify-between">
-                <div className="text-muted-foreground">Cle</div>
+              <div className="flex items-center gap-2">
+                <div className="text-primary">Cle :</div>
                 <div className="font-medium">{cle ? String(cle) : "-"}</div>
               </div>
             )}
@@ -122,29 +125,22 @@ export default function ProviderPayoutShow({ payout }: Props) {
               </div>
             ) : null}
 
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Sent at</div>
-              <div className="font-medium">{payout.sent_at ?? "-"}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Sent at :</div>
+              <div className="font-medium">{payout.sent_at?.slice(0, 16)}</div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Created at</div>
-              <div className="font-medium">{payout.created_at ?? "-"}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Created at :</div>
+              <div className="font-medium">{payout.created_at?.slice(0, 16)}</div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">Updated at</div>
-              <div className="font-medium">{payout.updated_at ?? "-"}</div>
+            <div className="flex items-center gap-2">
+              <div className="text-primary">Updated at :</div>
+              <div className="font-medium">{payout.updated_at?.slice(0, 16) }</div>
             </div>
 
-            {payout.metadata ? (
-              <div className="pt-4">
-                <div className="mb-2 text-muted-foreground">Metadata</div>
-                <pre className="overflow-auto rounded-md border bg-muted p-3 text-xs">
-                  {JSON.stringify(payout.metadata, null, 2)}
-                </pre>
-              </div>
-            ) : null}
+            
           </CardContent>
         </Card>
       </div>

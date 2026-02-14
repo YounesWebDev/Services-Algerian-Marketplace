@@ -1,5 +1,11 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
-import { CircleCheckBig, Download, IdCard } from "lucide-react";
+import {
+  ChevronDown,
+  CircleCheckBig,
+  Download,
+  IdCard,
+  UploadCloud,
+} from "lucide-react";
 
 import InputError from "@/components/input-error";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -49,9 +55,7 @@ export default function ProviderVerification() {
   const verification = props.verification;
   const isVerified = props.is_verified;
 
-  // middleware errors like withErrors(['verification' => '...'])
   const middlewareError = props.errors?.verification;
-
   const flashSuccess = props.flash?.success;
 
   const form = useForm<{
@@ -93,8 +97,11 @@ export default function ProviderVerification() {
           </div>
 
           {!isVerified ? (
-            <Button variant="outline" asChild>
-              <Link href={dashboard().url} className="rounded-3xl text-white ">Skip for now</Link>
+            <Button variant="outline" asChild  className="rounded-3xl text-foreground border-gray-200 transition duration-700 hover:bg-foreground hover:text-background">
+              <Link href={dashboard().url}>
+                Skip for now
+            
+              </Link>
             </Button>
           ) : null}
         </div>
@@ -116,12 +123,14 @@ export default function ProviderVerification() {
         {/* Current status card */}
         <Card>
           <CardHeader>
-            <div className="flex items-center  justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div className="font-medium">Current status</div>
               {isVerified ? (
-                <div className="text-primary flex items-center gap-2 border border-gray-200 p-2 rounded-3xl"><CircleCheckBig className="w-4 h-4"/> Verified</div>
+                <div className="text-primary flex items-center gap-2 border border-gray-200 p-2 rounded-3xl">
+                  <CircleCheckBig className="w-4 h-4" /> Verified
+                </div>
               ) : (
-                <Badge variant="outline">Not verified</Badge>
+                <Badge variant="outline" className="rounded-2xl text-red-600 border-gray-200">Not verified</Badge>
               )}
             </div>
           </CardHeader>
@@ -135,8 +144,10 @@ export default function ProviderVerification() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground ">Document type:</span>{" "}
-                  <span className="font-medium flex items-center gap-2"><IdCard/> {verification.doc_type}</span>
+                  <span className="text-muted-foreground">Document type:</span>{" "}
+                  <span className="font-medium flex items-center gap-2">
+                    <IdCard className="w-4 h-4" /> {verification.doc_type}
+                  </span>
                 </div>
 
                 <div>
@@ -146,10 +157,14 @@ export default function ProviderVerification() {
 
                 {docUrl ? (
                   <div>
-                    <span className="text-muted-foreground flex items-center">Uploaded file:</span>{" "}
-                    
-                    <span className="text-muted-foreground flex items-center">  </span>
-                    <a className="text-foreground transition duration-700 hover:text-primary flex items-center" href={docUrl} download>
+                    <span className="text-muted-foreground flex items-center">
+                      Uploaded file:
+                    </span>
+                    <a
+                      className="text-foreground transition duration-700 hover:text-primary flex items-center"
+                      href={docUrl}
+                      download
+                    >
                       <Download className="w-4 h-4 inline mr-1" /> Download
                     </a>
                   </div>
@@ -190,78 +205,113 @@ export default function ProviderVerification() {
         <Separator />
 
         {/* Submit form */}
-      {canSubmit && (<Card>
-          <CardHeader>
-            <div className="font-medium">Submit verification</div>
-          </CardHeader>
+        {canSubmit ? (
+          <Card>
+            <CardHeader>
+              <div className="font-medium">Submit verification</div>
+            </CardHeader>
 
-          <CardContent className="space-y-4">
-            {!canSubmit ? (
-              <Alert>
-                <AlertTitle>Submission disabled</AlertTitle>
-                <AlertDescription>
-                  {isVerified
-                    ? "You are already verified."
-                    : "You already have a pending verification request."}
-                </AlertDescription>
-              </Alert>
-            ) : null}
+            <CardContent className="space-y-4">
+              <form onSubmit={submit} className="space-y-4">
+                {/* Document number */}
+                <div className="grid gap-2">
+                  <Label htmlFor="doc_number">Document number</Label>
+                  <Input
+                    id="doc_number"
+                    value={form.data.doc_number}
+                    onChange={(e) => form.setData("doc_number", e.target.value)}
+                    placeholder="Enter the number on your document"
+                    disabled={!canSubmit}
+                    className="rounded-3xl bg-primary-foreground/30 border border-gray-200"
+                  />
+                  <InputError message={form.errors.doc_number} />
+                </div>
 
-            <form onSubmit={submit} className="space-y-4">
-              <div className="grid gap-2">
-                <Label htmlFor="doc_type">Document type</Label>
-                <Input
-                  id="doc_type"
-                  value={form.data.doc_type}
-                  onChange={(e) => form.setData("doc_type", e.target.value)}
-                  placeholder="Example: National ID, Passport..."
-                  disabled={!canSubmit}
-                />
-                <InputError message={form.errors.doc_type} />
-              </div>
+                {/* Document type + file */}
+                <div className="grid gap-6">
+                  {/* Document Type Dropdown */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="doc_type">Document type</Label>
 
-              <div className="grid gap-2">
-                <Label htmlFor="doc_number">Document number</Label>
-                <Input
-                  id="doc_number"
-                  value={form.data.doc_number}
-                  onChange={(e) => form.setData("doc_number", e.target.value)}
-                  placeholder="Enter the number on your document"
-                  disabled={!canSubmit}
-                />
-                <InputError message={form.errors.doc_number} />
-              </div>
+                    <div className="relative">
+                      <select
+                        id="doc_type"
+                        value={form.data.doc_type}
+                        onChange={(e) => form.setData("doc_type", e.target.value)}
+                        disabled={!canSubmit}
+                        className="appearance-none w-full rounded-4xl border border-gray-200 bg-primary-foreground/40 px-4 py-3 pr-10 text-sm shadow-sm transition duration-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <option value="">Select document</option>
+                        <option value="passport">Passport</option>
+                        <option value="id_card">ID Card</option>
+                        <option value="driving_license">Driving License</option>
+                      </select>
 
-              <div className="grid gap-2">
-                <Label htmlFor="doc_file">Upload document</Label>
-                <Input
-                  id="doc_file"
-                  type="file"
-                  accept="image/png,image/jpg,image/jpeg,image/webp,application/pdf"
-                  onChange={(e) => form.setData("doc_file", e.target.files?.[0] ?? null)}
-                  disabled={!canSubmit}
-                />
-                <InputError message={form.errors.doc_file} />
-                <p className="text-xs text-muted-foreground">
-                  Accepted: PNG/JPG/WEBP/PDF up to 4MB.
-                </p>
-              </div>
+                      <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    </div>
 
-              <div className="flex gap-2">
-                <Button disabled={!canSubmit || form.processing}>Submit</Button>
+                    <InputError message={form.errors.doc_type} />
+                  </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => form.reset("doc_file")}
-                  disabled={!canSubmit || form.processing}
-                >
-                  Reset file
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>)}
+                  {/* File Upload */}
+                  <div className="grid gap-2">
+                    <Label>Upload document</Label>
+
+                    <label
+                      htmlFor="doc_file"
+                      className={`flex flex-col items-center justify-center gap-2 rounded-4xl border-2 border-dashed border-gray-300 bg-primary-foreground/30 p-6 text-center cursor-pointer transition duration-300 hover:border-primary hover:bg-primary/5 ${
+                        !canSubmit ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <UploadCloud className="h-8 w-8 text-muted-foreground" />
+
+                      {form.data.doc_file ? (
+                        <span className="text-sm font-medium text-primary">
+                          {form.data.doc_file.name}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          Click to upload or drag & drop
+                        </span>
+                      )}
+
+                      <span className="text-xs text-muted-foreground">
+                        PNG / JPG / WEBP / PDF • Max 4MB
+                      </span>
+                    </label>
+
+                    <input
+                      id="doc_file"
+                      type="file"
+                      accept="image/png,image/jpg,image/jpeg,image/webp,application/pdf"
+                      className="hidden"
+                      disabled={!canSubmit}
+                      onChange={(e) =>
+                        form.setData("doc_file", e.target.files?.[0] ?? null)
+                      }
+                    />
+
+                    <InputError message={form.errors.doc_file} />
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button disabled={!canSubmit || form.processing} className="rounded-3xl transition duration-700 hover:bg-foreground hover:text-background">Submit</Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => form.reset("doc_file")}
+                    disabled={!canSubmit || form.processing}
+                     className="rounded-3xl transition border border-gray-200 duration-700 hover:bg-foreground hover:text-background"
+                  >
+                    Reset file
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </AppLayout>
   );

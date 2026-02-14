@@ -1,6 +1,7 @@
-﻿import { Head, Link } from "@inertiajs/react";
+﻿import { Head, Link, router } from "@inertiajs/react";
+import { BadgeCheck, ExternalLink } from "lucide-react";
+import { useRef } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,10 @@ import {
 } from "@/components/ui/select";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
-import { index as providerPayoutsIndex, show as providerPayoutsShow } from "@/routes/provider/payouts";
+import {
+  index as providerPayoutsIndex,
+  show as providerPayoutsShow,
+} from "@/routes/provider/payouts";
 
 type Payout = {
   id: number;
@@ -48,24 +52,33 @@ const money = (v: unknown) => {
   return `${v ?? ""} DZD`;
 };
 
-const StatusBadge = ({ status }: { status: string }) => {
-  const s = status?.toLowerCase();
-  if (s === "sent") return <Badge>Sent</Badge>;
-  if (s === "pending") return <Badge variant="secondary">Pending</Badge>;
-  return <Badge variant="outline">{status}</Badge>;
-};
-
-export default function ProviderPayoutsIndex({ payouts: list, filters, earnings }: Props) {
+export default function ProviderPayoutsIndex({
+  payouts: list,
+  filters,
+  earnings,
+}: Props) {
   const q = filters?.q ?? "";
   const status = filters?.status ?? "";
 
+  // ✅ hook must be inside component
+  const typingTimeout = useRef<number | null>(null);
+
+  // ✅ use Inertia navigation (no full reload / black flash)
   const submit = (next: { q?: string; status?: string }) => {
-    window.location.href = providerPayoutsIndex({
-      query: {
-        q: next.q ?? q,
-        status: next.status ?? status,
-      },
-    }).url;
+    router.get(
+      providerPayoutsIndex({
+        query: {
+          q: next.q ?? q,
+          status: next.status ?? status,
+        },
+      }).url,
+      {},
+      {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+      }
+    );
   };
 
   return (
@@ -79,25 +92,33 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
 
       <div className="space-y-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card>
+          <Card className="bg-primary-foreground/30 border text-foreground border-gray-200 rounded-4xl transition duration-700 hover:bg-primary-foreground/54  hover:shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Online earnings</CardTitle>
+              <CardTitle className="text-lg font-medium  text-foreground">
+                Online earnings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold">{money(earnings.online)}</div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card className="bg-primary-foreground/30 border text-foreground border-gray-200 rounded-4xl transition duration-700 hover:bg-primary-foreground/54  hover:shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Cash earnings</CardTitle>
+              <CardTitle className="text-lg font-medium text-foreground">
+                Cash earnings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold">{money(earnings.cash)}</div>
             </CardContent>
           </Card>
-          <Card>
+
+          <Card className="bg-primary-foreground/30 border text-foreground border-gray-200 rounded-4xl transition duration-700 hover:bg-primary-foreground/54  hover:shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total earnings</CardTitle>
+              <CardTitle className="text-lg font-medium text-foreground">
+                Total earnings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold">{money(earnings.total)}</div>
@@ -105,23 +126,33 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
           </Card>
         </div>
 
-        <Card>
+        <Card className="border-gray-200 rounded-4xl bg-primary-foreground/30 hover:bg-primary-foreground/40 transition duration-700 hover:shadow-xl">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Your Payouts</CardTitle>
 
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <Input
                 value={q}
-                onChange={(e) => submit({ q: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (typingTimeout.current) {
+                    window.clearTimeout(typingTimeout.current);
+                  }
+
+                  typingTimeout.current = window.setTimeout(() => {
+                    submit({ q: value });
+                  }, 400);
+                }}
                 placeholder="Search method / reference..."
-                className="sm:w-64"
+                className="rounded-3xl border border-gray-200 "
               />
 
               <Select
                 value={status === "" ? "all" : status}
                 onValueChange={(v) => submit({ status: v === "all" ? "" : v })}
               >
-                <SelectTrigger className="sm:w-40">
+                <SelectTrigger className="sm:w-40 rounded-3xl border border-gray-200  ">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -131,7 +162,11 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
                 </SelectContent>
               </Select>
 
-              <Button variant="outline" onClick={() => submit({ q: "", status: "" })}>
+              <Button
+                variant="outline"
+                onClick={() => submit({ q: "", status: "" })}
+                className="rounded-3xl bg-primary transition duration-700 hover:text-background hover:bg-foreground"
+              >
                 Reset
               </Button>
             </div>
@@ -141,7 +176,7 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
             {list.data.length === 0 ? (
               <div className="text-sm text-muted-foreground">No payouts yet.</div>
             ) : (
-              <div className="divide-y rounded-md border">
+              <div className="divide-y rounded-3xl  border border-gray-200">
                 {list.data.map((p) => {
                   const ref =
                     p?.metadata && typeof p.metadata === "object" && p.metadata
@@ -156,25 +191,40 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
                       className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={p.status} />
-                          <div className="text-sm font-medium">{money(p.amount)}</div>
-                        </div>
+                       <div className="flex items-center gap-2">
+  <div className="flex items-center">
+    {p.status === "sent" ? (
+      <div className="text-primary flex items-center gap-1">
+        <BadgeCheck className="h-4 w-4" />
+        {p.status}
+      </div>
+    ) : (
+      <div className="text-muted-foreground">
+        {p.status}
+      </div>
+    )}
+  </div>
 
-                        <div className="text-xs text-muted-foreground">
+  <div className="text-sm font-medium">
+    {money(p.amount)}
+  </div>
+</div>
+
+
+                        <div className="text-xs text-foreground p-2 border border-gray-200 rounded-2xl w-max">
                           {p.method ? `Method: ${p.method}` : "Method: -"}
                           {ref ? ` • Ref: ${ref}` : ""}
                         </div>
 
-                        <div className="text-xs text-muted-foreground">
-                          Created: {p.created_at ?? "-"}
-                          {p.sent_at ? ` • Sent: ${p.sent_at}` : ""}
+                        <div className="text-xs text-foreground flex flex-col gap-2 p-2 rounded-2xl w-max">
+                        <div className="border border-gray-200 p-2 rounded-3xl"> Created: {p.created_at?.slice(0, 16)}</div>
+                         <div className="border border-gray-200 p-2 rounded-3xl"> {p.sent_at ? `  Sent: ${p.sent_at?.slice(0, 16)}` : ""}</div>
                         </div>
                       </div>
 
                       <div className="flex gap-2">
                         <Link className="inline-flex" href={providerPayoutsShow(p.id).url}>
-                          <Button variant="secondary">Open</Button>
+                          <button  ><ExternalLink className="h-6 w-6 text-primary transition duration-700 hover:text-foreground "  /></button>
                         </Link>
                       </div>
                     </div>
@@ -182,9 +232,6 @@ export default function ProviderPayoutsIndex({ payouts: list, filters, earnings 
                 })}
               </div>
             )}
-
-            {/* If you already have a Pagination component, use it here.
-                Otherwise keep it simple for now. */}
           </CardContent>
         </Card>
       </div>
