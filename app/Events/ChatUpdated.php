@@ -8,6 +8,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class ChatUpdated implements ShouldBroadcastNow
 {
@@ -41,9 +42,13 @@ class ChatUpdated implements ShouldBroadcastNow
     // Data used by chat list page
     public function broadcastWith(): array
     {
+        $preview = $this->message->body !== ''
+            ? Str::limit($this->message->body, 80)
+            : ($this->message->attachments()->exists() ? 'Sent an attachment' : '');
+
         return [
             'chat_id' => $this->chat->id,
-            'last_message_preview' => $this->message->body,
+            'last_message_preview' => $preview,
             'last_message_at' => $this->chat->last_message_at?->toISOString(),
             'sender_id' => $this->message->sender_id,
             'message_id' => $this->message->id,

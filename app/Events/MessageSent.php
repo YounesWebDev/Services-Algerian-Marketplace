@@ -16,7 +16,10 @@ class MessageSent implements ShouldBroadcastNow
 
     public function __construct(Message $message)
     {
-        $message->load('sender:id,name,avatar_path');
+        $message->load([
+            'sender:id,name,avatar_path',
+            'attachments:id,message_id,path,original_name,type,size_bytes',
+        ]);
         $this->message = $message;
     }
 
@@ -43,6 +46,13 @@ class MessageSent implements ShouldBroadcastNow
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender?->name,
             'sender_avatar_path' => $this->message->sender?->avatar_path,
+            'attachments' => $this->message->attachments->map(fn ($attachment) => [
+                'id' => $attachment->id,
+                'path' => $attachment->path,
+                'original_name' => $attachment->original_name,
+                'type' => $attachment->type,
+                'size_bytes' => $attachment->size_bytes,
+            ])->values()->all(),
             'read_at' => $this->message->read_at?->toISOString(),
             'created_at' => $this->message->created_at?->toISOString(),
         ];

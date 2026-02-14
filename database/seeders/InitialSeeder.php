@@ -447,7 +447,6 @@ class InitialSeeder extends Seeder
                 'chat_id' => $chat->id,
                 'sender_id' => $client1->id,
                 'body' => 'Hi, I’m interested in your service. Are you available this week?',
-                'attachment_path' => null,
                 'read_at' => now(),
             ]);
 
@@ -455,7 +454,6 @@ class InitialSeeder extends Seeder
                 'chat_id' => $chat->id,
                 'sender_id' => $service->provider_id,
                 'body' => 'Yes! I can schedule you. Please share your location and preferred time.',
-                'attachment_path' => null,
                 'read_at' => null,
             ]);
 
@@ -465,7 +463,9 @@ class InitialSeeder extends Seeder
         // Request chats (client + provider about offer)
         foreach (array_slice($createdOffers, 0, 6) as $offer) {
             $req = JobRequest::find($offer->request_id);
-            if (! $req) continue;
+            if (! $req) {
+                continue;
+            }
 
             $chat = Chat::updateOrCreate(
                 [
@@ -484,7 +484,6 @@ class InitialSeeder extends Seeder
                 'chat_id' => $chat->id,
                 'sender_id' => $req->client_id,
                 'body' => 'Thanks for the offer. Can you start tomorrow?',
-                'attachment_path' => null,
                 'read_at' => now(),
             ]);
 
@@ -492,7 +491,6 @@ class InitialSeeder extends Seeder
                 'chat_id' => $chat->id,
                 'sender_id' => $offer->provider_id,
                 'body' => 'Yes, I can start tomorrow. I’ll confirm once you accept.',
-                'attachment_path' => null,
                 'read_at' => null,
             ]);
 

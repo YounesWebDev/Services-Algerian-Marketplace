@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
@@ -31,8 +32,17 @@ type MessageRow = {
     sender_id: number;
     sender_name: string | null;
     sender_avatar_path: string | null;
+    attachments?: MessageAttachment[];
     read_at?: string | null;
     created_at: string | null;
+};
+
+type MessageAttachment = {
+    id: number;
+    path: string;
+    original_name: string | null;
+    type: string | null;
+    size_bytes: number | null;
 };
 
 type MessageSentData = {
@@ -42,6 +52,7 @@ type MessageSentData = {
     sender_id: number;
     sender_name: string | null;
     sender_avatar_path: string | null;
+    attachments?: MessageAttachment[];
     read_at?: string | null;
     created_at: string | null;
 };
@@ -126,6 +137,33 @@ function formatSeenAt(isoDate: string | null | undefined): string {
     return `Seen at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 }
 
+function formatAttachmentSize(sizeBytes: number | null): string {
+    if (!sizeBytes || sizeBytes <= 0) {
+        return '';
+    }
+
+    if (sizeBytes < 1024) {
+        return `${sizeBytes} B`;
+    }
+
+    if (sizeBytes < 1024 * 1024) {
+        return `${Math.round(sizeBytes / 1024)} KB`;
+    }
+
+    return `${(sizeBytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function isImageAttachment(attachment: MessageAttachment): boolean {
+    if (attachment.type && attachment.type.startsWith('image/')) {
+        return true;
+    }
+
+    const fileName = (attachment.original_name ?? '').toLowerCase();
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'];
+
+    return imageExtensions.some((extension) => fileName.endsWith(extension));
+}
+
 export default function ChatsShow() {
     const { props } = usePage<{ chat: ChatData; messages: MessageRow[] } & SharedData>();
     const chat = props.chat;
@@ -136,20 +174,29 @@ export default function ChatsShow() {
     const [messages, setMessages] = useState<MessageRow[]>(props.messages ?? []);
     const [presenceInfo, setPresenceInfo] = useState<PresenceInfo | null>(null);
     const [body, setBody] = useState('');
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [bodyError, setBodyError] = useState<string | null>(null);
     const [sending, setSending] = useState(false);
+    const maxUploadSizeBytes = 10 * 1024 * 1024;
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const channelName = useMemo(() => `private-chat.${chat.id}`, [chat.id]);
     const boxRef = useRef<HTMLDivElement | null>(null);
 
     function getXsrfToken(): string | null {
-        const cookieMatch = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+        const cookieEntries = document.cookie.split(';');
 
-        if (!cookieMatch) {
-            return null;
+        for (const entry of cookieEntries) {
+            const trimmedEntry = entry.trim();
+
+            if (!trimmedEntry.startsWith('XSRF-TOKEN=')) {
+                continue;
+            }
+
+            return decodeURIComponent(trimmedEntry.slice('XSRF-TOKEN='.length));
         }
 
-        return decodeURIComponent(cookieMatch[1]);
+        return null;
     }
 
     async function submit(e: React.FormEvent) {
@@ -157,8 +204,8 @@ export default function ChatsShow() {
 
         const cleanBody = body.trim();
 
-        if (!cleanBody) {
-            setBodyError('Message is required.');
+        if (!cleanBody && selectedFiles.length === 0) {
+            setBodyError('Write a message or attach at least one file.');
             return;
         }
 
@@ -182,6 +229,13 @@ export default function ChatsShow() {
             sender_id: me.id,
             sender_name: me.name,
             sender_avatar_path: me.avatar_path ?? null,
+            attachments: selectedFiles.map((file, index) => ({
+                id: -Date.now() - index - 1,
+                path: '',
+                original_name: file.name,
+                type: file.type || null,
+                size_bytes: file.size,
+            })),
             read_at: null,
             created_at: new Date().toISOString(),
         };
@@ -189,20 +243,27 @@ export default function ChatsShow() {
         setMessages((prev) => [...prev, optimisticMessage]);
 
         try {
-            const form = new URLSearchParams();
-            form.set('body', cleanBody);
+            const formData = new FormData();
+
+            if (cleanBody) {
+                formData.set('body', cleanBody);
+            }
+
+            selectedFiles.forEach((file) => {
+                formData.append('attachments[]', file);
+            });
+
             const socketId = getSocketId();
 
             const response = await fetch(myChatMessagesStore.url(chat.id), {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-XSRF-TOKEN': xsrfToken,
                     ...(socketId ? { 'X-Socket-ID': socketId } : {}),
                 },
-                body: form,
+                body: formData,
                 credentials: 'same-origin',
             });
 
@@ -215,9 +276,28 @@ export default function ChatsShow() {
             }
 
             if (response.status === 422) {
-                const payload = (await response.json()) as { errors?: { body?: string[] } };
+                const payload = (await response.json()) as {
+                    errors?: Record<string, string[] | undefined>;
+                };
                 setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-                setBodyError(payload.errors?.body?.[0] ?? 'Message is invalid.');
+                const errors = payload.errors ?? {};
+                const firstAttachmentError = Object.entries(errors).find(([key, value]) =>
+                    key.startsWith('attachments.') && Array.isArray(value) && value.length > 0,
+                )?.[1]?.[0];
+                const uploadError = firstAttachmentError ?? errors.attachments?.[0];
+
+                if (uploadError?.toLowerCase().includes('failed to upload')) {
+                    setBodyError('Upload failed. Please try a smaller file or retry.');
+                    setBody(cleanBody);
+
+                    return;
+                }
+
+                setBodyError(
+                    errors.body?.[0]
+                        ?? uploadError
+                        ?? 'Message is invalid.',
+                );
                 setBody(cleanBody);
                 return;
             }
@@ -241,6 +321,11 @@ export default function ChatsShow() {
 
                     return [...withoutOptimistic, payload.message!];
                 });
+
+                setSelectedFiles([]);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
             }
         } catch {
             setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
@@ -416,7 +501,7 @@ export default function ChatsShow() {
                     <CardContent>
                         <div
                             ref={boxRef}
-                            className="h-[400px] space-y-3 overflow-y-auto rounded-lg border p-4"
+                            className="h-100 space-y-3 overflow-y-auto rounded-lg border p-4"
                         >
                             {messages.length === 0 ? (
                                 <div className="text-sm text-muted-foreground">No messages yet.</div>
@@ -445,9 +530,67 @@ export default function ChatsShow() {
                                                 >
                                                     {message.sender_name ?? 'Unknown'}
                                                 </div>
-                                                <div className="break-words text-sm whitespace-pre-wrap">
-                                                    {message.body}
+                                                <div className="wrap-break-words text-sm whitespace-pre-wrap">
+                                                    {message.body !== '' ? message.body : null}
                                                 </div>
+
+                                                {message.attachments && message.attachments.length > 0 ? (
+                                                    <div className="mt-2 space-y-1">
+                                                        {message.attachments.map((attachment) => {
+                                                            const sizeLabel = formatAttachmentSize(
+                                                                attachment.size_bytes,
+                                                            );
+                                                            const title = attachment.original_name ?? 'Attachment';
+
+                                                            if (!attachment.path) {
+                                                                return (
+                                                                    <div
+                                                                        key={attachment.id}
+                                                                        className="text-xs underline"
+                                                                    >
+                                                                        {title}
+                                                                        {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            if (isImageAttachment(attachment)) {
+                                                                return (
+                                                                    <a
+                                                                        key={attachment.id}
+                                                                        href={toStorageUrl(attachment.path)}
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                        className="block"
+                                                                    >
+                                                                        <img
+                                                                            src={toStorageUrl(attachment.path)}
+                                                                            alt={title}
+                                                                            className="max-h-52 w-auto rounded-md border"
+                                                                        />
+                                                                        <div className="mt-1 text-xs underline">
+                                                                            {title}
+                                                                            {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                        </div>
+                                                                    </a>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <a
+                                                                    key={attachment.id}
+                                                                    href={toStorageUrl(attachment.path)}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    className="block text-xs underline"
+                                                                >
+                                                                    {title}
+                                                                    {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                </a>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : null}
 
                                                 {isMine && message.read_at ? (
                                                     <div className="mt-2 text-[11px] text-primary-foreground/80">
@@ -475,6 +618,36 @@ export default function ChatsShow() {
                                 rows={3}
                                 placeholder="Type your message..."
                             />
+                            <Input
+                                ref={fileInputRef}
+                                type="file"
+                                multiple
+                                accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.svg,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar,.7z"
+                                onChange={(event) => {
+                                    const files = Array.from(event.target.files ?? []);
+                                    const tooLargeFiles = files.filter((file) =>
+                                        file.size > maxUploadSizeBytes,
+                                    );
+
+                                    if (tooLargeFiles.length > 0) {
+                                        setBodyError(
+                                            'Some files are larger than 10MB. Please choose smaller files.',
+                                        );
+                                        setSelectedFiles([]);
+                                        event.currentTarget.value = '';
+
+                                        return;
+                                    }
+
+                                    setBodyError(null);
+                                    setSelectedFiles(files);
+                                }}
+                            />
+                            {selectedFiles.length > 0 ? (
+                                <div className="text-xs text-muted-foreground">
+                                    {selectedFiles.map((file) => file.name).join(', ')}
+                                </div>
+                            ) : null}
                             {bodyError ? (
                                 <Alert variant="destructive">
                                     <AlertDescription>{bodyError}</AlertDescription>
@@ -493,3 +666,4 @@ export default function ChatsShow() {
         </AppLayout>
     );
 }
+

@@ -13,7 +13,6 @@ class Message extends Model
         'chat_id',
         'sender_id',
         'body',
-        'attachment_path',
         'read_at',
     ];
 
@@ -32,5 +31,10 @@ class Message extends Model
     public function sender()
     {
         return $this->belongsTo(\App\Models\User::class, 'sender_id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(\App\Models\MessageAttachment::class);
     }
 }

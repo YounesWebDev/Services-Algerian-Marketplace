@@ -39,12 +39,16 @@ class NewMessageAlert implements ShouldBroadcastNow
 
     public function broadcastWith(): array
     {
+        $preview = $this->message->body !== ''
+            ? Str::limit($this->message->body, 80)
+            : ($this->message->attachments()->exists() ? 'Sent an attachment' : '');
+
         return [
             'chat_id' => $this->message->chat_id,
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender?->name,
             'sender_avatar_path' => $this->message->sender?->avatar_path,
-            'preview' => Str::limit($this->message->body, 80),
+            'preview' => $preview,
         ];
     }
 }

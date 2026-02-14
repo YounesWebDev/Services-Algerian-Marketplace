@@ -9,6 +9,7 @@ use App\Events\NewMessageAlert;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Models\MessageAttachment;
 use App\Models\Offer;
 use App\Models\Request as JobRequest;
 use App\Models\Service;
@@ -136,7 +137,7 @@ class ChatController extends Controller
                 'client:id,name,avatar_path',
                 'provider:id,name,avatar_path',
                 'messages' => function ($query) {
-                    $query->latest()->limit(1);
+                    $query->with('attachments:id,message_id')->latest()->limit(1);
                 },
             ])
             ->withCount([
@@ -161,6 +162,13 @@ class ChatController extends Controller
             ->values()
             ->map(function ($chat) use ($user) {
                 $last = $chat->messages->first();
+
+                $lastPreview = '';
+                if ($last) {
+                    $lastPreview = $last->body !== ''
+                        ? $last->body
+                        : ($last->attachments->isNotEmpty() ? 'Sent an attachment' : '');
+                }
                 $other = (int) $chat->client_id === (int) $user->id ? $chat->provider : $chat->client;
 
                 return [
@@ -168,7 +176,7 @@ class ChatController extends Controller
                     'type' => $chat->type,
                     'last_message_at' => $chat->last_message_at,
                     'last_message_id' => $last?->id,
-                    'last_message_preview' => $last?->body,
+                    'last_message_preview' => $lastPreview,
                     'unread_count' => (int) $chat->unread_count,
                     'other_user' => $other ? [
                         'id' => $other->id,
@@ -227,7 +235,10 @@ class ChatController extends Controller
 
         $messages = Message::query()
             ->where('chat_id', $chat->id)
-            ->with('sender:id,name,avatar_path')
+            ->with([
+                'sender:id,name,avatar_path',
+                'attachments:id,message_id,path,original_name,type,size_bytes',
+            ])
             ->oldest()
             ->get()
             ->map(fn ($m) => [
@@ -237,6 +248,13 @@ class ChatController extends Controller
                 'sender_id' => $m->sender_id,
                 'sender_name' => $m->sender?->name,
                 'sender_avatar_path' => $m->sender?->avatar_path,
+                'attachments' => $m->attachments->map(fn ($a) => [
+                    'id' => $a->id,
+                    'path' => $a->path,
+                    'original_name' => $a->original_name,
+                    'type' => $a->type,
+                    'size_bytes' => $a->size_bytes,
+                ])->values(),
                 'read_at' => $m->read_at?->toISOString(),
                 'created_at' => $m->created_at?->toISOString(),
             ]);
@@ -268,18 +286,38 @@ class ChatController extends Controller
         }
 
         $data = $request->validate([
-            'body' => ['required', 'string', 'min:1', 'max:5000'],
+            'body' => ['nullable', 'string', 'max:5000', 'required_without:attachments'],
+            'attachments' => ['nullable', 'array', 'max:10', 'required_without:body'],
+            'attachments.*' => [
+                'file',
+                'max:10240',
+                'mimes:jpg,jpeg,png,webp,gif,bmp,svg,pdf,doc,docx,xls,xlsx,txt,zip,rar,7z',
+            ],
         ]);
 
         $message = Message::query()->create([
             'chat_id' => $chat->id,
             'sender_id' => $user->id,
-            'body' => $data['body'],
-            'attachment_path' => null,
+            'body' => trim((string) ($data['body'] ?? '')),
             'read_at' => null,
         ]);
 
-        $message->load('sender:id,name,avatar_path');
+        foreach ($request->file('attachments', []) as $file) {
+            $path = $file->store('chat-attachments', 'public');
+
+            MessageAttachment::query()->create([
+                'message_id' => $message->id,
+                'path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'type' => $file->getClientMimeType(),
+                'size_bytes' => $file->getSize(),
+            ]);
+        }
+
+        $message->load([
+            'sender:id,name,avatar_path',
+            'attachments:id,message_id,path,original_name,type,size_bytes',
+        ]);
 
         // keep chats sorted by latest activity
         $chat->update(['last_message_at' => now()]);
@@ -309,6 +347,13 @@ class ChatController extends Controller
                     'sender_id' => $message->sender_id,
                     'sender_name' => $message->sender?->name,
                     'sender_avatar_path' => $message->sender?->avatar_path,
+                    'attachments' => $message->attachments->map(fn ($a) => [
+                        'id' => $a->id,
+                        'path' => $a->path,
+                        'original_name' => $a->original_name,
+                        'type' => $a->type,
+                        'size_bytes' => $a->size_bytes,
+                    ])->values(),
                     'read_at' => $message->read_at?->toISOString(),
                     'created_at' => $message->created_at?->toISOString(),
                 ],

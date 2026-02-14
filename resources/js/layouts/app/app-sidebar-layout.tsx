@@ -54,13 +54,19 @@ export default function AppSidebarLayout({
 
     useEffect(() => {
         const getXsrfToken = () => {
-            const cookieMatch = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+            const cookieEntries = document.cookie.split(';');
 
-            if (!cookieMatch) {
-                return null;
+            for (const entry of cookieEntries) {
+                const trimmedEntry = entry.trim();
+
+                if (!trimmedEntry.startsWith('XSRF-TOKEN=')) {
+                    continue;
+                }
+
+                return decodeURIComponent(trimmedEntry.slice('XSRF-TOKEN='.length));
             }
 
-            return decodeURIComponent(cookieMatch[1]);
+            return null;
         };
 
         const sendPing = () => {
