@@ -19,7 +19,7 @@ class NewMessageAlert implements ShouldBroadcastNow
 
     public function __construct(Message $message, int $recipientId)
     {
-        $message->load('sender:id,name');
+        $message->load('sender:id,name,avatar_path');
 
         $this->message = $message;
         $this->recipientId = $recipientId;
@@ -43,6 +43,7 @@ class NewMessageAlert implements ShouldBroadcastNow
             'chat_id' => $this->message->chat_id,
             'sender_id' => $this->message->sender_id,
             'sender_name' => $this->message->sender?->name,
+            'sender_avatar_path' => $this->message->sender?->avatar_path,
             'preview' => Str::limit($this->message->body, 80),
         ];
     }

@@ -1,6 +1,12 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
 import { index as myChatsIndex } from '@/routes/my/chats';
@@ -51,6 +57,26 @@ type PresenceInfo = {
     last_seen_at: string | null;
     offline_for_seconds: number | null;
 };
+
+function toStorageUrl(path: string | null): string {
+    if (!path) {
+        return '';
+    }
+
+    if (path.startsWith('http') || path.startsWith('/')) {
+        return path;
+    }
+
+    if (path.startsWith('storage/')) {
+        return `/${path}`;
+    }
+
+    return `/storage/${path}`;
+}
+
+function getInitial(name: string | null | undefined): string {
+    return (name ?? 'U').charAt(0).toUpperCase();
+}
 
 function formatOfflineSince(seconds: number | null): string {
     if (seconds === null) {
@@ -342,77 +368,127 @@ export default function ChatsShow() {
             <Head title={`Chat #${chat.id}`} />
 
             <div className="max-w-3xl space-y-4 p-6">
-                <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                        <h1 className="text-xl font-semibold">
-                            Chat with {chat.other_user?.name ?? 'Unknown User'}
-                        </h1>
-
-                        {presenceInfo ? (
-                            presenceInfo.is_online ? (
-                                <div className="flex items-center gap-2 text-sm text-green-600">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                                    <span>Online</span>
-                                </div>
-                            ) : (
-                                <div className="space-y-0.5 text-sm text-gray-500">
-                                    <div>{formatOfflineSince(presenceInfo.offline_for_seconds)}</div>
-                                    <div>{formatLastSeen(presenceInfo.last_seen_at)}</div>
-                                </div>
-                            )
-                        ) : null}
-                    </div>
-
-                    <Link href={myChatsIndex.url()} className="text-sm underline">
-                        Back
-                    </Link>
-                </div>
-
-                <div ref={boxRef} className="h-[400px] space-y-2 overflow-y-auto rounded-md border p-4">
-                    {messages.length === 0 ? (
-                        <div className="text-sm text-gray-600">No messages yet.</div>
-                    ) : (
-                        messages.map((message) => {
-                            const isMine = message.sender_id === me.id;
-
-                            return (
-                                <div key={message.id} className="rounded border p-2">
-                                    <div className="text-xs text-gray-500">
-                                        {message.sender_name ?? 'Unknown'}
-                                    </div>
-                                    <div>{message.body}</div>
-
-                                    {isMine && message.read_at ? (
-                                        <div className="mt-1 text-xs text-green-600">
-                                            {formatSeenAt(message.read_at)}
-                                        </div>
+                <Card>
+                    <CardHeader className="space-y-0">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                                <Avatar className="h-10 w-10 border">
+                                    <AvatarImage
+                                        src={toStorageUrl(chat.other_user?.avatar_path ?? null)}
+                                        alt={chat.other_user?.name ?? 'Unknown User'}
+                                    />
+                                    <AvatarFallback>
+                                        {getInitial(chat.other_user?.name)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0">
+                                    <CardTitle className="text-xl">
+                                        Chat with {chat.other_user?.name ?? 'Unknown User'}
+                                    </CardTitle>
+                                    {presenceInfo ? (
+                                        presenceInfo.is_online ? (
+                                            <div className="mt-1">
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="gap-1 text-green-700"
+                                                >
+                                                    <span className="h-2 w-2 rounded-full bg-green-500" />
+                                                    <span>Online</span>
+                                                </Badge>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-1 space-y-0.5 text-sm text-muted-foreground">
+                                                <div>{formatOfflineSince(presenceInfo.offline_for_seconds)}</div>
+                                                <div>{formatLastSeen(presenceInfo.last_seen_at)}</div>
+                                            </div>
+                                        )
                                     ) : null}
                                 </div>
-                            );
-                        })
-                    )}
-                </div>
+                            </div>
 
-                <form onSubmit={submit} className="space-y-2">
-                    <textarea
-                        value={body}
-                        onChange={(e) => setBody(e.target.value)}
-                        className="w-full rounded-md border p-2"
-                        rows={3}
-                        placeholder="Type your message..."
-                    />
-                    {bodyError ? (
-                        <div className="text-sm text-red-600">{bodyError}</div>
-                    ) : null}
+                            <Button variant="outline" size="sm" asChild>
+                                <Link href={myChatsIndex.url()}>
+                                    Back
+                                </Link>
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div
+                            ref={boxRef}
+                            className="h-[400px] space-y-3 overflow-y-auto rounded-lg border p-4"
+                        >
+                            {messages.length === 0 ? (
+                                <div className="text-sm text-muted-foreground">No messages yet.</div>
+                            ) : (
+                                messages.map((message) => {
+                                    const isMine = message.sender_id === me.id;
 
-                    <button
-                        type="submit"
-                        disabled={sending}
-                        className="rounded-md bg-black px-4 py-2 text-sm text-white disabled:opacity-60"
-                    >
-                        {sending ? 'Sending...' : 'Send'}
-                    </button>
-                </form>
+                                    return (
+                                        <div
+                                            key={message.id}
+                                            className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                                        >
+                                            <div
+                                                className={
+                                                    isMine
+                                                        ? 'max-w-[80%] rounded-lg border border-primary/20 bg-primary p-3 text-primary-foreground'
+                                                        : 'max-w-[80%] rounded-lg border bg-card p-3'
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        isMine
+                                                            ? 'mb-1 text-xs text-primary-foreground/80'
+                                                            : 'mb-1 text-xs text-muted-foreground'
+                                                    }
+                                                >
+                                                    {message.sender_name ?? 'Unknown'}
+                                                </div>
+                                                <div className="break-words text-sm whitespace-pre-wrap">
+                                                    {message.body}
+                                                </div>
+
+                                                {isMine && message.read_at ? (
+                                                    <div className="mt-2 text-[11px] text-primary-foreground/80">
+                                                        {formatSeenAt(message.read_at)}
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base">Send message</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={submit} className="space-y-3">
+                            <Textarea
+                                value={body}
+                                onChange={(e) => setBody(e.target.value)}
+                                rows={3}
+                                placeholder="Type your message..."
+                            />
+                            {bodyError ? (
+                                <Alert variant="destructive">
+                                    <AlertDescription>{bodyError}</AlertDescription>
+                                </Alert>
+                            ) : null}
+
+                            <div className="flex justify-end">
+                                <Button type="submit" disabled={sending}>
+                                    {sending ? 'Sending...' : 'Send'}
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );

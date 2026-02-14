@@ -5,6 +5,8 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { leaveChannel, listenPrivate } from '@/lib/echo';
 import { show as myChatsShow } from '@/routes/my/chats';
 import { offline, ping } from '@/routes/presence';
@@ -14,8 +16,29 @@ type AlertData = {
     chat_id: number;
     sender_id: number;
     sender_name: string | null;
+    sender_avatar_path: string | null;
     preview: string | null;
 };
+
+function toStorageUrl(path: string | null): string {
+    if (!path) {
+        return '';
+    }
+
+    if (path.startsWith('http')) {
+        return path;
+    }
+
+    if (path.startsWith('/')) {
+        return path;
+    }
+
+    if (path.startsWith('storage/')) {
+        return `/${path}`;
+    }
+
+    return `/storage/${path}`;
+}
 
 export default function AppSidebarLayout({
     children,
@@ -140,18 +163,38 @@ export default function AppSidebarLayout({
 
             {/* Global popup alert (visible on all pages). */}
             {alertData ? (
-                <button
-                    type="button"
+                <Alert
+                    role="button"
+                    tabIndex={0}
                     onClick={openChatFromAlert}
-                    className="fixed right-4 bottom-4 z-50 w-80 rounded-lg border bg-white p-3 text-left shadow-lg"
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            openChatFromAlert();
+                        }
+                    }}
+                    className="fixed right-4 bottom-4 z-50 w-80 cursor-pointer rounded-lg bg-white p-3 shadow-lg hover:bg-gray-50 grid-cols-[1fr]"
                 >
-                    <div className="text-sm font-semibold">
-                        New message from {alertData.sender_name ?? 'User'}
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border">
+                            <AvatarImage
+                                src={toStorageUrl(alertData.sender_avatar_path)}
+                                alt={alertData.sender_name ?? 'User'}
+                            />
+                            <AvatarFallback className="bg-gray-100 text-sm font-semibold text-gray-600">
+                                {(alertData.sender_name ?? 'U').charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                            <AlertTitle className="col-start-auto text-sm font-semibold">
+                                {alertData.sender_name ?? 'User'}
+                            </AlertTitle>
+                            <AlertDescription className="col-start-auto mt-1 truncate text-xs text-gray-600">
+                                {alertData.preview ?? 'Open chat'}
+                            </AlertDescription>
+                        </div>
                     </div>
-                    <div className="mt-1 text-xs text-gray-600">
-                        {alertData.preview ?? 'Open chat'}
-                    </div>
-                </button>
+                </Alert>
             ) : null}
         </AppShell>
     );
