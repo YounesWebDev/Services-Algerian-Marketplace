@@ -4,7 +4,7 @@ export default function AppLogo() {
             <img
                 src="/favicon-2.png"
                 alt="App logo"
-                className="h-10 w-10 max-w-none object-contain"
+                className="h-50 w-50 max-w-none object-contain"
             />
         </div>
     );
