@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { type PropsWithChildren } from 'react';
+import { type PropsWithChildren, type ReactNode } from 'react';
 
 import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
@@ -7,12 +7,14 @@ import { home } from '@/routes';
 interface AuthLayoutProps {
     name?: string;
     title?: string;
+    titleComponent?: ReactNode;
     description?: string;
 }
 
 export default function AuthSimpleLayout({
     children,
     title,
+    titleComponent,
     description,
 }: PropsWithChildren<AuthLayoutProps>) {
     return (
@@ -31,7 +33,9 @@ export default function AuthSimpleLayout({
                         </Link>
 
                         <div className="space-y-2 text-center">
-                            <h1 className="text-xl font-medium">{title}</h1>
+                            <h1 className="auth-title-font text-2xl font-bold">
+                                {titleComponent ?? title}
+                            </h1>
                             <p className="text-center text-sm text-muted-foreground">
                                 {description}
                             </p>

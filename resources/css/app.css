@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Gravitas+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
@@ -208,4 +209,8 @@
 
 body {
   letter-spacing: var(--tracking-normal);
+}
+
+.auth-title-font {
+  font-family: 'Gravitas One', serif;
 }

@@ -12,8 +12,8 @@ import { store } from '@/routes/register';
 export default function Register() {
     return (
         <AuthLayout
-            title="Create an profinder account"
-            description="Enter your details below to create your account"
+            title="Create an account and enjoy the experience with Us"
+            description="Enter your details below"
         >
             <Head title="Register" />
             <Form
