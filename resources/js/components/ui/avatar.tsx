@@ -3,10 +3,16 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+type AvatarProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
+  isOnline?: boolean
+}
+
 function Avatar({
   className,
+  isOnline,
+  children,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+}: AvatarProps) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
@@ -15,7 +21,13 @@ function Avatar({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+
+      {isOnline && (
+        <span className="absolute bottom-0 left-0 size-2.5 rounded-full bg-green-500 ring-2 ring-background" />
+      )}
+    </AvatarPrimitive.Root>
   )
 }
 

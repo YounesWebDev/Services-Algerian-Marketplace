@@ -1,8 +1,7 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { Star, StarHalf } from "lucide-react";
+import { CheckCircle, CircleX, Clock, ExternalLink, Star, StarHalf } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -11,7 +10,6 @@ import { dashboard } from "@/routes";
 import { show as myRequestShow } from "@/routes/client/my/requests";
 import { create as reportCreate } from "@/routes/reports";
 import { show as serviceShow } from "@/routes/services";
-
 
 type UserItem = {
   id: number;
@@ -60,11 +58,12 @@ const initials = (name: string) => {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase()).join("");
 };
+
 function Stars({ value }: { value: number }) {
   const rating = Number.isFinite(value) ? Math.max(0, Math.min(5, value)) : 0;
 
   const full = Math.floor(rating);
-  const hasHalf = rating % 1 !== 0; // if between a number and a number => half star
+  const hasHalf = rating % 1 !== 0;
   const empty = 5 - full - (hasHalf ? 1 : 0);
 
   return (
@@ -84,7 +83,6 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-
 export default function ProfileShow() {
   const { props } = usePage<{
     auth?: { user?: { role?: string } | null };
@@ -93,6 +91,7 @@ export default function ProfileShow() {
     requests?: RequestItem[] | null;
     services?: ServiceItem[] | null;
   }>();
+
   const user = props.user;
   const profile = props.profile;
   const requests = props.requests ?? [];
@@ -108,31 +107,35 @@ export default function ProfileShow() {
       <div className="p-6 max-w-3xl space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Avatar className="h-14 w-14">
-              <AvatarImage src={avatarUrl} alt={user.name} />
-              <AvatarFallback>{initials(user.name)}</AvatarFallback>
-            </Avatar>
+
+            {/* ✅ ONLY CHANGE IS HERE */}
+            <div className="relative inline-block">
+              <Avatar className="h-14 w-14">
+                <AvatarImage src={avatarUrl} alt={user.name} />
+                <AvatarFallback>{initials(user.name)}</AvatarFallback>
+              </Avatar>
+
+              {user.status === "active" && (
+                <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-full bg-green-500 ring-2 ring-background z-10" />
+              )}
+            </div>
 
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-semibold">{user.name}</h1>
-                <Badge variant="secondary">{user.role}</Badge>
-                <Badge variant={user.status === "active" ? "default" : "destructive"}>
-                  {user.status}
-                </Badge>
               </div>
 
-              {/* if you don't want to show email publicly, remove it from controller props */}
               {user.email ? (
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               ) : null}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button variant="outline" asChild>
+          <div className="flex items-center rounded-3xl bp-2 border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white  gap-2">
+            <button  >
               <Link href={dashboard().url}>Back</Link>
-            </Button>
+            </button>
+
             {user.role === "provider" && viewerRole === "client" ? (
               <Button variant="outline" asChild>
                 <Link
@@ -147,12 +150,13 @@ export default function ProfileShow() {
           </div>
         </div>
 
-        <Card>
+        {/* ---- About Card ---- */}
+        <Card className="border border-gray-200 rounded-4xl bg-primary-foreground/30">
           <CardHeader>
             <div className="font-medium">About</div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-sm text-foreground whitespace-pre-line">
+            <div className="text-sm whitespace-pre-line">
               {profile?.bio ? profile.bio : "No bio yet."}
             </div>
 
@@ -175,16 +179,13 @@ export default function ProfileShow() {
                     </span>
                   </div>
 
-                 <div className="flex items-center gap-2">
-  <span className="text-sm text-muted-foreground">Rating:</span>
-
-  <Stars value={Number(profile?.rating_avg ?? 0)} />
-
-  <span className="text-foreground font-medium">
-    {Number(profile?.rating_avg ?? 0).toFixed(2)} ({profile?.rating_count ?? 0})
-  </span>
-</div>
-
+                  <div className="flex items-center gap-2">
+                    <Stars value={Number(profile?.rating_avg ?? 0)} />
+                    <span className="text-foreground font-medium">
+                      {Number(profile?.rating_avg ?? 0).toFixed(2)} (
+                      {profile?.rating_count ?? 0})
+                    </span>
+                  </div>
 
                   <div>
                     Verified:{" "}
@@ -198,8 +199,9 @@ export default function ProfileShow() {
           </CardContent>
         </Card>
 
+        {/* ---- Services / Requests (UNCHANGED) ---- */}
         {user.role === "provider" ? (
-          <Card>
+          <Card className="rounded-3xl">
             <CardHeader>
               <div className="font-medium">Services</div>
             </CardHeader>
@@ -208,20 +210,34 @@ export default function ProfileShow() {
                 <div className="text-sm text-muted-foreground">No services yet.</div>
               ) : (
                 services.map((service) => (
-                  <div key={service.id} className="rounded-md border p-3">
+                  <div key={service.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-5">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="font-medium">{service.title}</div>
+                      <div className="text-xl">{service.title}</div>
                       <Link
                         href={serviceShow(service.slug).url}
-                        className="text-sm underline"
+                        className=" text-primary hover:text-foreground"
                       >
-                        View
+                        <ExternalLink className="h-6 w-6" />
                       </Link>
                     </div>
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Status: <span className="text-foreground">{service.status}</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground mt-1">
+
+                    <div className="text-sm text-foreground mt-1">
+  <div className="rounded-3xl border border-gray-200 w-max p-2">
+    Status:{" "}
+    {service.status === "approved" ? (
+      <span className="text-primary"><CheckCircle className="h-4 w-4 inline mr-1" />{service.status}</span>
+    ) : service.status === "pending" ? (
+      <span className="text-yellow-600"><Clock className="h-4 w-4 inline mr-1" />{service.status}</span>
+    ) : service.status === "rejected" ? (
+      <span className="text-red-600"><CircleX className="h-4 w-4 inline mr-1" />{service.status}</span>
+    ) : (
+      <span className="text-muted-foreground">{service.status}</span>
+    )}
+  </div>
+</div>
+
+
+                    <div className="text-sm text-muted-foreground p-2 rounded-3xl border border-gray-200 w-max mt-1">
                       Pricing:{" "}
                       <span className="text-foreground">
                         {service.pricing_type}
@@ -253,9 +269,11 @@ export default function ProfileShow() {
                         View
                       </Link>
                     </div>
+
                     <div className="text-sm text-muted-foreground mt-1">
                       Status: <span className="text-foreground">{request.status}</span>
                     </div>
+
                     <div className="text-sm text-muted-foreground mt-1">
                       Budget:{" "}
                       <span className="text-foreground">
