@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { BookOpenCheck, ExternalLink, MapPin } from "lucide-react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
@@ -48,17 +49,17 @@ export default function ClientRequestsIndex() {
 
           <Link
             href={myRequestsCreate.url()}
-            className="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm"
+            className="inline-flex items-center rounded-3xl bg-primary  px-3 py-2 text-white text-sm transition duration-700 hover:bg-primary-foreground hover:text-background "
           >
-            Create Request
+            Create Request +
           </Link>
         </div>
 
         <div className="flex gap-2 items-center">
           <Link
             href={myRequestsIndex.url()}
-            className={`px-3 py-1 rounded-md text-sm border ${
-              filters.status === "" ? "bg-black text-white" : "bg-white"
+            className={`px-3 py-1 rounded-3xl  text-sm border ${
+              filters.status === "" ? "bg-primary text-foreground border border-gray-200" : "bg-primary-foreground/30 text-foreground border border-gray-200 transition duration-700 hover:bg-primary-foreground/50 hover:shadow-lg"
             }`}
           >
             All
@@ -68,8 +69,8 @@ export default function ClientRequestsIndex() {
             <Link
               key={s}
               href={myRequestsIndex.url({ query: { status: s } })}
-              className={`px-3 py-1 rounded-md text-sm border ${
-                filters.status === s ? "bg-black text-white" : "bg-white"
+              className={`px-3 py-1 rounded-3xl text-sm border ${
+                filters.status === s ? "bg-primary text-foreground border border-gray-200" : "bg-primary-foreground/30  text-foreground border border-gray-200 transition duration-700 hover:bg-primary-foreground/50 hover:shadow-lg"
               }`}
             >
               {s}
@@ -79,38 +80,45 @@ export default function ClientRequestsIndex() {
 
         <div className="space-y-3">
           {requests.data.length === 0 ? (
-            <div className="rounded-md border p-4 text-sm text-gray-600">
+            <div className="rounded-md border p-4 text-sm text-fordround">
               No requests yet.
             </div>
           ) : (
             requests.data.map((r) => (
-              <div key={r.id} className="rounded-md border p-4">
+              <div key={r.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-4 transition duration-700 hover:bg-primary-foreground/50 hover:shadow-lg">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="font-medium">{r.title}</div>
+                  <div className="font-medium text-lg">{r.title}</div>
                   <Link
                     href={`/my/requests/${r.id}`}
                     className="text-sm underline"
                   >
-                    View
+                    <ExternalLink className="h-6 w-6 text-primary transition duration-700 hover:text-foreground"/>
                   </Link>
                 </div>
-                <div className="text-sm text-gray-600 mt-1">
-                  {r.category?.name} - {r.city?.name}
+                <div className="text-sm text-foreground mt-1 p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-2">
+                  {r.category?.name} <div className="p-2 rounded-3xl border border-gray-200 flex items-center"><MapPin className="h-6 w-6 text-red-600"/> {r.city?.name}</div>
                 </div>
 
-                <div className="text-sm text-gray-600 mt-1">
-                  Status: <span className="font-medium">{r.status}</span>
+                <div className="text-sm text-foreground p-2 rounded-3xl border border-gray-200 w-max mt-1">
+                  <div className="p-1">
+                    Status {
+                   r.status === "open" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-primary"><BookOpenCheck className="h-4 w-4 inline mr-1"/>{r.status}</span>
+                  : r.status === "assigned" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-primary">{r.status}</span>
+                  : r.status === "closed" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600">{r.status}</span>
+                  : r.status === "cancelled" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600">{r.status}</span>
+                  : null}
+                  </div>
                 </div>
 
-                <div className="text-sm text-gray-600 mt-1">
-                  Budget:{" "}
-                  <span className="font-medium">
-                    {r.budget_min ?? "--"} - {r.budget_max ?? "--"} DZD
+                <div className="text-sm text-foreground mt-1">
+                  
+                  <span className="font-medium p-1 rounded-3xl border border-gray-200 flex items-center w-max gap-4">
+                    <div className="rounded-3xl p-2 border border-gray-200 w-max text-primary">Min {r.budget_min ?? "--"} DZD</div> <div className="rounded-3xl p-2 border border-gray-200 w-max text-red-600">Max {r.budget_max ?? "--"} DZD</div> 
                   </span>
                   {r.urgency ? (
                     <>
                       {" "}
-                      - Urgency: <span className="font-medium">{r.urgency}</span>
+                      <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-3">Urgency <div className="font-medium rounded-3xl p-2 border border-gray-200 ">{r.urgency}</div></div>
                     </>
                   ) : null}
                 </div>

@@ -12,7 +12,7 @@ import { store } from '@/routes/register';
 export default function Register() {
     return (
         <AuthLayout
-            title="Create an account and enjoy the experience with Us"
+            title="Create an account and enjoy"
             description="Enter your details below"
         >
             <Head title="Register" />
