@@ -1,10 +1,9 @@
 import { Head, Link, router, usePage } from "@inertiajs/react";
+import { Search, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import PaginationLinks from "@/components/pagination-links";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { index as clientProvidersIndex } from "@/routes/client/providers";
 import { show as profileShow } from "@/routes/profiles";
+
 type ProviderProfile = {
   bio: string | null;
   address: string | null;
@@ -97,13 +97,13 @@ export default function ProvidersIndex() {
             <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           </div>
 
-          <Button variant="outline" asChild>
+          <button className="rounded-3xl py-2 text-red-600 border border-gray-200 transition duration-700 hover:bg-red-600 hover:text-white px-3">
             <Link href={dashboard().url}>Back</Link>
-          </Button>
+          </button>
         </div>
 
         {/* Search */}
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <div className="font-medium">Search</div>
           </CardHeader>
@@ -117,15 +117,18 @@ export default function ProvidersIndex() {
                   onChange={(e) => setQ(e.target.value)}
                   onKeyDown={onEnter}
                   placeholder="Example: Ahmed, FixPro, Plumber..."
+                  className="rounded-3xl border border-gray-200 bgprimary-foreground/40"
                 />
-                <Button onClick={submitSearch}>Search</Button>
+                <button
+                  onClick={submitSearch}
+                  className="flex items-center rounded-3xl p-2 border border-gray-200 bg-primary transition duration-700 hover:bg-foreground hover:text-background"
+                >
+                  <Search /> <p className="hidden md:flex ">Search</p>
+                </button>
               </div>
             </div>
 
-            <div className="text-xs text-muted-foreground">
-              (Optional filters by city/category are already supported by backend if you add
-              dropdowns later.)
-            </div>
+            
           </CardContent>
         </Card>
 
@@ -143,8 +146,11 @@ export default function ProvidersIndex() {
               const company = p.profile?.company_name;
               const verified = !!p.profile?.verified_at;
 
+              const rating = Number(p.profile?.rating_avg ?? 0);
+              const count = p.profile?.rating_count ?? 0;
+
               return (
-                <Card key={p.id} className="overflow-hidden">
+                <Card key={p.id} className="overflow-hidde rounded-4xl border border-gray-200 bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40  hover:shadow-2xl">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-11 w-11">
@@ -153,7 +159,15 @@ export default function ProvidersIndex() {
                       </Avatar>
 
                       <div className="min-w-0">
-                        <div className="font-medium truncate">{p.name}</div>
+                        <div className="font-medium truncate">
+                           {verified ? (
+                            <img src="verify.png" alt="Verified" className="inline-block h-4 w-4 ml-1" />
+                          ) : (
+                            <div></div>
+                          )}
+                          {p.name}
+                         
+                        </div>
                         <div className="text-xs text-muted-foreground truncate">
                           {company ? company : "No company name"}
                         </div>
@@ -161,19 +175,43 @@ export default function ProvidersIndex() {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant="secondary">
+                      <div className="text-xs rounded-3xl p-1 border border-gray-200">
                         Approved services: {p.approved_services_count}
-                      </Badge>
+                      </div>
 
-                      {verified ? (
-                        <Badge>Verified</Badge>
-                      ) : (
-                        <Badge variant="outline">Not verified</Badge>
-                      )}
+                      {/* ⭐ Real Half Star Logic */}
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const full = rating >= star;
+                          const half = rating >= star - 0.5 && rating < star;
 
-                      <Badge variant="outline">
-                        Rating: {p.profile?.rating_avg ?? "0.00"} ({p.profile?.rating_count ?? 0})
-                      </Badge>
+                          return (
+                            <div key={star} className="relative">
+                              <Star size={16} className="text-gray-300" />
+
+                              {full && (
+                                <Star
+                                  size={16}
+                                  className="absolute top-0 left-0 fill-yellow-400 text-yellow-400"
+                                />
+                              )}
+
+                              {half && (
+                                <div className="absolute top-0 left-0 w-1/2 overflow-hidden">
+                                  <Star
+                                    size={16}
+                                    className="fill-yellow-400 text-yellow-400"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        <span className="ml-1 text-xs text-muted-foreground">
+                          {rating.toFixed(2)} ({count})
+                        </span>
+                      </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-line">
@@ -181,9 +219,9 @@ export default function ProvidersIndex() {
                     </div>
 
                     <div className="pt-1">
-                      <Button asChild className="w-full">
+                      <button  className="w-full rounded-3xl py-2 border border-gray-200 bg-primary transition duration-700 hover:bg-foreground hover:text-background">
                         <Link href={profileShow(p.id).url}>Open profile</Link>
-                      </Button>
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
@@ -192,7 +230,9 @@ export default function ProvidersIndex() {
           </div>
         )}
 
-        {providers.links?.length > 0 && <PaginationLinks links={providers.links} />}
+        {providers.links?.length > 0 && (
+          <PaginationLinks links={providers.links} />
+        )}
       </div>
     </AppLayout>
   );

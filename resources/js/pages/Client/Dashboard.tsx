@@ -136,14 +136,14 @@ export default function Dashboard() {
         <div className="mt-6 flex gap-4">
           <Link
             href={clientBookingsIndex.url()}
-            className="p-2 w-max border border-gray-200 rounded-4xl bg-primary text-primary-foreground transition duration-700 hover:bg-primary-foreground hover:text-background"
+            className="p-2 w-max border border-gray-200 rounded-4xl bg-primary text-primary-foreground transition duration-700 hover:bg-foreground hover:text-background"
           >
             Go to Bookings
           </Link>
 
           <Link
             href={clientOffersIndex.url()}
-            className="p-2 w-max border border-gray-200 rounded-4xl bg-primary-background text-primary-foreground transition duration-700 hover:bg-primary-foreground hover:text-background"
+            className="p-2 w-max border border-gray-200 rounded-4xl bg-background  text-foreground transition duration-700 hover:bg-foreground hover:text-background hover:shadow-2xl"
           >
             Go to Offers
           </Link>

@@ -56,7 +56,7 @@ export default function ClientBookingsIndex() {
       <div className="p-6 space-y-4">
         <div>
           <h1 className="text-xl font-semibold">My Bookings</h1>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted ">
             Bookings come from: booking a service OR accepting an offer.
           </p>
         </div>
@@ -71,19 +71,19 @@ export default function ClientBookingsIndex() {
         <div className="flex flex-wrap gap-2">
           <Link
             href={clientBookingsIndex.url()}
-            className={`px-3 py-1 rounded-md text-sm border ${
-              filters.status === "" ? "bg-black text-white" : "bg-white"
+            className={`px-3 py-1 rounded-3xl border border-gray-200 text-sm ${
+              filters.status === "" ? "bg-primary text-foreground" : "bg-primary-foreground/30"
             }`}
           >
             All
           </Link>
 
-          {["pending", "confirmed", "in_progress", "completed", "cancelled"].map((s) => (
+          {["pending", "confirmed", "in progress", "completed", "cancelled"].map((s) => (
             <Link
               key={s}
               href={clientBookingsIndex.url({ query: { status: s } })}
-              className={`px-3 py-1 rounded-md text-sm border ${
-                filters.status === s ? "bg-black text-white" : "bg-white"
+              className={`px-3 py-1 rounded-3xl text-sm border border-gray-200 ${
+                filters.status === s ? "bg-primary text-foreground" : "bg-primary-foreground/30"
               }`}
             >
               {s}
@@ -94,7 +94,7 @@ export default function ClientBookingsIndex() {
         {/* List */}
         <div className="space-y-3">
           {bookings.data.length === 0 ? (
-            <div className="rounded-md border p-4 text-sm text-gray-600">
+            <div className="rounded-md border p-4 text-sm text-muted">
               No bookings found.
             </div>
           ) : (
@@ -105,7 +105,7 @@ export default function ClientBookingsIndex() {
                 : b.offer?.request?.title ?? "Request booking";
 
               return (
-                <div key={b.id} className="rounded-md border p-4">
+                <div key={b.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover:shadow-2xl  p-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="font-medium">{title}</div>
@@ -159,13 +159,11 @@ export default function ClientBookingsIndex() {
 
                     {/* Action */}
                     <div className="flex flex-col items-end gap-2">
-                      <span className="text-xs px-2 py-1 rounded border bg-gray-50">
-                        Booking #{b.id}
-                      </span>
+                      
 
                       <Link
                         href={clientBookingsShow.url(b.id)}
-                        className="rounded-md bg-black px-3 py-2 text-white text-sm"
+                        className="rounded-3xl bg-primary px-3 py-2 text-foreground transition duration-700 hover:bg-foreground hover:text-background  text-sm"
                       >
                         Open
                       </Link>

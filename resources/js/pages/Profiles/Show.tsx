@@ -1,8 +1,7 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { CheckCircle, CircleX, Clock, ExternalLink, Star, StarHalf } from "lucide-react";
+import { CheckCircle, CircleX, Clock, ExternalLink, Star, StarHalf, TriangleAlert } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
@@ -115,9 +114,11 @@ export default function ProfileShow() {
                 <AvatarFallback>{initials(user.name)}</AvatarFallback>
               </Avatar>
 
-              {user.status === "active" && (
-                <span className="absolute -bottom-1 -left-1 h-4 w-4 rounded-full bg-green-500 ring-2 ring-background z-10" />
-              )}
+              {user.role === "provider" && profile?.verified_at ? (
+                <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-0.5">
+                  <CheckCircle className="h-4 w-4 text-white" />
+                </div>
+              ) : null}
             </div>
 
             <div>
@@ -130,25 +131,32 @@ export default function ProfileShow() {
               ) : null}
             </div>
           </div>
-
-          <div className="flex items-center rounded-3xl bp-2 border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white  gap-2">
-            <button  >
-              <Link href={dashboard().url}>Back</Link>
-            </button>
-
-            {user.role === "provider" && viewerRole === "client" ? (
-              <Button variant="outline" asChild>
+          
+          
+ 
+         <div className="flex items-center justify-center gap-3 ">
+              {user.role === "provider" && viewerRole === "client" ? (
+              <button  >
                 <Link
                   href={reportCreate({
                     query: { type: "provider", id: user.id },
                   }).url}
+                  className=""
                 >
-                  Report this provider
+                <div className="flex items-center  rounded-3xl p-2 border border-gray-200 gap-2 text-red-600 transition duration-700 "> <TriangleAlert className="h-5 w-5 " />Report</div>
                 </Link>
-              </Button>
+              </button>
             ) : null}
-          </div>
+           <div className="flex items-center rounded-3xl bp-2 border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white  gap-2">
+
+            <button  >
+              <Link href={dashboard().url}>Back</Link>
+            </button>
+
+          </div></div>
+          
         </div>
+        
 
         {/* ---- About Card ---- */}
         <Card className="border border-gray-200 rounded-4xl bg-primary-foreground/30">
