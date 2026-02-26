@@ -11,7 +11,6 @@ import React, { useEffect, useMemo, useState } from "react";
 
 // shadcn/ui
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AppLayout from "@/layouts/app-layout";
 
@@ -156,7 +155,7 @@ export default function Create({ categories, cities }: Props) {
 
           <Link
             href="/requests"
-            className="text-sm px-3 py-2 rounded-4xl border border-gray-200 transition duration-300 hover:bg-foreground hover:text-background"
+            className="text-sm px-3 py-2 rounded-4xl border border-gray-200 text-red-600 transition duration-700 hover:bg-foreground hover:text-background"
           >
             Back
           </Link>
@@ -212,7 +211,7 @@ export default function Create({ categories, cities }: Props) {
               value={form.data.title}
               onChange={(e) => form.setData("title", e.target.value)}
               placeholder="Example: Fix leaking sink"
-              className="rounded-4xl"
+              className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
             />
             {form.errors.title && (
               <div className="text-sm text-red-600 mt-1">{form.errors.title}</div>
@@ -243,7 +242,7 @@ export default function Create({ categories, cities }: Props) {
                 type="number"
                 value={form.data.budget_min}
                 onChange={(e) => form.setData("budget_min", e.target.value)}
-                className="rounded-4xl"
+                className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
               />
               {form.errors.budget_min && (
                 <div className="text-sm text-red-600 mt-1">{form.errors.budget_min}</div>
@@ -255,7 +254,7 @@ export default function Create({ categories, cities }: Props) {
                 type="number"
                 value={form.data.budget_max}
                 onChange={(e) => form.setData("budget_max", e.target.value)}
-                className="rounded-4xl"
+                className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
               />
               {form.errors.budget_max && (
                 <div className="text-sm text-red-600 mt-1">{form.errors.budget_max}</div>
@@ -346,13 +345,13 @@ export default function Create({ categories, cities }: Props) {
             )}
           </div>
 
-          <Button
+          <button
             type="submit"
             disabled={form.processing}
-            className="rounded-4xl transition duration-300 hover:bg-foreground hover:text-background"
+            className="rounded-4xl transition duration-700 p-2 bg-primary hover:bg-foreground hover:text-background"
           >
             {form.processing ? "Creating..." : "Create Request"}
-          </Button>
+          </button>
         </form>
       </div>
 

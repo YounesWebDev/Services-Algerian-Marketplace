@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { BookOpenCheck, ExternalLink, MapPin } from "lucide-react";
+import { BookOpenCheck, Clock, ExternalLink, MapPin, Trash2, X } from "lucide-react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
@@ -104,8 +104,8 @@ export default function ClientRequestsIndex() {
                     Status {
                    r.status === "open" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-primary"><BookOpenCheck className="h-4 w-4 inline mr-1"/>{r.status}</span>
                   : r.status === "assigned" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-primary">{r.status}</span>
-                  : r.status === "closed" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600">{r.status}</span>
-                  : r.status === "cancelled" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600">{r.status}</span>
+                  : r.status === "closed" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600"><X className="h-4 w-4 inline mr-1"/>{r.status}</span>
+                  : r.status === "cancelled" ? <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600"><Trash2 className="h-4 w-4 inline mr-1"/>{r.status}</span>
                   : null}
                   </div>
                 </div>
@@ -118,7 +118,15 @@ export default function ClientRequestsIndex() {
                   {r.urgency ? (
                     <>
                       {" "}
-                      <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-3">Urgency <div className="font-medium rounded-3xl p-2 border border-gray-200 ">{r.urgency}</div></div>
+                      <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-2">
+                        Urgency 
+                        <div className="font-medium rounded-3xl p-2 border border-gray-200 ">
+                          {r.urgency === "low" ? <span className="text-primary"><Clock className="h-4 w-4 inline mr-1"/>Low</span>
+                          : r.urgency === "medium" ? <span className="text-yellow-600"><Clock className="h-4 w-4 inline mr-1"/>Medium</span>
+                          : r.urgency === "high" ? <span className="text-red-600"><Clock className="h-4 w-4 inline mr-1"/>High</span>
+                           : null}
+                          </div>
+                        </div>
                     </>
                   ) : null}
                 </div>
