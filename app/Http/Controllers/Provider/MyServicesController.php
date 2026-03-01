@@ -7,7 +7,9 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class MyServicesController extends Controller
@@ -73,7 +75,7 @@ class MyServicesController extends Controller
 
         $i = 2;
         while (Service::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $i;
+            $slug = $baseSlug.'-'.$i;
             $i++;
         }
 
@@ -103,7 +105,7 @@ class MyServicesController extends Controller
         }
 
         return redirect()->route('provider.my.services.index')->with('success', 'Service created (pending approval)');
-        
+
     }
 
     public function edit(Request $request, Service $service)
@@ -135,27 +137,65 @@ class MyServicesController extends Controller
         }
 
         $data = $request->validate([
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'city_id' => ['required', 'integer', 'exists:cities,id'],
-            'title' => ['required', 'string', 'min:5', 'max:191'],
-            'description' => ['required', 'string', 'min:10'],
-            'base_price' => ['required', 'numeric', 'min:0'],
-            'pricing_type' => ['required', 'in:fixed,hourly,quote'],
-            'payment_type' => ['required', 'in:cash,online,both'],
+            'category_id' => ['sometimes', 'integer', 'exists:categories,id'],
+            'city_id' => ['sometimes', 'integer', 'exists:cities,id'],
+            'title' => ['sometimes', 'string', 'min:5', 'max:191'],
+            'description' => ['sometimes', 'string', 'min:10'],
+            'base_price' => ['sometimes', 'nullable', 'numeric', 'min:0'],
+            'pricing_type' => ['sometimes', 'in:fixed,hourly,quote'],
+            'payment_type' => ['sometimes', 'in:cash,online,both'],
+            'remove_media_ids' => ['nullable', 'array'],
+            'remove_media_ids.*' => [
+                'integer',
+                Rule::exists('service_media', 'id')->where(fn ($query) => $query->where('service_id', $service->id)),
+            ],
+            'cover_media_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('service_media', 'id')->where(fn ($query) => $query->where('service_id', $service->id)),
+            ],
+            'cover_new_photo_index' => ['nullable', 'integer', 'min:0'],
             'photos' => ['nullable', 'array', 'max:6'],
             'photos.*' => ['file', 'image', 'mimes:png,jpg,jpeg,webp', 'max:4096'],
         ]);
 
-        $service->update([
-            'category_id' => $data['category_id'],
-            'city_id' => $data['city_id'],
-            'title' => $data['title'],
-            'description' => $data['description'],
-            'base_price' => $data['base_price'] !== '' ? $data['base_price'] : null,
-            'pricing_type' => $data['pricing_type'],
-            'payment_type' => $data['payment_type'],
+        $updates = [
             'status' => 'pending',
-        ]);
+        ];
+
+        $updatableFields = [
+            'category_id',
+            'city_id',
+            'title',
+            'description',
+            'base_price',
+            'pricing_type',
+            'payment_type',
+        ];
+
+        foreach ($updatableFields as $field) {
+            if (array_key_exists($field, $data)) {
+                $updates[$field] = $data[$field];
+            }
+        }
+
+        $service->update($updates);
+
+        if (! empty($data['remove_media_ids'])) {
+            $mediaToDelete = $service->media()
+                ->whereIn('id', $data['remove_media_ids'])
+                ->get();
+
+            foreach ($mediaToDelete as $media) {
+                if ($media->path) {
+                    Storage::disk('public')->delete($media->path);
+                }
+            }
+
+            $service->media()->whereIn('id', $data['remove_media_ids'])->delete();
+        }
+
+        $createdMediaIds = [];
 
         if (! empty($data['photos'])) {
             $startPosition = (int) $service->media()->max('position');
@@ -163,11 +203,61 @@ class MyServicesController extends Controller
             foreach ($data['photos'] as $i => $file) {
                 $path = $file->store("services/{$service->id}", 'public');
 
-                $service->media()->create([
+                $newMedia = $service->media()->create([
                     'path' => $path,
                     'type' => 'image',
                     'position' => $startPosition + $i + 1,
                 ]);
+
+                $createdMediaIds[] = $newMedia->id;
+            }
+        }
+
+        $coverMediaId = null;
+
+        if (
+            array_key_exists('cover_new_photo_index', $data) &&
+            $data['cover_new_photo_index'] !== null
+        ) {
+            $coverNewPhotoIndex = (int) $data['cover_new_photo_index'];
+
+            if (array_key_exists($coverNewPhotoIndex, $createdMediaIds)) {
+                $coverMediaId = $createdMediaIds[$coverNewPhotoIndex];
+            }
+        }
+
+        if (
+            $coverMediaId === null &&
+            array_key_exists('cover_media_id', $data) &&
+            $data['cover_media_id'] !== null
+        ) {
+            $selectedCoverMediaId = (int) $data['cover_media_id'];
+            $removedMediaIds = $data['remove_media_ids'] ?? [];
+
+            if (! in_array($selectedCoverMediaId, $removedMediaIds, true)) {
+                $coverMediaId = $selectedCoverMediaId;
+            }
+        }
+
+        if ($coverMediaId !== null) {
+            $mediaIds = $service->media()
+                ->orderBy('position')
+                ->orderBy('id')
+                ->pluck('id')
+                ->all();
+
+            if (in_array($coverMediaId, $mediaIds, true)) {
+                $orderedMediaIds = array_values(array_filter(
+                    $mediaIds,
+                    fn (int $mediaId) => $mediaId !== $coverMediaId
+                ));
+                array_unshift($orderedMediaIds, $coverMediaId);
+
+                foreach ($orderedMediaIds as $position => $mediaId) {
+                    $service->media()
+                        ->whereKey($mediaId)
+                        ->update(['position' => $position]);
+                }
             }
         }
 

@@ -1,7 +1,6 @@
 import { Link, usePage } from "@inertiajs/react";
 import {
     BookOpen,
-    Folder,
     LayoutGrid,
     User as userIcon,
     Tags,
@@ -13,6 +12,8 @@ import {
     Flag,
     FileWarning,
     MessageSquare,
+    PhoneIncoming,
+    Info,
 } from "lucide-react";
 
 import { NavFooter } from "@/components/nav-footer";
@@ -27,7 +28,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { dashboard } from "@/routes";
+import { about, contact, dashboard } from "@/routes";
 import { index as adminCategoriesIndex } from "@/routes/admin/categories";
 import { index as adminDisputesIndex } from "@/routes/admin/disputes";
 import { index as adminPaymentsIndex } from "@/routes/admin/payments";
@@ -59,14 +60,14 @@ import AppLogo from "./app-logo";
 // ----------------------------
 const footerNavItems: NavItem[] = [
     {
-    title: "Repository",
-    href: "https://github.com/laravel/react-starter-kit",
-    icon: Folder,
+    title: "About Us",
+    href: about.url(),
+    icon: Info,
     },
     {
-    title: "Documentation",
-    href: "https://laravel.com/docs/starter-kits#react",
-    icon: BookOpen,
+    title: "Contact",
+    href: contact.url(),
+    icon: PhoneIncoming,
     },
 ];
 
