@@ -68,6 +68,7 @@
 
 .icon-btn__label {
   font-size: 1em;
+  font-weight: bold;
   white-space: nowrap;
   text-align: center;
   line-height: 2;
@@ -99,4 +100,22 @@
   .icon-btns {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+@media (max-width: 768px) {
+  .icon-btn:focus-visible .icon-btn__label,
+.icon-btn .icon-btn__label {
+  opacity: 1;
+  transform: translateY(20%);
+  font-size: 0.80em;
+}
+.icon-btn:focus-visible .icon-btn__back,
+.icon-btn .icon-btn__back {
+  transform: rotate(25deg) translate3d(-0.5em, -0.5em, 0.5em);
+}
+
+.icon-btn:focus-visible .icon-btn__front,
+.icon-btn .icon-btn__front {
+  transform: translate3d(0, 0, 2em);
+}
 }

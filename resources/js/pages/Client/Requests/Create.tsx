@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, useForm } from "@inertiajs/react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import {
   CheckCircle2Icon,
   UploadCloudIcon,
@@ -9,12 +9,25 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 
-// shadcn/ui
+import InputError from "@/components/input-error";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/layouts/app-layout";
-
-// icons
+import { dashboard } from "@/routes";
+import {
+  index as myRequestsIndex,
+  store as myRequestsStore,
+} from "@/routes/client/my/requests";
 
 type Category = { id: number; name: string; slug?: string };
 type City = { id: number; name: string };
@@ -29,10 +42,6 @@ type AlertContent = {
   description: string;
   variant: "success" | "error";
 };
-
-// ✅ Change this to your real store route if needed
-// Example: "/client/my/requests" OR route("client.my.requests.store")
-const STORE_URL = "/requests";
 
 function saveNextPageNotification(content: AlertContent) {
   try {
@@ -63,7 +72,6 @@ export default function Create({ categories, cities }: Props) {
     photos: [],
   });
 
-  // ✅ Alert state (shows on this page if it stays)
   const [showAlert, setShowAlert] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [alertContent, setAlertContent] = useState<AlertContent>({
@@ -83,11 +91,12 @@ export default function Create({ categories, cities }: Props) {
     }, 2500);
   }
 
-  // ✅ Photos handling
   function addPhotos(files: File[]) {
     const allowed = ["image/png", "image/jpeg", "image/webp"];
     const filtered = files.filter((f) => allowed.includes(f.type));
-    if (!filtered.length) return;
+    if (!filtered.length) {
+      return;
+    }
 
     form.setData("photos", [...(form.data.photos ?? []), ...filtered]);
   }
@@ -99,7 +108,6 @@ export default function Create({ categories, cities }: Props) {
     );
   }
 
-  // Previews (with cleanup)
   const previews = useMemo(() => {
     return (form.data.photos ?? []).map((file) => ({
       file,
@@ -109,34 +117,35 @@ export default function Create({ categories, cities }: Props) {
 
   useEffect(() => {
     return () => {
-      previews.forEach((p) => URL.revokeObjectURL(p.url));
+      previews.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, [previews]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
 
-    form.post(STORE_URL, {
+    form.post(myRequestsStore().url, {
       forceFormData: true,
       preserveScroll: true,
-
       onSuccess: () => {
-        const msg: AlertContent = {
-          title: "Created successfully ✅",
+        const message: AlertContent = {
+          title: "Created successfully",
           description: "Your request has been created.",
           variant: "success",
         };
 
-        // ✅ if backend redirects, show it on the next page (needs index code to read it)
-        saveNextPageNotification(msg);
+        saveNextPageNotification(message);
+        fireAlert(message);
 
-        // ✅ if backend DOES NOT redirect, you will still see it here
-        fireAlert(msg);
-
-        // optional reset
-        form.reset("title", "description", "budget_min", "budget_max", "urgency", "photos");
+        form.reset(
+          "title",
+          "description",
+          "budget_min",
+          "budget_max",
+          "urgency",
+          "photos"
+        );
       },
-
       onError: () => {
         fireAlert({
           title: "Creation failed",
@@ -148,145 +157,151 @@ export default function Create({ categories, cities }: Props) {
   }
 
   return (
-    <AppLayout>
-      <div className="mx-auto max-w-2xl px-6 py-10 space-y-6">
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: "My Requests", href: myRequestsIndex().url },
+        { title: "Create Request", href: myRequestsIndex().url },
+      ]}
+    >
+      <Head title="Create Request" />
+
+      <div className="mx-auto max-w-2xl space-y-6 px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Create Request</h1>
 
-          <Link
-            href="/requests"
-            className="text-sm px-3 py-2 rounded-4xl border border-gray-200 text-red-600 transition duration-700 hover:bg-foreground hover:text-background"
+          <Button
+            variant="outline"
+            asChild
+            className="rounded-4xl border-gray-200 text-red-600 transition duration-700 hover:bg-foreground hover:text-background"
           >
-            Back
-          </Link>
+            <Link href={myRequestsIndex().url}>Back</Link>
+          </Button>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-medium">Category</label>
-            <select
-              className="mt-1 h-10 w-full rounded-4xl border border-gray-200 bg-primary-foreground/30 px-3 text-sm"
-              value={form.data.category_id}
-              onChange={(e) => form.setData("category_id", e.target.value)}
+          <div className="space-y-2">
+            <Label htmlFor="category_id">Category</Label>
+            <Select
+              value={form.data.category_id || undefined}
+              onValueChange={(value) => form.setData("category_id", value)}
             >
-              <option value="">Select category...</option>
-              {categories.map((c) => (
-                <option key={c.id} value={String(c.id)}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            {form.errors.category_id && (
-              <div className="text-sm text-red-600 mt-1">
-                {form.errors.category_id}
-              </div>
-            )}
+              <SelectTrigger
+                id="category_id"
+                className="h-10 rounded-4xl border-gray-200 bg-primary-foreground/30"
+              >
+                <SelectValue placeholder="Select category..." />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={String(category.id)}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <InputError message={form.errors.category_id} />
           </div>
 
-          {/* City */}
-          <div>
-            <label className="block text-sm font-medium">Wilaya</label>
-            <select
-              className="mt-1 h-10 w-full rounded-4xl border border-gray-200 bg-primary-foreground/30 px-3 text-sm"
-              value={form.data.city_id}
-              onChange={(e) => form.setData("city_id", e.target.value)}
+          <div className="space-y-2">
+            <Label htmlFor="city_id">Wilaya</Label>
+            <Select
+              value={form.data.city_id || undefined}
+              onValueChange={(value) => form.setData("city_id", value)}
             >
-              <option value="">Select wilaya...</option>
-              {cities.map((c) => (
-                <option key={c.id} value={String(c.id)}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-            {form.errors.city_id && (
-              <div className="text-sm text-red-600 mt-1">{form.errors.city_id}</div>
-            )}
+              <SelectTrigger
+                id="city_id"
+                className="h-10 rounded-4xl border-gray-200 bg-primary-foreground/30"
+              >
+                <SelectValue placeholder="Select wilaya..." />
+              </SelectTrigger>
+              <SelectContent>
+                {cities.map((city) => (
+                  <SelectItem key={city.id} value={String(city.id)}>
+                    {city.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <InputError message={form.errors.city_id} />
           </div>
 
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium">Title</label>
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
             <Input
+              id="title"
               value={form.data.title}
               onChange={(e) => form.setData("title", e.target.value)}
               placeholder="Example: Fix leaking sink"
-              className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
+              className="rounded-4xl border border-gray-200 bg-primary-foreground/30"
             />
-            {form.errors.title && (
-              <div className="text-sm text-red-600 mt-1">{form.errors.title}</div>
-            )}
+            <InputError message={form.errors.title} />
           </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium">Description</label>
-            <textarea
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
               value={form.data.description}
               onChange={(e) => form.setData("description", e.target.value)}
               placeholder="Explain what you need..."
-              className="mt-1 w-full min-h-[140px] rounded-4xl border border-gray-200 bg-primary-foreground/30 px-3 py-2 text-sm"
+              className="min-h-[140px] rounded-4xl border-gray-200 bg-primary-foreground/30"
             />
-            {form.errors.description && (
-              <div className="text-sm text-red-600 mt-1">
-                {form.errors.description}
-              </div>
-            )}
+            <InputError message={form.errors.description} />
           </div>
 
-          {/* Budget */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium">Budget min (DZD)</label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="budget_min">Budget min (DZD)</Label>
               <Input
+                id="budget_min"
                 type="number"
                 value={form.data.budget_min}
                 onChange={(e) => form.setData("budget_min", e.target.value)}
-                className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
+                className="rounded-4xl border border-gray-200 bg-primary-foreground/30"
               />
-              {form.errors.budget_min && (
-                <div className="text-sm text-red-600 mt-1">{form.errors.budget_min}</div>
-              )}
+              <InputError message={form.errors.budget_min} />
             </div>
-            <div>
-              <label className="block text-sm font-medium">Budget max (DZD)</label>
+
+            <div className="space-y-2">
+              <Label htmlFor="budget_max">Budget max (DZD)</Label>
               <Input
+                id="budget_max"
                 type="number"
                 value={form.data.budget_max}
                 onChange={(e) => form.setData("budget_max", e.target.value)}
-                className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
+                className="rounded-4xl border border-gray-200 bg-primary-foreground/30"
               />
-              {form.errors.budget_max && (
-                <div className="text-sm text-red-600 mt-1">{form.errors.budget_max}</div>
-              )}
+              <InputError message={form.errors.budget_max} />
             </div>
           </div>
 
-          {/* Urgency */}
-          <div>
-            <label className="block text-sm font-medium">Urgency (optional)</label>
-            <select
-              className="mt-1 h-10 w-full rounded-4xl border border-gray-200 bg-primary-foreground/30 px-3 text-sm"
-              value={form.data.urgency}
-              onChange={(e) => form.setData("urgency", e.target.value)}
+          <div className="space-y-2">
+            <Label htmlFor="urgency">Urgency (optional)</Label>
+            <Select
+              value={form.data.urgency || undefined}
+              onValueChange={(value) => form.setData("urgency", value)}
             >
-              <option value="">Select urgency...</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-            {form.errors.urgency && (
-              <div className="text-sm text-red-600 mt-1">{form.errors.urgency}</div>
-            )}
+              <SelectTrigger
+                id="urgency"
+                className="h-10 rounded-4xl border-gray-200 bg-primary-foreground/30"
+              >
+                <SelectValue placeholder="Select urgency..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+            <InputError message={form.errors.urgency} />
           </div>
 
-          {/* Photos */}
           <div className="space-y-3">
-            <label className="block text-sm font-medium">
+            <Label>
               Photos <span className="text-muted-foreground">(PNG/JPG/WebP)</span>
-            </label>
+            </Label>
 
-            {/* Dropzone */}
             <div
               className="group relative rounded-4xl border border-dashed border-gray-300 bg-background p-4 transition hover:border-gray-400 hover:shadow-sm"
               onDragOver={(e) => e.preventDefault()}
@@ -299,7 +314,7 @@ export default function Create({ categories, cities }: Props) {
                 type="file"
                 multiple
                 accept="image/png,image/jpeg,image/webp"
-                className="absolute inset-0 opacity-0 cursor-pointer"
+                className="absolute inset-0 cursor-pointer opacity-0"
                 onChange={(e) => addPhotos(Array.from(e.target.files ?? []))}
               />
 
@@ -314,62 +329,62 @@ export default function Create({ categories, cities }: Props) {
               </div>
             </div>
 
-            {form.errors.photos && (
-              <div className="text-sm text-red-600 mt-1">{form.errors.photos}</div>
-            )}
+            <InputError message={form.errors.photos} />
 
-            {/* Preview */}
             {previews.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {previews.map((p, i) => (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {previews.map((preview, index) => (
                   <div
-                    key={`${p.file.name}-${i}`}
+                    key={`${preview.file.name}-${index}`}
                     className="relative overflow-hidden rounded-3xl border border-gray-200"
                   >
                     <img
-                      src={p.url}
-                      alt={p.file.name}
+                      src={preview.url}
+                      alt={preview.file.name}
                       className="h-24 w-full object-cover"
                     />
-                    <button
+                    <Button
                       type="button"
-                      onClick={() => removePhoto(i)}
-                      className="absolute top-2 right-2 rounded-full bg-background/80 backdrop-blur p-1 border border-gray-200 hover:bg-background"
+                      onClick={() => removePhoto(index)}
+                      variant="outline"
+                      size="icon"
+                      className="absolute top-2 right-2 size-7 rounded-full border-gray-200 bg-background/80 p-1 backdrop-blur hover:bg-background"
                       aria-label="Remove photo"
                     >
                       <XIcon className="size-4" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={form.processing}
-            className="rounded-4xl transition duration-700 p-2 bg-primary hover:bg-foreground hover:text-background"
+            className="rounded-4xl bg-primary p-2 transition duration-700 hover:bg-foreground hover:text-background"
           >
             {form.processing ? "Creating..." : "Create Request"}
-          </button>
+          </Button>
         </form>
       </div>
 
-      {/* ✅ Floating Alert */}
       {showAlert ? (
         <div
-          className={`fixed bottom-4 right-4 z-50 transform transition-all duration-300 ease-out
-            ${animate ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
-          `}
+          className={`fixed bottom-4 right-4 z-50 transform transition-all duration-300 ease-out ${
+            animate ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          }`}
         >
-          <Alert className="bg-primary/5 backdrop-blur-sm max-w-[92vw] sm:max-w-md">
+          <Alert className="max-w-[92vw] bg-primary/5 backdrop-blur-sm sm:max-w-md">
             {alertContent.variant === "success" ? (
               <CheckCircle2Icon className="text-primary" />
             ) : (
               <XCircleIcon className="text-red-600" />
             )}
             <AlertTitle
-              className={alertContent.variant === "success" ? "text-primary" : "text-red-600"}
+              className={
+                alertContent.variant === "success" ? "text-primary" : "text-red-600"
+              }
             >
               {alertContent.title}
             </AlertTitle>

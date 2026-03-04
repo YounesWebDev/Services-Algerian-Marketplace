@@ -125,7 +125,7 @@ class ProviderBookingController extends Controller
             }
         }
 
-        return back()->with('success', 'Booking status updated');
+        return back()->with('success', 'Booking status updated successfully');
     }
 
     // provider confirms cash payment

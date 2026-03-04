@@ -54,7 +54,7 @@ class AcceptOfferController extends Controller
                 'offer_id' => $offer->id,
                 'client_id' => $offer->request->client_id,
                 'provider_id' => $offer->provider_id,
-                'scheduled_at' => null,
+                'scheduled_at' => now(),
                 'status' => 'pending',
                 'total_amount' => $offer->proposed_price,
                 'currency' => 'DZD',
