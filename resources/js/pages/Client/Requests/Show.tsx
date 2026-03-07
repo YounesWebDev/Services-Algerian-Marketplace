@@ -1,11 +1,13 @@
 import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
-import { BookOpenCheck, Clock, MapPin, Trash2 } from "lucide-react";
+import { BookOpenCheck, Clock, MapPin, MessageCircle, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { index as myRequestsIndex } from "@/routes/client/my/requests";
 import { accept as clientOffersAccept, contact as clientOffersContact } from "@/routes/client/offers";
 import { show as profileShow } from "@/routes/profiles";
+
 type Category = { id: number; name: string; slug: string };
 type City = { id: number; name: string };
 
@@ -39,7 +41,7 @@ type Offer = {
   message: string;
   proposed_price: string;
   estimated_days: number | null;
-  status: string; // sent | rejected | assigned | accepted...
+  status: string;
   created_at: string;
 
   provider?: Provider;
@@ -65,7 +67,14 @@ export default function ClientRequestShow() {
 
   const sortedMedia = (job.media ?? []).slice().sort((a, b) => a.position - b.position);
 
-  // Accept offer form
+  const [active, setActive] = useState(0);
+
+  const validImages = sortedMedia.filter((m) => publicImagePath(m.path));
+  const cover =
+    validImages.length > 0
+      ? publicImagePath(validImages[Math.min(active, validImages.length - 1)]?.path)
+      : "";
+
   const acceptForm = useForm({});
 
   function acceptOffer(offerId: number) {
@@ -78,7 +87,7 @@ export default function ClientRequestShow() {
     router.post(clientOffersContact.url(offerId));
   }
 
-  const canAccept = job.status === "open"; // only open requests can accept offers
+  const canAccept = job.status === "open";
 
   return (
     <AppLayout
@@ -94,9 +103,10 @@ export default function ClientRequestShow() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold">{job.title}</h1>
-            <div >
-              <span >
-                <div className="mt-1 mb-3 flex w-max items-center rounded-3xl border border-gray-200 p-1  text-sm text-foreground">
+
+            <div>
+              <span>
+                <div className="mt-1 mb-3 flex w-max items-center rounded-3xl border border-gray-200 p-1 text-sm text-foreground">
                   Status{" "}
                   {job.status === "open" ? (
                     <span className="rounded-full border border-gray-200 p-2 font-medium text-primary">
@@ -109,39 +119,61 @@ export default function ClientRequestShow() {
                     </span>
                   ) : job.status === "closed" || job.status === "cancelled" ? (
                     <span className="rounded-full border border-gray-200 p-2 font-medium text-red-600">
-                       <Trash2 className="mr-1 inline h-4 w-4" />{job.status}
+                      <Trash2 className="mr-1 inline h-4 w-4" />
+                      {job.status}
                     </span>
                   ) : null}
                 </div>
               </span>
             </div>
+
             <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center ">
-             <div className=""> {job.category?.name ? <div className="">  {job.category.name}</div> : null}  </div>
-              <div className=" flex items-center p-2 rounded-3xl border border-gray-200 w-max ml-2 ">{job.city?.name ? <div className="flex items-center  "> <MapPin className="text-red-600 "/>  {job.city.name}</div> : null}</div>
-              
-              
-              
+              <div>{job.category?.name ? <div>{job.category.name}</div> : null}</div>
+
+              <div className="flex items-center p-2 rounded-3xl border border-gray-200 w-max ml-2 ">
+                {job.city?.name ? (
+                  <div className="flex items-center">
+                    <MapPin className="text-red-600" /> {job.city.name}
+                  </div>
+                ) : null}
+              </div>
             </div>
-             <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-max mt-1 flex items-center gap-2 ">
-            Budget{" "}
-            <div className="font-medium rounded-3xl p-2 border border-gray-200 flex items-center gap-2">
-              <div className="text-primary">{job.budget_min ?? "--"}</div> - <div className="text-red-600">{job.budget_max ?? "--"}</div>  DZD
-            </div>{" "}
-            
+
+            <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-max mt-1 flex items-center gap-2 ">
+              Budget
+              <div className="font-medium rounded-3xl p-2 border border-gray-200 flex items-center gap-2">
+                <div className="text-primary">{job.budget_min ?? "--"}</div> -
+                <div className="text-red-600">{job.budget_max ?? "--"}</div> DZD
+              </div>
+            </div>
+
+            <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-2 mt-3 ">
+              Urgency
+              <div className="font-medium rounded-3xl p-2 border border-gray-200 ">
+                {job.urgency === "low" ? (
+                  <span className="text-primary">
+                    <Clock className="h-4 w-4 inline mr-1" />
+                    Low
+                  </span>
+                ) : job.urgency === "medium" ? (
+                  <span className="text-yellow-600">
+                    <Clock className="h-4 w-4 inline mr-1" />
+                    Medium
+                  </span>
+                ) : job.urgency === "high" ? (
+                  <span className="text-red-600">
+                    <Clock className="h-4 w-4 inline mr-1" />
+                    High
+                  </span>
+                ) : null}
+              </div>
+            </div>
           </div>
 
-          <div className="p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-2 mt-3 ">
-                        Urgency 
-                        <div className="font-medium rounded-3xl p-2 border border-gray-200 ">
-                          {job.urgency === "low" ? <span className="text-primary"><Clock className="h-4 w-4 inline mr-1"/>Low</span>
-                          : job.urgency === "medium" ? <span className="text-yellow-600"><Clock className="h-4 w-4 inline mr-1"/>Medium</span>
-                          : job.urgency === "high" ? <span className="text-red-600"><Clock className="h-4 w-4 inline mr-1"/>High</span>
-                           : null}
-                          </div>
-                        </div>
-          </div>
-
-          <Link href={myRequestsIndex.url()} className="text-sm px-3 py-2 rounded-3xl text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground hover:shadow-2xl ">
+          <Link
+            href={myRequestsIndex.url()}
+            className="text-sm px-3 py-2 rounded-3xl text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground hover:shadow-2xl "
+          >
             Back
           </Link>
         </div>
@@ -156,139 +188,100 @@ export default function ClientRequestShow() {
           </div>
         ) : null}
 
-        {/* Request details */}
-        <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200  p-4 space-y-2">
+        <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 space-y-2">
           <div className="font-medium">Description</div>
           <p className="text-sm text-foreground whitespace-pre-line">{job.description}</p>
-
-         
         </div>
 
-       <div className="rounded-3xl border bg-primary-foreground/30 shadow-sm p-6">
-  {/* Header */}
-  <div className="flex items-center justify-between">
-    <h3 className="text-lg font-semibold tracking-tight">Photos</h3>
-    {sortedMedia.length > 0 && (
-      <span className="text-xs bg-muted px-3 py-1 rounded-full">
-        {sortedMedia.length} image{sortedMedia.length > 1 && "s"}
-      </span>
-    )}
-  </div>
-
-  {/* Content */}
-  {sortedMedia.length === 0 ? (
-    <div className="mt-6 flex flex-col items-center justify-center text-center text-muted-foreground">
-      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-3">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-6 h-6 opacity-60"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3 16l4-4a3 3 0 014 0l4 4m-2-2l1-1a3 3 0 014 0l3 3"
-          />
-        </svg>
-      </div>
-      <p className="text-sm">No photos uploaded yet</p>
-    </div>
-  ) : (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
-      {sortedMedia.slice(0, 8).map((m) => {
-        const url = publicImagePath(m.path);
-        return (
-          <div
-            key={m.id}
-            className="group relative rounded-2xl overflow-hidden border bg-muted aspect-square"
-          >
-            {url ? (
-              <img
-                src={url}
-                alt="Request"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-              />
-            ) : (
-              <div className="w-full h-full" />
-            )}
-
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <span className="text-white text-sm font-medium">
-                View
-              </span>
+        {/* Photos */}
+        <div className="space-y-3">
+          {cover ? (
+            <img src={cover} alt={job.title} className="w-full h-80 rounded-4xl object-cover border" />
+          ) : (
+            <div className="w-full h-80 rounded-4xl border flex items-center justify-center text-sm text-gray-500">
+              No photos.
             </div>
-          </div>
-        );
-      })}
-    </div>
-  )}
-</div>
+          )}
+
+          {validImages.length > 1 && (
+            <div className="flex gap-2 overflow-auto">
+              {validImages.map((m, idx) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setActive(idx)}
+                  className={[
+                    "border rounded-md overflow-hidden shrink-0",
+                    idx === active ? "ring-2 ring-primary" : "",
+                  ].join(" ")}
+                >
+                  <img
+                    src={publicImagePath(m.path)}
+                    alt={`media-${idx}`}
+                    className="h-16 w-24 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Offers */}
         <div className="rounded-md border p-4 space-y-3">
           <div className="font-medium">Offers</div>
-          <p className="text-sm text-gray-600">
-            Providers send offers. You can accept only while your request is <b>open</b>.
-          </p>
-
-          {!canAccept ? (
-            <div className="text-sm text-gray-700">
-              This request is not open anymore, so you can't accept offers.
-            </div>
-          ) : null}
 
           {offers.length === 0 ? (
-            <div className="text-sm text-gray-600">No offers yet.</div>
+            <div className="text-sm text-foreground">No offers yet.</div>
           ) : (
             <div className="space-y-3">
               {offers.map((o) => {
                 const canAcceptThis = canAccept && o.status === "sent";
 
                 return (
-                  <div key={o.id} className="rounded-md border p-3">
+                  <div key={o.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          {o.provider?.avatar_path ? (
-                            <img
-                              src={o.provider.avatar_path}
-                              alt={o.provider.name}
-                              className="w-7 h-7 rounded-full object-cover border"
-                            />
-                          ) : (
-                            <span className="w-7 h-7 rounded-full border bg-gray-100" />
-                          )}
-                          <div className="font-medium">{o.provider?.name ?? "Provider"}</div>
-                          {o.provider ? (
-                            <Link
-                              href={profileShow(o.provider.id).url}
-                              className="text-xs underline"
-                            >
-                              View profile
-                            </Link>
-                          ) : null}
-                          <span className="text-xs px-2 py-1 rounded border bg-gray-50">
-                            {o.status}
-                          </span>
-                        </div>
+                      <div className="space-y-2">
 
-                        <div className="text-sm text-gray-700 whitespace-pre-line">
+                        {/* FIXED PROVIDER SECTION */}
+                        {o.provider ? (
+                          <Link
+                            href={profileShow(o.provider.id).url}
+                            className="flex items-center gap-2"
+                          >
+                            {o.provider.avatar_path ? (
+                              <img
+                                src={o.provider.avatar_path}
+                                alt={o.provider.name}
+                                className="w-7 h-7 rounded-full object-cover border"
+                              />
+                            ) : (
+                              <span className="w-7 h-7 rounded-full border bg-gray-100" />
+                            )}
+
+                            <span className="font-medium text-sm hover:underline">
+                              {o.provider.name}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="font-medium text-sm">Provider</div>
+                        )}
+
+                        <span className="text-xs px-2 py-1 rounded-3xl border border-gray-200 w-max text-foreground">
+                          {o.status}
+                        </span>
+
+                        <div className="text-sm text-foreground mt-3 whitespace-pre-line">
                           {o.message}
                         </div>
 
-                        <div className="text-sm text-gray-600">
-                          Price: <span className="font-medium">{o.proposed_price}</span> DZD
-                          {o.estimated_days !== null ? (
-                            <>
-                              {" "}
-                              - Estimated days:{" "}
-                              <span className="font-medium">{o.estimated_days}</span>
-                            </>
-                          ) : null}
+                        <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-max flex items-center gap-2 ">
+                          Price <div className="font-medium rounded-3xl p-2 border border-gray-200 ">{o.proposed_price} DZD</div> 
+                          
+                        </div>
+                        <div>
+                           {o.estimated_days !== null && (
+                            <><div className="rounded-3xl p-2 border border-gray-200 flex items-center gap-2 w-max"> <Clock/> Estimated days: <div className="font-medium ">{o.estimated_days}</div></div></>
+                          )}
                         </div>
                       </div>
 
@@ -297,26 +290,22 @@ export default function ClientRequestShow() {
                           <button
                             type="button"
                             onClick={() => contactProvider(o.id)}
-                            className="rounded-md border px-3 py-2 text-sm"
+                            className=" px-3 py-2 text-sm text-primary transition duration-700 hover:text-foreground disabled:opacity-60 flex items-center gap-1"
                           >
-                            Contact
+                           <MessageCircle/> 
                           </button>
+
                           <button
                             type="button"
                             onClick={() => acceptOffer(o.id)}
                             disabled={!canAcceptThis || acceptForm.processing}
-                            className="rounded-md bg-black px-3 py-2 text-white text-sm disabled:opacity-60"
+                            className="rounded-4xl bg-primary px-3 py-2 text-foreground text-sm disabled:hidden transition duration-700 hover:bg-foreground hover:text-background disabled:opacity-60 flex items-center gap-1 "
                           >
                             {acceptForm.processing ? "Working..." : "Accept"}
                           </button>
                         </div>
-
-                        {!canAcceptThis ? (
-                          <span className="text-xs text-gray-500">
-                            {o.status !== "sent" ? "Not available" : "--"}
-                          </span>
-                        ) : null}
                       </div>
+
                     </div>
                   </div>
                 );

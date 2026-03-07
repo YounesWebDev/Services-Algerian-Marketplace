@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from "@inertiajs/react";
+import { CircleX } from "lucide-react";
 
 import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,12 +61,12 @@ export default function Create({ target }: { target: Target }) {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
+          <button className="rounded-3xl px-3 py-2 text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground">
             <Link href={dashboard().url}>Back</Link>
-          </Button>
+          </button>
         </div>
 
-        <Card>
+        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
             <CardTitle>Target</CardTitle>
           </CardHeader>
@@ -86,7 +86,7 @@ export default function Create({ target }: { target: Target }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
             <CardTitle>Report details</CardTitle>
           </CardHeader>
@@ -99,7 +99,7 @@ export default function Create({ target }: { target: Target }) {
 
               <div className="space-y-2">
                 <Label htmlFor="reason">Reason</Label>
-                <Input
+                <Input className="rounded-3xl p-2 border border-gray-200 "
                   id="reason"
                   value={data.reason}
                   onChange={(e) => setData("reason", e.target.value)}
@@ -112,6 +112,7 @@ export default function Create({ target }: { target: Target }) {
               <div className="space-y-2">
                 <Label htmlFor="description">Description (optional)</Label>
                 <Textarea
+                className="rounded-3xl p-2 border border-gray-200 "
                   id="description"
                   value={data.description}
                   onChange={(e) => setData("description", e.target.value)}
@@ -130,10 +131,12 @@ export default function Create({ target }: { target: Target }) {
               )}
 
               <div className="flex items-center gap-3">
-                <Button disabled={processing}>Submit report</Button>
-                <Button type="button" variant="outline" asChild>
-                  <Link href={dashboard().url}>Cancel</Link>
-                </Button>
+                <button disabled={processing} className="rounded-3xl border bg-primary border-gray-200 transition duration-700 hover:bg-foreground hover:text-background p-2 ">Submit report</button>
+                <button disabled={processing} className="rounded-3xl flex items-center px-3 py-2 text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground">
+                  <Link href={dashboard().url}>
+                    <div className="flex items-center gap-2"><CircleX /> Cancel</div>
+                  </Link>
+                </button>
               </div>
 
               <p className="text-xs text-muted-foreground">

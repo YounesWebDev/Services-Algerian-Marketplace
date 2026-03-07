@@ -1,5 +1,5 @@
 import { Link, router, useForm, usePage } from "@inertiajs/react";
-import { Clock, CreditCard, Handshake, Pin } from "lucide-react";
+import { Clock, CreditCard, Flag, Handshake, MessageCircle, Pin, Search } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -227,15 +227,15 @@ export default function Show({ service }: { service: Service }) {
       </div>
 
       {/* Booking */}
-      <div className="rounded-md border p-4 space-y-2">
+      <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 space-y-2">
         <div className="font-medium">Book this service</div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-foreground">
           This will create a booking with status <b>pending</b>. Then you choose payment (cash or online)
           in your booking page.
         </p>
 
         {!user ? (
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-foreground">
             You must{" "}
             <Link className="underline" href={login()}>
               login
@@ -243,7 +243,7 @@ export default function Show({ service }: { service: Service }) {
             as a client to book.
           </div>
         ) : user.role !== "client" ? (
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-foreground">
             Only <b>clients</b> can book services.
           </div>
         ) : (
@@ -252,7 +252,7 @@ export default function Show({ service }: { service: Service }) {
               <label className="block text-sm font-medium">Scheduled at (optional)</label>
               <input
                 type="datetime-local"
-                className="mt-1 w-full rounded-md border p-2"
+                className="mt-1  rounded-3xl w-max border border-gray-200 p-2"
                 value={bookingForm.data.scheduled_at}
                 onChange={(e) => bookingForm.setData("scheduled_at", e.target.value)}
               />
@@ -264,7 +264,7 @@ export default function Show({ service }: { service: Service }) {
             <button
               type="submit"
               disabled={bookingForm.processing}
-              className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
+              className="rounded-3xl bg-primary px-4 py-2 text-foreground  transition duration-700 hover:bg-foreground hover:text-background text-sm "
             >
               {bookingForm.processing ? "Booking..." : "Create Booking"}
             </button>
@@ -275,29 +275,30 @@ export default function Show({ service }: { service: Service }) {
       {/* CTA */}
       <div className="flex gap-3">
         {!user ? (
-          <Button asChild className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl">
-            <Link href={login()}>
-              Contact provider
+          <button >
+            <Link href={login()}
+                          className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"          >
+
+             <MessageCircle/> Contact 
             </Link>
-          </Button>
+          </button>
         ) : user.role !== "client" ? (
-          <Button
+          <button
             disabled
-            className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl"
-          >
-            Contact provider
-          </Button>
+              className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"          >
+               <MessageCircle/>  Contact 
+         </button>
         ) : (
-          <Button
+          <button
             onClick={contactProvider}
-            className="rounded-4xl transition duration-700  hover:bg-foreground hover:text-background hover:shadow-xl"
+            className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
           >
-            Contact provider
-          </Button>
+           <MessageCircle/> Contact 
+          </button>
         )}
 
-        <Button
-          variant="outline"
+        <button
+          
           onClick={() =>
             router.get(
               user?.role === "provider"
@@ -305,21 +306,23 @@ export default function Show({ service }: { service: Service }) {
                 : servicesIndex.url(),
             )
           }
-          className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl"
+          className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
         >
-          Browse more
-        </Button>
+         <Search/> Browse 
+        </button>
 
         {user?.role === "client" ? (
-          <Button variant="outline" asChild>
+          <button >
             <Link
               href={reportCreate({
                 query: { type: "service", id: service.id },
               }).url}
+                        className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
+
             >
-              Report this service
+             <Flag/> Report
             </Link>
-          </Button>
+          </button>
         ) : null}
       </div>
 
@@ -378,8 +381,8 @@ export default function Show({ service }: { service: Service }) {
 
                         <div className="text-sm text-muted-foreground">
                           {r.rating !== null && r.rating !== undefined ? (
-                            <div className="flex items-center gap-2">
-                              <Stars value={Number(r.rating)} />
+                            <div className="flex items-center gap-2 ">
+                             <div className="text-amber-400"> <Stars value={Number(r.rating)} /></div>
                               <span>{Number(r.rating)}/5</span>
                             </div>
                           ) : (

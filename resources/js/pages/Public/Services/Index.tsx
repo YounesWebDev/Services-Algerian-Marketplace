@@ -1,17 +1,16 @@
 import { router, usePage } from "@inertiajs/react";
-import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 // shadcn/ui
+import Navbar from "@/components/navbar"; 
 import PaginationLinks from "@/components/pagination-links";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AppLayout from "@/layouts/app-layout";
 import { SharedData } from "@/types";
 
-// ✅ Alert
 
 // Utility to convert storage paths to accessible URLs
 function toStorageUrl(path: string): string {
@@ -100,33 +99,6 @@ type Props = {
   filters: Filters;
 };
 
-// ✅ notification type (stored from Create.tsx)
-type AppNotification = {
-  title: string;
-  description: string;
-  variant?: "success" | "error";
-};
-
-function consumeStoredNotification(): AppNotification | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    const raw = sessionStorage.getItem("APP_NOTIFICATION");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as AppNotification;
-
-    return {
-      title: parsed.title || "Success ✅",
-      description: parsed.description || "",
-      variant: parsed.variant || "success",
-    };
-  } catch {
-    return null;
-  }
-}
-
 export default function Index({ services, categories, cities, filters }: Props) {
   // Local UI state (start with filters coming from backend)
   const [q, setQ] = useState(filters?.q ?? "");
@@ -134,45 +106,6 @@ export default function Index({ services, categories, cities, filters }: Props) 
   const [category, setCategory] = useState(filters?.category ?? "");
   const { auth } = usePage<SharedData>().props;
   const user = auth?.user ?? null;
-
-  // ✅ Alert state
-  const [initialNotification] = useState<AppNotification | null>(() =>
-    consumeStoredNotification()
-  );
-  const [showAlert, setShowAlert] = useState(Boolean(initialNotification));
-  const [animate, setAnimate] = useState(false);
-  const [alertContent] = useState<AppNotification>(
-    initialNotification ?? {
-      title: "",
-      description: "",
-      variant: "success",
-    }
-  );
-
-  // âœ… Start animation / auto-dismiss for active notification
-  useEffect(() => {
-    if (!showAlert) {
-      return;
-    }
-
-    sessionStorage.removeItem("APP_NOTIFICATION");
-
-    const animationFrameId = window.requestAnimationFrame(() => {
-      setAnimate(true);
-    });
-
-    const hideTimerId = window.setTimeout(() => {
-      setAnimate(false);
-      window.setTimeout(() => setShowAlert(false), 300);
-    }, 2500);
-
-    return () => {
-      window.cancelAnimationFrame(animationFrameId);
-      window.clearTimeout(hideTimerId);
-    };
-  }, [showAlert]);
-
-
   // Run search using Inertia (no full refresh)
   function runSearch() {
     router.get(
@@ -191,6 +124,11 @@ export default function Index({ services, categories, cities, filters }: Props) 
 
   const PageUI = (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
+      {
+        user === null ? (
+          <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={null} canRegister={true} /></div>
+        ) : null
+      }
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -219,13 +157,13 @@ export default function Index({ services, categories, cities, filters }: Props) 
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search (e.g. plumber)"
-          className="rounded-4xl"
+          className="rounded-4xl bg-primary-foreground/30 border border-gray-200"
         />
 
         <select
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className="h-10 w-full rounded-4xl border px-3 text-sm"
+          className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-2"
         >
           <option value="">All wilayas</option>
           {cities.map((c) => (
@@ -239,7 +177,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="h-10 w-full rounded-4xl border px-3 text-sm"
+          className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-2"
         >
           <option value="">All categories</option>
           {categories.map((cat) => (
@@ -249,12 +187,12 @@ export default function Index({ services, categories, cities, filters }: Props) 
           ))}
         </select>
 
-        <Button
+        <button
           onClick={runSearch}
-          className="rounded-4xl transition duration-700 hover:bg-foreground hover:text-background"
+          className="rounded-4xl flex items-center gap-2 bg-primary w-max p-2 text-foreground transition duration-700 hover:bg-foreground hover:text-background"
         >
-          Search
-        </Button>
+          <Search/> <p className="hiddenmd: flex">Search</p>
+        </button>
       </div>
 
       {/* Results */}
@@ -333,39 +271,14 @@ export default function Index({ services, categories, cities, filters }: Props) 
       {/* Pagination */}
       {services.links?.length > 0 && <PaginationLinks links={services.links} />}
 
-      {/* ✅ Floating Alert */}
-      {showAlert ? (
-        <div
-          className={`fixed bottom-4 right-4 z-50 transform transition-all duration-300 ease-out
-            ${
-              animate
-                ? "translate-x-0 opacity-100"
-                : "translate-x-full opacity-0"
-            }`}
-        >
-          <Alert className="bg-primary/30   backdrop-blur-sm max-w-[92vw] sm:max-w-md">
-            {alertContent.variant === "error" ? (
-              <XCircleIcon className="text-red-600" />
-            ) : (
-              <CheckCircle2Icon className="text-primary" />
-            )}
-
-            <AlertTitle
-              className={
-                alertContent.variant === "error" ? "text-red-600" : "text-primary"
-              }
-            >
-              {alertContent.title}
-            </AlertTitle>
-
-            <AlertDescription className="text-foreground">
-              {alertContent.description}
-            </AlertDescription>
-          </Alert>
-        </div>
-      ) : null}
+     
+      
     </div>
   );
 
   return user?.role === "client" ? <AppLayout>{PageUI}</AppLayout> : PageUI;
 }
+
+
+
+

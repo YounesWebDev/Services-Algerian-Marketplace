@@ -1,7 +1,6 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import {
   Briefcase,
-  CheckCircle2Icon,
   CircleCheckBig,
   CircleDollarSign,
   CircleX,
@@ -10,9 +9,10 @@ import {
   CreditCard,
   OctagonAlert,
 } from "lucide-react";
+import { CheckCircle2Icon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
 import {
   index as providerBookingsIndex,
@@ -270,25 +270,7 @@ export default function ProviderBookingShow() {
       <Head title={`Provider Booking #${booking.id}`} />
 
       {/* Animated Alert */}
-      {showAlert ? (
-        <div
-          className={`fixed bottom-4 right-4 z-50 transform transition-all duration-300 ease-out
-            ${animate ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
-          `}
-        >
-          <Alert
-            className={`${alertBgClass} backdrop-blur-sm max-w-[92vw] sm:max-w-md`}
-          >
-            {alertIcon}
-            <AlertTitle className={alertTitleClass}>
-              {alertContent.title}
-            </AlertTitle>
-            <AlertDescription className="text-foreground">
-              {alertContent.description}
-            </AlertDescription>
-          </Alert>
-        </div>
-      ) : null}
+      
 
       <div className="p-6 max-w-3xl space-y-4">
         <div className="flex items-start justify-between gap-4">
@@ -303,6 +285,25 @@ export default function ProviderBookingShow() {
             Back
           </Link>
         </div>
+        {showAlert ? (
+          <div className="fixed bottom-6 right-6 z-50">
+            <Alert
+              className={[
+                alertBgClass,
+                "backdrop-blur-sm w-[92vw] sm:w-96 shadow-2xl transition-all duration-300",
+                animate ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
+              ].join(" ")}
+            >
+              {alertIcon}
+              <AlertTitle className={alertTitleClass}>
+                {alertContent.title}
+              </AlertTitle>
+              <AlertDescription className="text-foreground">
+                {alertContent.description}
+              </AlertDescription>
+            </Alert>
+          </div>
+        ) : null}
 
         {/* Booking card */}
         <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 transition duration-700 hover:bg-primary-foreground/40 hover:shadow-2xl p-4">

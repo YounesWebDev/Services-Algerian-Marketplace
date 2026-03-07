@@ -131,11 +131,11 @@ export default function ClientBookingShow() {
       <div className="p-6 max-w-3xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold">Booking #{booking.id}</h1>
-            <p className="text-sm text-gray-600">{title}</p>
+            <h1 className="text-xl font-semibold">Booking </h1>
+            <p className="text-2xl text-primary text-foredround">{title}</p>
           </div>
 
-          <Link href={clientBookingsIndex.url()} className="text-sm underline">
+          <Link href={clientBookingsIndex.url()} className="text-sm rounded-3xl px-3 py-2 border border-gray-200 text-red-600 text-bold transition duration-700 hover:bg-foreground">
             Back
           </Link>
         </div>
@@ -160,13 +160,13 @@ export default function ClientBookingShow() {
         ) : null}
 
         {/* Booking info */}
-        <div className="rounded-md border p-4 space-y-2">
-          <div className="text-sm text-gray-600">
+        <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 space-y-2">
+          <div className="text-sm text-foreground">
             Source: <span className="font-medium">{booking.source}</span> • Status:{" "}
             <span className="font-medium">{booking.status}</span>
           </div>
 
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-foreground">
             Total: <span className="font-medium">{booking.total_amount}</span> {booking.currency}
             {booking.scheduled_at ? (
               <>
@@ -176,7 +176,7 @@ export default function ClientBookingShow() {
             ) : null}
           </div>
 
-          <div className="text-sm text-gray-600 flex items-center gap-2 mt-2">
+          <div className="text-sm text-foreground flex items-center gap-2 mt-2">
             {booking.provider?.avatar_path ? (
               <img
                 src={booking.provider.avatar_path}
@@ -202,7 +202,7 @@ export default function ClientBookingShow() {
 
         {/* Fee explanation (optional) */}
         {fee ? (
-          <div className="rounded-md border p-4 text-sm text-gray-700">
+          <div className="rounded-md border p-4 text-sm text-foreground">
             <div className="font-medium mb-1">Platform fees (for understanding)</div>
             <div>
               Commission rate: <span className="font-medium">{fee.commission_rate}</span>
@@ -220,7 +220,7 @@ export default function ClientBookingShow() {
         {canCancel ? (
           <div className="rounded-md border p-4">
             <div className="font-medium">Cancel booking</div>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground mt-1">
               You can cancel while the booking is pending or confirmed.
             </p>
             <form onSubmit={submitCancel} className="mt-3">
@@ -238,7 +238,7 @@ export default function ClientBookingShow() {
         {booking.status === "completed" && !booking.review ? (
           <div className="rounded-md border p-4">
             <div className="font-medium">Review</div>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground mt-1">
               Share your feedback about this booking.
             </p>
             <div className="mt-3">
@@ -254,7 +254,7 @@ export default function ClientBookingShow() {
         {canDispute && !booking.dispute ? (
           <div className="rounded-md border p-4">
             <div className="font-medium">Dispute</div>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-foreground mt-1">
               Open a dispute if there is an issue with this booking.
             </p>
             <div className="mt-3">
@@ -270,11 +270,11 @@ export default function ClientBookingShow() {
           <div className="font-medium">Payment</div>
 
           {!booking.payment ? (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-foreground">
               No payment yet. Choose Cash or Online below.
             </div>
           ) : (
-            <div className="text-sm text-gray-700 space-y-1">
+            <div className="text-sm text-foreground space-y-1">
               <div>
                 Type: <span className="font-medium">{booking.payment.payment_type}</span> • Status:{" "}
                 <span className="font-medium">{booking.payment.status}</span>
@@ -296,7 +296,7 @@ export default function ClientBookingShow() {
               ) : null}
 
               {booking.payment.payment_type === "cash" && booking.payment.status === "pending" ? (
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   Cash selected. Waiting for provider to confirm cash payment.
                 </div>
               ) : null}
@@ -308,7 +308,7 @@ export default function ClientBookingShow() {
         {!booking.payment ? (
           <div className="rounded-md border p-4">
           <div className="font-medium">Choose payment method</div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-foreground mt-1">
             - Online: fill card form → we send OTP to <b>+000000000</b> (code is always <b>000000</b>). <br />
             - Cash: provider will confirm cash later.
           </p>
