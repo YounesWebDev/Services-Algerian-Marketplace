@@ -83,7 +83,7 @@ export default function ProviderVerification() {
   const docUrl = publicFilePath(verification?.doc_path ?? null);
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="Provider verification" />
 
       <div className="p-6 max-w-3xl space-y-6">
@@ -276,7 +276,7 @@ export default function ProviderVerification() {
                       )}
 
                       <span className="text-xs text-muted-foreground">
-                        PNG / JPG / WEBP / PDF • Max 4MB
+                        PNG / JPG / WEBP / PDF â€¢ Max 4MB
                       </span>
                     </label>
 

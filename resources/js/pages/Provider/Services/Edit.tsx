@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
 import {
     index as providerServicesIndex,
     update as providerServicesUpdate,
@@ -198,7 +199,7 @@ export default function ProviderServicesEdit(props: {
         });
     }
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
             <Head title="Edit Service" />
 
             <div className="max-w-2xl space-y-4 p-6">

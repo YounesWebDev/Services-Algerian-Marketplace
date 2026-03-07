@@ -1,6 +1,7 @@
 import { Head, usePage } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 
 type Stats = {
   pending_bookings: number;
@@ -16,7 +17,7 @@ export default function Dashboard() {
   const { stats } = usePage<PageProps>().props;
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
     <Head title="Provider Dashboard" />
 <div className="p-4 max-w-full mx-auto">
   <h1 className="text-2xl font-bold mb-6 text-foreground">Provider Dashboard</h1>

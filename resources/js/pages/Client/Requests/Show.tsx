@@ -2,6 +2,15 @@ import { Head, Link, router, useForm, usePage } from "@inertiajs/react";
 import { BookOpenCheck, Clock, MapPin, MessageCircle, Trash2 } from "lucide-react";
 import { useState } from "react";
 
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { index as myRequestsIndex } from "@/routes/client/my/requests";
@@ -295,14 +304,45 @@ export default function ClientRequestShow() {
                            <MessageCircle/> 
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => acceptOffer(o.id)}
-                            disabled={!canAcceptThis || acceptForm.processing}
-                            className="rounded-4xl bg-primary px-3 py-2 text-foreground text-sm disabled:hidden transition duration-700 hover:bg-foreground hover:text-background disabled:opacity-60 flex items-center gap-1 "
-                          >
-                            {acceptForm.processing ? "Working..." : "Accept"}
-                          </button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button
+                                type="button"
+                                disabled={!canAcceptThis || acceptForm.processing}
+                                className="rounded-4xl bg-primary px-3 py-2 text-sm text-foreground transition duration-700 hover:bg-foreground hover:text-background disabled:hidden disabled:opacity-60 flex items-center gap-1 "
+                              >
+                                {acceptForm.processing ? "Working..." : "Accept"}
+                              </button>
+                            </DialogTrigger>
+
+                            <DialogContent>
+                              <DialogTitle>Accept this offer?</DialogTitle>
+                              <DialogDescription>
+                                This will create a booking and automatically reject the other offers
+                                for this request.
+                              </DialogDescription>
+
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <button
+                                    type="button"
+                                    className="rounded-3xl border border-gray-200 px-3 py-2 text-sm"
+                                  >
+                                    Cancel
+                                  </button>
+                                </DialogClose>
+
+                                <button
+                                  type="button"
+                                  onClick={() => acceptOffer(o.id)}
+                                  disabled={acceptForm.processing}
+                                  className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50"
+                                >
+                                  {acceptForm.processing ? "Processing..." : "Confirm"}
+                                </button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </div>
 

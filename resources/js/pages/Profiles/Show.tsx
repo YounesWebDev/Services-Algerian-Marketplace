@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { show as myRequestShow } from "@/routes/client/my/requests";
+import { show as profileShow } from "@/routes/profiles";
 import { create as reportCreate } from "@/routes/reports";
 import { show as serviceShow } from "@/routes/services";
 
@@ -100,14 +101,19 @@ export default function ProfileShow() {
   const avatarUrl = publicImagePath(user.avatar_path);
 
   return (
-    <AppLayout>
+    <AppLayout
+      breadcrumbs={[
+        { title: "Dashboard", href: dashboard().url },
+        { title: user.name, href: profileShow(user.id).url },
+      ]}
+    >
       <Head title={`${user.name} - Profile`} />
 
       <div className="p-6 max-w-3xl space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
 
-            {/* ✅ ONLY CHANGE IS HERE */}
+            {/* âœ… ONLY CHANGE IS HERE */}
             <div className="relative inline-block">
               <Avatar className="h-14 w-14">
                 <AvatarImage src={avatarUrl} alt={user.name} />

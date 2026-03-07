@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
+import { dashboard } from '@/routes';
 import { index as myChatsIndex } from '@/routes/my/chats';
 import { store as myChatMessagesStore } from '@/routes/my/chats/messages';
 import { show as presenceShow } from '@/routes/presence';
@@ -449,7 +450,13 @@ export default function ChatsShow() {
     }, [messages]);
 
     return (
-        <AppLayout>
+        <AppLayout
+            breadcrumbs={[
+                { title: 'Dashboard', href: dashboard().url },
+                { title: 'My Chats', href: myChatsIndex.url() },
+                { title: chat.other_user?.name ?? `Chat #${chat.id}`, href: '#' },
+            ]}
+        >
             <Head title={`Chat #${chat.id}`} />
 
             <div className="max-w-3xl space-y-4 p-6">
@@ -666,4 +673,3 @@ export default function ChatsShow() {
         </AppLayout>
     );
 }
-

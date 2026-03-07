@@ -3,6 +3,7 @@ import { Clock, MapPin } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
 import {
     contact as providerRequestsContact,
     index as providerRequestsIndex,
@@ -79,7 +80,7 @@ export default function ProviderRequestsShow() {
     }
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
             <Head title={r.title} />
 
             <div className="max-w-3xl space-y-4 rounded-4xl bg-primary-foreground/30 p-6">
@@ -147,14 +148,14 @@ export default function ProviderRequestsShow() {
                                     <div className="flex w-full items-center gap-1 rounded-4xl border border-gray-200 p-1 font-bold text-primary sm:w-auto">
                                         Min{' '}
                                         <div className="w-full rounded-4xl p-2 text-center sm:w-auto">
-                                            {r.budget_min ?? '—'} DZD
+                                            {r.budget_min ?? 'â€”'} DZD
                                         </div>
                                     </div>
 
                                     <div className="flex w-full items-center gap-1 rounded-4xl border border-gray-200 p-1 font-bold text-red-600 sm:w-auto">
                                         Max{' '}
                                         <div className="w-full p-2 text-center sm:w-auto">
-                                            {r.budget_max ?? '—'} DZD
+                                            {r.budget_max ?? 'â€”'} DZD
                                         </div>
                                     </div>
                                 </span>
@@ -191,7 +192,7 @@ export default function ProviderRequestsShow() {
                     </div>
                 </div>
 
-                {/* ✅ Photos (manual slider + thumbnails bottom) */}
+                {/* âœ… Photos (manual slider + thumbnails bottom) */}
                 <div className="rounded-md border p-4">
                     <h2 className="font-medium">Photos</h2>
 
@@ -371,7 +372,7 @@ function MarketplacePhotoSlider({
                     }`}
                     aria-label="Previous photo"
                 >
-                    ‹
+                    â€¹
                 </button>
 
                 {/* Next */}
@@ -386,7 +387,7 @@ function MarketplacePhotoSlider({
                     }`}
                     aria-label="Next photo"
                 >
-                    ›
+                    â€º
                 </button>
             </div>
 

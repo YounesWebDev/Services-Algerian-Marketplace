@@ -379,11 +379,11 @@ class InitialSeeder extends Seeder
         }
 
         // ----------------------------
-        // 9) Offers (valid DB statuses only)
-        // sent|withdrawn|accepted|rejected
+        // 9) Offers (valid app statuses only)
+        // sent|assigned|rejected
         // ----------------------------
         $createdOffers = [];
-        $offerStatusPool = ['sent', 'rejected', 'withdrawn'];
+        $offerStatusPool = ['sent', 'rejected', 'assigned'];
 
         foreach ($createdRequests as $i => $req) {
             // create 2 offers per request (provider1 + provider2)
@@ -411,15 +411,21 @@ class InitialSeeder extends Seeder
             }
         }
 
-        // ensure at least one ACCEPTED offer + ASSIGNED request (to test booking from offer)
-        $acceptedOffer = Offer::query()
-            ->whereIn('status', ['sent', 'rejected', 'withdrawn'])
+        // ensure at least one ASSIGNED offer + ASSIGNED request (to test booking from offer)
+        $assignedOffer = Offer::query()
+            ->where('status', 'sent')
             ->first();
 
-        if ($acceptedOffer) {
-            $acceptedOffer->update(['status' => 'accepted']);
+        if ($assignedOffer) {
+            $assignedOffer->update(['status' => 'assigned']);
 
-            $specialReq = JobRequest::find($acceptedOffer->request_id);
+            Offer::query()
+                ->where('request_id', $assignedOffer->request_id)
+                ->where('id', '!=', $assignedOffer->id)
+                ->where('status', 'sent')
+                ->update(['status' => 'rejected']);
+
+            $specialReq = JobRequest::find($assignedOffer->request_id);
             if ($specialReq) {
                 $specialReq->update(['status' => 'assigned']);
             }
@@ -502,23 +508,23 @@ class InitialSeeder extends Seeder
         // ----------------------------
         $createdBookings = [];
 
-        // A) Pending booking from ACCEPTED offer (request-first)
-        if ($acceptedOffer) {
-            $req = JobRequest::find($acceptedOffer->request_id);
+        // A) Pending booking from ASSIGNED offer (request-first)
+        if ($assignedOffer) {
+            $req = JobRequest::find($assignedOffer->request_id);
 
             if ($req) {
                 $booking = Booking::updateOrCreate(
                     [
                         'source' => 'request_offer',
-                        'offer_id' => $acceptedOffer->id,
+                        'offer_id' => $assignedOffer->id,
                         'client_id' => $req->client_id,
-                        'provider_id' => $acceptedOffer->provider_id,
+                        'provider_id' => $assignedOffer->provider_id,
                     ],
                     [
                         'service_id' => null,
                         'scheduled_at' => null,
                         'status' => 'pending',
-                        'total_amount' => $acceptedOffer->proposed_price,
+                        'total_amount' => $assignedOffer->proposed_price,
                         'currency' => 'DZD',
                     ]
                 );

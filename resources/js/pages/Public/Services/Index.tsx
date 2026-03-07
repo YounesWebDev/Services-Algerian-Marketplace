@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import { SharedData } from "@/types";
 
 
@@ -276,7 +277,7 @@ export default function Index({ services, categories, cities, filters }: Props) 
     </div>
   );
 
-  return user?.role === "client" ? <AppLayout>{PageUI}</AppLayout> : PageUI;
+  return user?.role === "client" ? <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>{PageUI}</AppLayout> : PageUI;
 }
 
 

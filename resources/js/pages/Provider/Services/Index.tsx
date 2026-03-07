@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import PaginationLinks from "@/components/pagination-links";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import {
   create as providerServicesCreate,
   destroy as providerServicesDestroy,
@@ -129,7 +130,7 @@ export default function ProviderServicesIndex() {
   }, [flash?.success]);
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="My Services " />
 
       <div className="p-4 sm:p-6 space-y-4">
@@ -293,7 +294,7 @@ export default function ProviderServicesIndex() {
                             <div className="text-sm p-1 border border-gray-200 rounded-3xl text-primary flex flex-wrap items-center gap-2 w-full md:w-auto">
                               price{" "}
                               <span className="font-medium p-2 rounded-3xl border border-gray-200">
-                                {s.base_price ?? "—"} DZD
+                                {s.base_price ?? "â€”"} DZD
                               </span>
                             </div>
                           </div>
@@ -317,7 +318,7 @@ export default function ProviderServicesIndex() {
                               onClick={() => {
                                 if (!confirm("Remove this service?")) return;
 
-                                // ✅ TS-safe + supports preserveScroll
+                                // âœ… TS-safe + supports preserveScroll
                                 router.delete(providerServicesDestroy(s.id).url, {
                                   preserveScroll: true,
                                   onSuccess: () => {

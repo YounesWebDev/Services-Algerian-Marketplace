@@ -12,6 +12,7 @@ import {
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import {
   index as providerBookingsIndex,
   show as providerBookingsShow,
@@ -58,7 +59,7 @@ export default function ProviderBookingsIndex() {
   const { bookings, filters, flash } = props;
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="Provider Bookings" />
 
       <div className="p-4 sm:p-6 space-y-4">

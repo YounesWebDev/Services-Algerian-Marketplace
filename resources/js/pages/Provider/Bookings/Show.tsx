@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import {
   index as providerBookingsIndex,
   status as bookingStatusUpdate,
@@ -266,7 +267,7 @@ export default function ProviderBookingShow() {
     alertContent.variant === "error" ? "bg-red-500/10" : "bg-primary/5";
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title={`Provider Booking #${booking.id}`} />
 
       {/* Animated Alert */}

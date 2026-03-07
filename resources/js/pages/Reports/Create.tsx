@@ -49,7 +49,7 @@ export default function Create({ target }: { target: Target }) {
       : "Request";
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="Report" />
 
       <div className="max-w-2xl mx-auto space-y-4">
@@ -121,8 +121,8 @@ export default function Create({ target }: { target: Target }) {
                 />
                 <InputError message={formErrors.description} />
                 <p className="text-xs text-muted-foreground">
-                  Note: description is optional. (If you didn’t add a DB column,
-                  it won’t be stored yet.)
+                  Note: description is optional. (If you didnâ€™t add a DB column,
+                  it wonâ€™t be stored yet.)
                 </p>
               </div>
 

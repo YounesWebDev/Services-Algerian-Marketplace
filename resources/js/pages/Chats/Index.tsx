@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { leaveChannel, listenPrivate } from '@/lib/echo';
-import { show as myChatsShow } from '@/routes/my/chats';
+import { dashboard } from '@/routes';
+import { index as myChatsIndex, show as myChatsShow } from '@/routes/my/chats';
 import { show as presenceShow } from '@/routes/presence';
 import { SharedData } from '@/types';
 
@@ -222,7 +223,12 @@ export default function ChatsIndex() {
     }, [otherUserIds]);
 
     return (
-        <AppLayout>
+        <AppLayout
+            breadcrumbs={[
+                { title: 'Dashboard', href: dashboard().url },
+                { title: 'My Chats', href: myChatsIndex().url },
+            ]}
+        >
             <Head title="My Chats" />
 
             <div className="space-y-4 p-6">

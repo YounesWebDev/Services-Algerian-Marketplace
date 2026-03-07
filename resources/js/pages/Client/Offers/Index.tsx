@@ -1,13 +1,23 @@
-import { Head, Link, usePage } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { Clock, MapPin } from "lucide-react";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import PaginationLinks from "@/components/pagination-links";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import {
+  accept as clientOffersAccept,
   index as clientOffersIndex,
 } from "@/routes/client/offers";
 
@@ -44,6 +54,7 @@ export default function ClientOffersIndex() {
   }>();
 
   const { offers, filters, flash, errors } = props;
+  const acceptForm = useForm({});
 
   const alertMessage = flash?.success ?? errors?.offer ?? "";
   const [hiddenAlertMessage, setHiddenAlertMessage] = useState<string | null>(null);
@@ -58,6 +69,12 @@ export default function ClientOffersIndex() {
       return () => clearTimeout(timer);
     }
   }, [alertMessage]);
+
+  function acceptOffer(offerId: number) {
+    acceptForm.post(clientOffersAccept.url(offerId), {
+      preserveScroll: true,
+    });
+  }
 
   return (
     <AppLayout
@@ -207,43 +224,46 @@ export default function ClientOffersIndex() {
                         {o.status}
                       </span>
 
-                      {/* ✅ shadcn AlertDialog confirm
-                      
-                       <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
                             type="button"
                             disabled={!canAccept || acceptForm.processing}
-                            className="rounded-3xl bg-primary transition duration-700 hover:bg-foreground hover:text-background hover:shadow-3xl px-3 py-2 text-white text-sm disabled:opacity-50"
+                            className="rounded-3xl bg-primary px-3 py-2 text-sm text-white transition duration-700 hover:bg-foreground hover:text-background hover:shadow-3xl disabled:opacity-50"
                           >
                             {acceptForm.processing ? "Working..." : "Accept"}
-                          </Button>
-                        </AlertDialogTrigger>
+                          </button>
+                        </DialogTrigger>
 
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Accept this offer?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will create a booking and automatically reject the other offers
-                              for this request.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
+                        <DialogContent>
+                          <DialogTitle>Accept this offer?</DialogTitle>
+                          <DialogDescription>
+                            This will create a booking and automatically reject the other offers for
+                            this request.
+                          </DialogDescription>
 
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <button
+                                type="button"
+                                className="rounded-3xl border border-gray-200 px-3 py-2 text-sm"
+                              >
+                                Cancel
+                              </button>
+                            </DialogClose>
 
-                            <AlertDialogAction
+                            <button
+                              type="button"
                               onClick={() => acceptOffer(o.id)}
                               disabled={acceptForm.processing}
+                              className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50"
                             >
                               {acceptForm.processing ? "Processing..." : "Confirm"}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                            </button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
 
-                      */}
-                     
                       {!canAccept ? (
                         <div className="text-xs text-muted-foreground mt-1">
                           You can only accept offers with status <b>sent</b>.

@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import {
   index as providerServicesIndex,
   store as providerServicesStore,
@@ -35,7 +36,7 @@ export default function ProviderServicesCreate(props: {
   }
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="Create Service" />
 
       <div className="p-6 max-w-2xl space-y-4">
@@ -256,7 +257,7 @@ export default function ProviderServicesCreate(props: {
               aria-label="Remove photo"
               title="Remove"
             >
-              ✕
+              âœ•
             </button>
 
             {/* Order badge like IG */}

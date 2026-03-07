@@ -3,6 +3,7 @@ import { Clock, MapPin, SquareArrowOutUpRight } from "lucide-react";
 
 import PaginationLinks from "@/components/pagination-links";
 import AppLayout from "@/layouts/app-layout";
+import { dashboard } from '@/routes';
 import {
   index as providerRequestsIndex,
   show as providerRequestsShow,
@@ -47,7 +48,7 @@ export default function ProviderRequestsIndex() {
   const { requests, categories, cities, filters } = props;
 
   return (
-    <AppLayout>
+    <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
       <Head title="Requests" />
 
       <div className="p-4 sm:p-6 space-y-4">
@@ -189,14 +190,14 @@ export default function ProviderRequestsIndex() {
                               <div className="font-bold flex items-center gap-1 p-1 rounded-4xl border border-gray-200 text-primary w-full sm:w-auto">
                                 Min{" "}
                                 <div className="p-2 rounded-4xl  w-full sm:w-auto text-center">
-                                  {r.budget_min ?? "—"} DZD
+                                  {r.budget_min ?? "â€”"} DZD
                                 </div>
                               </div>
 
                               <div className="font-bold text-red-600 flex items-center gap-1 p-1 rounded-4xl border border-gray-200 w-full sm:w-auto">
                                 Max{" "}
                                 <div className="p-2  w-full sm:w-auto text-center">
-                                  {r.budget_max ?? "—"} DZD
+                                  {r.budget_max ?? "â€”"} DZD
                                 </div>
                               </div>
                             </span>
