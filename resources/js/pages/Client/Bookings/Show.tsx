@@ -7,6 +7,7 @@ import { index as clientBookingsIndex, payment as bookingPayment } from "@/route
 import { create as disputeCreate } from "@/routes/client/bookings/dispute";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
 import { show as serviceShow } from "@/routes/services";
+import { BadgeCheck, CircleX, ClipboardList, Clock, Info } from "lucide-react";
 type Provider = { id: number; name: string; avatar_path: string | null };
 type Service = { id: number; title: string; slug: string };
 type RequestItem = { id: number; title: string };
@@ -161,22 +162,49 @@ export default function ClientBookingShow() {
 
         {/* Booking info */}
         <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 space-y-2">
-          <div className="text-sm text-foreground">
-            Source: <span className="font-medium">{booking.source}</span> • Status:{" "}
-            <span className="font-medium">{booking.status}</span>
-          </div>
+          <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
+                                  <span>Status</span>{" "}
+                                  {booking.status === "in_progress" ? (
+                                    <div className="font-medium rounded-3xl p-2 border border-gray-200 text-amber-400 flex items-center gap-2">
+                                      <ClipboardList className="h-4 w-4" /> in progress
+                                    </div>
+                                  ) : booking.status === "confirmed" ? (
+                                    <div className="font-medium rounded-3xl p-2 border border-gray-200 text-primary flex items-center gap-2">
+                                      <BadgeCheck className="h-4 w-4" />
+                                      {booking.status}
+                                    </div>
+                                  ) : booking.status === "pending" ? (
+                                    <div className="font-medium rounded-3xl p-2 border border-gray-200 text-amber-400 flex items-center gap-2">
+                                      <Clock className="h-4 w-4" /> {booking.status}
+                                    </div>
+                                  ) : booking.status === "completed" ? (
+                                    <div className="font-medium rounded-3xl p-2 border border-gray-200 text-primary flex items-center gap-2">
+                                      <BadgeCheck className="h-4 w-4" />
+                                      {booking.status}
+                                    </div>
+                                  ) : booking.status === "cancelled" ? (
+                                    <div className="font-medium rounded-3xl p-2 border border-gray-200 text-red-600 flex items-center gap-2">
+                                      <CircleX className="h-4 w-4" /> {booking.status}
+                                    </div>
+                                  ) : null}
+                                </div>
+                                 <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
+                        <span>Total</span>
+                        <div className="font-medium p-2 rounded-3xl border border-gray-200 break-words">
+                          {booking.total_amount} {booking.currency}
+                        </div>
+                      </div>
 
-          <div className="text-sm text-foreground">
-            Total: <span className="font-medium">{booking.total_amount}</span> {booking.currency}
-            {booking.scheduled_at ? (
-              <>
-                {" "}
-                • Scheduled: <span className="font-medium">{booking.scheduled_at}</span>
-              </>
-            ) : null}
-          </div>
+                      {booking.scheduled_at ? (
+                        <div className="p-1 rounded-3xl border border-gray-200 flex items-center gap-2 w-max">
+                          <div>Scheduled</div>
+                          <div className="rounded-3xl p-2 border border-gray-200">{booking.scheduled_at}</div>
+                        </div>
+                      ) : null}
 
-          <div className="text-sm text-foreground flex items-center gap-2 mt-2">
+          
+
+          <div className="text-sm text-foreground flex items-center rounded-3xl p-2 border border-gray-200 w-max  gap-2 my-2">
             {booking.provider?.avatar_path ? (
               <img
                 src={booking.provider.avatar_path}
@@ -186,14 +214,14 @@ export default function ClientBookingShow() {
             ) : (
               <span className="w-8 h-8 rounded-full border bg-gray-100" />
             )}
-            <span>
-              Provider: <span className="font-medium">{booking.provider?.name}</span>
-            </span>
+            <div>
+               <span className="font-medium">{booking.provider?.name}</span>
+            </div>
           </div>
 
           {booking.source === "service" && booking.service?.slug ? (
-            <div className="text-sm">
-              <Link className="underline" href={serviceShow.url(booking.service.slug)}>
+            <div className="text-sm mt-2">
+              <Link className="p-2 rounded-3xl border border-gray-200  bg-primary transition duration-700 hover:bg-foreground hover:text-background mt-2 " href={serviceShow.url(booking.service.slug)}>
                 View service
               </Link>
             </div>
@@ -202,14 +230,14 @@ export default function ClientBookingShow() {
 
         {/* Fee explanation (optional) */}
         {fee ? (
-          <div className="rounded-md border p-4 text-sm text-foreground">
-            <div className="font-medium mb-1">Platform fees (for understanding)</div>
-            <div>
-              Commission rate: <span className="font-medium">{fee.commission_rate}</span>
+          <div className="rounded-4xl bg-primary-foreground/30 border border-gray-200 p-4 text-sm text-foreground">
+            <div className="font-medium mb-1 flex items-center gap-2"><Info /> Platform fees (for understanding)</div>
+            <div className="p-1 rounded-3xl border border-gray-200 flex items-center gap-2 w-max">
+              Commission rate <span className="font-medium p-2 rounded-3xl border border-gray-200 text-primary  ">{fee.commission_rate}%</span>
               {fee.fixed_fee ? (
                 <>
                   {" "}
-                  • Fixed fee: <span className="font-medium">{fee.fixed_fee}</span>
+                   Fixed fee: <span className="font-medium">{fee.fixed_fee}</span>
                 </>
               ) : null}
             </div>

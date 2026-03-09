@@ -1,173 +1,233 @@
-import { Button } from "@headlessui/react";
-import { Link } from "@inertiajs/react";
-import { Menu, X, House, GitPullRequest, Flag, SquareAsterisk, UsersRound, Info } from "lucide-react";
-import { useState } from "react";
+import { Link } from '@inertiajs/react';
+import {
+    Flag,
+    GitPullRequest,
+    House,
+    Info,
+    Menu,
+    SquareAsterisk,
+    UsersRound,
+    X,
+} from 'lucide-react';
+import { useState } from 'react';
 
-import { about, dashboard, home as homeRoute, login, register } from "@/routes";
-import { index as providerServicesIndex } from "@/routes/provider/my/services";
-import { index as providerRequestsIndex } from "@/routes/provider/requests";
-import { index as servicesIndex } from "@/routes/services";
-import type { User } from "@/types";
-
+import { Button } from '@/components/ui/button';
+import { about, dashboard, home as homeRoute, login, register } from '@/routes';
+import { index as providerServicesIndex } from '@/routes/provider/my/services';
+import { index as providerRequestsIndex } from '@/routes/provider/requests';
+import { index as servicesIndex } from '@/routes/services';
+import { type User } from '@/types';
 
 type NavbarProps = {
-  user: User | null;
-  canRegister: boolean;
+    user: User | null;
+    canRegister: boolean;
 };
 
 export default function Navbar({ user, canRegister }: NavbarProps) {
-  const [openMenu, setOpenMenu] = useState(false);
+    const [openMenu, setOpenMenu] = useState(false);
 
-  const dashboardUrl = dashboard().url;
-
-  return (
-    <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border border-gray-200 fixed w-full z-30 bg-primary-foreground/30">
-      <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-        <Link className="hover:text-primary transition" href={homeRoute.url()}>
-          <div className="font-bold text-xl">PROfinder</div>
-        </Link>
-
-        <div className="hidden md:flex gap-6">
-          <Link className="hover:text-primary transition" href={homeRoute.url()}>
-            Home
-          </Link>
-
-          {user?.role === "provider" && (
-            <Link className="hover:text-primary transition" href={providerRequestsIndex.url()}>
-              Requests
-            </Link>
-          )}
-
-          {user?.role === "admin" && (
-            <Link className="hover:text-primary transition" href="/admin/reports">
-              Reports
-            </Link>
-          )}
-
-          {user?.role === "provider" ? (
-            <Link className="hover:text-primary transition" href={providerServicesIndex.url()}>
-              My Services
-            </Link>
-          ) : user?.role === "admin" ? (
-            <Link className="hover:text-primary transition" href="/admin/users">
-              Users
-            </Link>
-          ) : (
-            <Link className="hover:text-primary transition" href={servicesIndex.url()}>
-              Services
-            </Link>
-          )}
-
-          {!user && (
-            <Link className="hover:text-primary transition" href={about.url()}>
-              About
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile menu button */}
-        <Button
-          onClick={() => setOpenMenu(!openMenu)}
-          className="md:hidden"
-        >
-          {openMenu ? <X size={26} /> : <Menu size={26} />}
-        </Button>
-
-        {/* Desktop right */}
-        <div className="hidden md:flex gap-3 text-sm">
-          {user ? (
-            <Link
-              href={dashboardUrl}
-              className="inline-block rounded-full transition p-2 border border-gray-200 hover:bg-primary"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <>
-              <Link href={login()} className="px-4 py-1.5">
-                Log in
-              </Link>
-              {canRegister && (
+    return (
+        <div className="fixed z-30 mx-2 mt-5 w-full rounded-full border border-gray-200 bg-primary-foreground/30 backdrop-blur-sm">
+            <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
                 <Link
-                  href={register()}
-                  className="rounded-sm border px-4 py-1.5"
+                    className="transition hover:text-primary"
+                    href={homeRoute.url()}
                 >
-                  Register
+                    <div className="text-xl font-bold">PROfinder</div>
                 </Link>
-              )}
-            </>
-          )}
-        </div>
-      </div>
 
-      {/* Mobile menu */}
-      {openMenu && (
-        <div className="absolute right-4 top-20 border z-40 bg-black text-white border-gray-200 rounded-3xl p-5 flex gap-4 flex-col md:hidden w-[75%]">
-          {user && (
-            <Link
-              href={dashboardUrl}
-              className="rounded-full border px-5 py-2 text-center hover:bg-white hover:text-black transition"
-            >
-              Dashboard
-            </Link>
-          )}
+                <div className="hidden justify-between gap-15 md:flex">
+                    <Link
+                        className="p-1 transition hover:text-primary"
+                        href={homeRoute.url()}
+                    >
+                        Home
+                    </Link>
+                    {user?.role === 'provider' ? (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href={providerRequestsIndex.url()}
+                        >
+                            Requests
+                        </Link>
+                    ) : user?.role === 'admin' ? (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href="/admin/reports"
+                        >
+                            Reports
+                        </Link>
+                    ) : null}
+                    {user?.role === 'provider' ? (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href={providerServicesIndex.url()}
+                        >
+                            My Services
+                        </Link>
+                    ) : user?.role === 'admin' ? (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href="/admin/users"
+                        >
+                            Users
+                        </Link>
+                    ) : (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href={servicesIndex.url()}
+                        >
+                            Services
+                        </Link>
+                    )}
+                    {!user && (
+                        <Link
+                            className="p-1 transition hover:text-primary"
+                            href={about.url()}
+                        >
+                            About
+                        </Link>
+                    )}
+                </div>
 
-          <Link className="flex gap-3 items-center p-2" href={homeRoute.url()}>
-            <House /> Home
-          </Link>
+                <div>
+                    <button
+                        onClick={() => setOpenMenu(!openMenu)}
+                        type="button"
+                    >
+                        {openMenu ? (
+                            <X
+                                size={28}
+                                className="text-black md:hidden dark:text-white"
+                            />
+                        ) : (
+                            <Menu
+                                size={28}
+                                className="text-black md:hidden dark:text-white"
+                            />
+                        )}
+                    </button>
 
-          {user?.role === "provider" && (
-            <Link className="flex gap-3 items-center p-2" href={providerRequestsIndex.url()}>
-              <GitPullRequest /> Requests
-            </Link>
-          )}
+                    {openMenu && (
+                        <div className="flex flex-col">
+                            <div className="absolute top-18 right-4 z-40 flex w-[75%] flex-col gap-10 rounded-l-3xl border border-gray-200 bg-black p-5 text-white md:hidden">
+                                {user ? (
+                                    <Link
+                                        href={dashboard().url}
+                                        className="inline-block rounded-full border border-[#19140035] px-5 py-1.5 font-bold text-white duration-700 hover:bg-white hover:text-black"
+                                    >
+                                        <p className="font-bold text-white">
+                                            Dashboard
+                                        </p>
+                                    </Link>
+                                ) : (
+                                    <div className="flex justify-center gap-3">
+                                        <Link
+                                            href={login().url}
+                                            className="flex items-center justify-center rounded-3xl border border-gray-200 bg-white/30 p-2 py-1.5 text-sm leading-normal font-bold text-foreground backdrop-blur-sm hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                                        >
+                                            <p className="font-bold">Log in</p>
+                                        </Link>
+                                        {canRegister && (
+                                            <Link
+                                                href={register().url}
+                                                className="inline-block w-max rounded-3xl border border-gray-200 bg-primary  p-2 text-sm leading-normal font-bold text-white transition-all hover:border-[#1915014a] hover:backdrop-blur-sm dark:hover:border-[#62605b]"
+                                            >
+                                                <p className="font-bold">
+                                                    Register
+                                                </p>
+                                            </Link>
+                                        )}
+                                    </div>
+                                )}
 
-          {user?.role === "admin" && (
-            <Link className="flex gap-3 items-center p-2" href="/admin/reports">
-              <Flag /> Reports
-            </Link>
-          )}
+                                <Link
+                                    className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                    href={homeRoute.url()}
+                                >
+                                    <House /> Home
+                                </Link>
 
-          {user?.role === "provider" ? (
-            <Link className="flex gap-3 items-center p-2" href={providerServicesIndex.url()}>
-              <SquareAsterisk /> My Services
-            </Link>
-          ) : user?.role === "admin" ? (
-            <Link className="flex gap-3 items-center p-2" href="/admin/users">
-              <UsersRound /> Users
-            </Link>
-          ) : (
-            <Link className="flex gap-3 items-center p-2" href={servicesIndex.url()}>
-              <SquareAsterisk /> Services
-            </Link>
-          )}
+                                {user?.role === 'provider' ? (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                        href={providerRequestsIndex.url()}
+                                    >
+                                        <GitPullRequest /> Requests
+                                    </Link>
+                                ) : user?.role === 'admin' ? (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                        href="/admin/reports"
+                                    >
+                                        <Flag /> Reports
+                                    </Link>
+                                ) : null}
 
-          {!user && (
-            <Link className="flex gap-3 items-center p-2" href={about.url()}>
-              <Info /> About
-            </Link>
-          )}
+                                {user?.role === 'provider' ? (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                        href={providerServicesIndex.url()}
+                                    >
+                                        <SquareAsterisk /> My Services
+                                    </Link>
+                                ) : user?.role === 'admin' ? (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                        href="/admin/users"
+                                    >
+                                        <UsersRound /> Users
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
+                                        href={servicesIndex.url()}
+                                    >
+                                        <SquareAsterisk /> Services
+                                    </Link>
+                                )}
 
-          {!user && (
-            <div className="flex gap-3 justify-center">
-              <Link
-                href={login()}
-                className="rounded-3xl border px-4 py-2"
-              >
-                Log in
-              </Link>
-              {canRegister && (
-                <Link
-                  href={register()}
-                  className="rounded-3xl bg-white text-black px-4 py-2"
-                >
-                  Register
-                </Link>
-              )}
+                                {!user && (
+                                    <Link
+                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm transition"
+                                        href={about.url()}
+                                    >
+                                        <Info /> About
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="hidden justify-between gap-3 text-sm md:flex">
+                    {user ? (
+                        <Link
+                            href={dashboard().url}
+                            className="inline-block rounded-full border border-gray-200 p-2 transition duration-700 hover:bg-primary"
+                        >
+                            Dashboard
+                        </Link>
+                    ) : (
+                        <>
+                            <Link
+                                href={login().url}
+                                className="inline-block rounded-3xl border border-gray-200 px-5 py-1.5 text-sm leading-normal text-foreground transirion duration-700 hover:bg-foreground hover:text-background"
+                            >
+                                Log in
+                            </Link>
+                            {canRegister && (
+                                <Link
+                                    href={register().url}
+                                    className="inline-block rounded-3xl bg-primary  border border-gray-200 px-5 py-1.5 text-sm leading-normal text-foreground hover:bg-foreground transition duration-700 hover:text-background  "
+                                >
+                                    Register
+                                </Link>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
-          )}
         </div>
-      )}
-    </div>
-  );
+    );
 }

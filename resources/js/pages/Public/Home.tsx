@@ -32,6 +32,7 @@
     Info,
     } from "lucide-react";
     import React, { useEffect, useRef, useState } from "react";
+    import Navbar from "@/components/navbar";
 
     import GlassIcons from "@/components/GlassIcons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -259,160 +260,11 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     return (
         <div className="min-h-screen">
         {/* Navbar */}
-        <div className="rounded-full mt-5 mx-2 backdrop-blur-sm border border-gray-200 fixed w-full z-30 bg-primary-foreground/30">
-            <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
-                <Link className="hover:text-primary transition" href={homeRoute.url()}>
-                <div className="font-bold text-xl  ">PROfinder</div>
-                </Link>
-
-                <div className="hidden md:flex justify-between gap-15 ">
-
-                    <Link className="hover:text-primary    p-1 transition" href={homeRoute.url()}>
-                        Home
-                    </Link>
-                    {user?.role === "provider"  ? (
-                        <Link className="hover:text-primary    p-1 transition" href={providerRequestsIndex.url()}>
-                            Requests
-                        </Link>
-                    ) : user?.role === "admin" ? (
-                        <Link className="hover:text-primary    p-1 transition" href="/admin/reports">
-                            Reports
-                        </Link>
-                    ) : null}
-                    {user?.role === "provider" ? (
-                        <Link className="hover:text-primary    p-1 transition" href={providerServicesIndex.url()}>
-                            My Services
-                        </Link>
-                    ) : user?.role ==="admin" ? (
-                        <Link className="hover:text-primary    p-1 transition" href="/admin/users">
-                            Users
-                        </Link>
-                    ) : (
-                        <Link className="hover:text-primary     p-1 transition" href={servicesIndex.url()}>
-                            Services
-                        </Link>
-                    )}
-                    { !user && (
-                        <Link className="hover:text-primary    p-1 transition" href={about.url()}>
-                            About
-                        </Link>
-                    )}
-                    
-                </div>
-
-                <div>
-                    <Button
-                        onClick={() => {
-                            setOpenMenu(!openMenu);
-                        }
-                    }>
-                        {openMenu ? (
-                            <X
-                                size={28}
-                                className="md:hidden text-black dark:text-white"
-                            />
-                        ) : (
-                            <Menu
-                                size={28}
-                                className="md:hidden text-black dark:text-white"
-                            />
-                        )}
-                    </Button>
-
-                    {openMenu && (
-                    <div className="flex flex-col ">
-                        <div className="absolute top-18 right-4 border z-40 bg-black text-white border-gray-200 rounded-l-3xl p-5 flex gap-10 flex-col md:hidden w-[75%]">
-                            {user ? (
-                                <Link
-                                href={dashboard()}
-                                className="inline-block rounded-full border text-white font-bold border-[#19140035] px-5 py-1.5 transitio hover:bg-white hover:text-black duration-700 "
-                                >
-                                    <p className="font-bold text-white">Dashboard</p>
-                                </Link>
-                            ):(
-                                <>
-                                   <div className="flex justify-center gap-3"> <Link
-                                        href={login()}
-                                        className="flex justify-center items-center font-bold rounded-3xl border border-gray-200   bg-white/30 backdrop-blur-sm p-2 py-1.5 text-sm leading-normal text-white hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                                    >
-                                        <p className="font-bold ">Log in</p>
-                                    </Link>
-                                        {canRegister && (
-                                            <Link
-                                            href={register()}
-                                            className="inline-block font-bold rounded-3xl border bg-white text-black p-2 w-max text-sm leading-normal transition-all hover:backdrop-blur-sm hover:border-[#1915014a]  dark:hover:border-[#62605b]"
-                                            >
-                                               <p className="font-bold ">Register</p>
-                                            </Link>)}</div>
-                                        
-                                </>
-                            )}
-                            <Link className=" flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 " href={homeRoute.url()}>
-                          <House/> Home
-                    </Link>
-                    {user?.role === "provider"  ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={providerRequestsIndex.url()}>
-                          <GitPullRequest/>  Requests
-                        </Link>
-                    ) : user?.role === "admin" ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/admin/reports">
-                           <Flag/> Reports
-                        </Link>
-                    ) : null}
-                    {user?.role === "provider" ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={providerServicesIndex.url()}>
-                           <SquareAsterisk/> My Services
-                        </Link>
-                    ) : user?.role ==="admin" ? (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href="/admin/users">
-                            <UsersRound/> Users
-                        </Link>
-                    ) : (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2" href={servicesIndex.url()}>
-                           <SquareAsterisk/> Services
-                        </Link>
-                    )}
-                    { !user && (
-                        <Link className="flex justify-center items-center gap-3 rounded-3xl bg-white/30 backdrop-blur-sm border border-gray-200  p-2 transition" href={about.url()}>
-                           <Info/> About
-                        </Link>
-                    )}
-                       
-                        </div>
-                    </div>
-            )}
-
-                </div>
-
-                <div className="hidden md:flex justify-between gap-3 text-sm">
-                    {user ? (
-                        <Link
-                            href={dashboard()}
-                            className="inline-block rounded-full transition duration-700 p-2 border border-gray-200 hover:bg-primary"
-                            >
-                            Dashboard
-                        </Link>
-                    ):(
-                        <>
-                            <Link
-                                href={login()}
-                                className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                            >
-                                Log in
-                            </Link>
-                                {canRegister && (
-                                    <Link
-                                        href={register()}
-                                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                    >
-                                        Register
-                                    </Link>
-                                )}
-                        </>
-                    )}
-                </div>
-                </div>
-        </div>
+         {
+                user === null ? (
+                  <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={null} canRegister={true} /></div>
+                ) : null
+              }
 
        {/* Hero */}
 <div className="relative overflow-hidden h-screen">

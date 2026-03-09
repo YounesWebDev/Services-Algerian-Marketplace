@@ -6,6 +6,7 @@ import { index as servicesIndex } from "@/routes/services";
 export default function Contact() {
     return (
         <div className="min-h-screen bg-background text-foreground">
+            
             <div className="mx-auto max-w-3xl px-6 py-12 space-y-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Contact Us</h1>
