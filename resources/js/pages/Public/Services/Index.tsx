@@ -124,12 +124,11 @@ export default function Index({ services, categories, cities, filters }: Props) 
   }
 
   const PageUI = (
-    <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
-      {
-        user === null ? (
-          <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={null} canRegister={true} /></div>
-        ) : null
-      }
+    <>
+      <div className="sticky top-0 z-30">
+        {!user && <Navbar user={null} canRegister />}
+      </div>
+      <div className="mx-auto mt-5 max-w-6xl px-6 pb-10 space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -272,14 +271,9 @@ export default function Index({ services, categories, cities, filters }: Props) 
       {/* Pagination */}
       {services.links?.length > 0 && <PaginationLinks links={services.links} />}
 
-     
-      
-    </div>
+      </div>
+    </>
   );
 
   return user?.role === "client" ? <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>{PageUI}</AppLayout> : PageUI;
 }
-
-
-
-

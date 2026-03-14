@@ -1,12 +1,21 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 
+import Navbar from "@/components/navbar";
 import { home as homeRoute } from "@/routes";
 import { index as servicesIndex } from "@/routes/services";
+import { type SharedData } from "@/types";
 
 export default function About() {
+    const { auth } = usePage<SharedData>().props;
+    const user = auth?.user ?? null;
+
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <div className="mx-auto max-w-4xl px-6 py-12 space-y-8">
+            <div className="sticky top-0 z-30">
+                <Navbar user={user} canRegister />
+            </div>
+
+            <div className="mx-auto max-w-4xl px-6 pb-12 pt-5 space-y-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold">About PROfinder</h1>
                     <div className="flex gap-3">

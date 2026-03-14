@@ -167,13 +167,13 @@ export default function ClientOffersIndex() {
                 >
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="space-y-1 min-w-0 flex-1">
-                      <div className="text-xl break-words">{o.request?.title}</div>
+                      <div className="text-xl wrap-break-words">{o.request?.title}</div>
 
                       <div className="text-sm text-foreground flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-2 p-1 rounded-3xl border border-gray-200 w-full sm:w-max max-w-full">
                         <div>{o.request?.category?.name}</div>
                         <div className="flex items-center gap-1 p-2 rounded-3xl border border-gray-200 w-full sm:w-auto">
                           <MapPin className="w-6 h-6 text-red-600 shrink-0" />{" "}
-                          <span className="break-words">{o.request?.city?.name}</span>
+                          <span className="wrap-break-words">{o.request?.city?.name}</span>
                         </div>
                       </div>
 
@@ -191,7 +191,7 @@ export default function ClientOffersIndex() {
                         ) : null}
                       </div>
 
-                      <div className="text-sm text-foreground whitespace-pre-line p-2 w-full max-w-full break-words rounded-3xl bg-primary-foreground/40 border border-gray-200 mt-3">
+                      <div className="text-sm text-foreground whitespace-pre-line p-2 w-full max-w-full wrap-break-words rounded-3xl bg-primary-foreground/40 border border-gray-200 mt-3">
                         <div className="font-medium">
                           <div className="text-sm text-foreground mt-2 flex items-center gap-2 min-w-0">
                             {o.provider?.avatar_path ? (
@@ -203,7 +203,7 @@ export default function ClientOffersIndex() {
                             ) : (
                               <span className="w-7 h-7 rounded-full border bg-gray-100 shrink-0" />
                             )}
-                            <span className="text-sm break-words">{o.provider?.name}</span>
+                            <span className="text-sm wrap-break-words">{o.provider?.name}</span>
                           </div>
                         </div>{" "}
                         {o.message}

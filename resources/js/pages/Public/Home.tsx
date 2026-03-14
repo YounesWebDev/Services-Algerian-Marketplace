@@ -1,47 +1,44 @@
-    import { Button } from "@headlessui/react";
-    import { Link, router } from "@inertiajs/react";
-    import { usePage } from "@inertiajs/react";
-    import {
+import { Button } from "@headlessui/react";
+import { Link, router, usePage } from "@inertiajs/react";
+import {
+    AirVent,
+    BadgeCheck,
+    Camera,
+    Car,
+    CreditCard,
+    Flag,
+    GraduationCap,
+    Hammer,
+    Languages,
+    Laptop,
+    Leaf,
+    MessageCircleMore,
+    Paintbrush,
+    Plug,
+    Scissors,
+    Shield,
+    ShieldHalf,
+    Sparkles,
+    Star,
     Tag,
     Wrench,
-    Plug,
-    Paintbrush,
-    Sparkles,
-    Car,
-    Laptop,
-    Camera,
-    Hammer,
-    Leaf,
-    Shield,
-    GraduationCap,
-    Languages,
-    Scissors,
-    AirVent,
-    Menu,
-    X,
-    BadgeCheck,
-    CreditCard,
-    Star,
-    MessageCircleMore,
-    Flag,
-    ShieldHalf,
-    House,
-    GitPullRequest,
-    SquareAsterisk,
-    UsersRound,
-    Info,
-    } from "lucide-react";
-    import React, { useEffect, useRef, useState } from "react";
-    import Navbar from "@/components/navbar";
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
-    import GlassIcons from "@/components/GlassIcons";
+import GlassIcons from "@/components/GlassIcons";
+import Navbar from "@/components/navbar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { about, contact, dashboard, home as homeRoute, login, register, terms } from "@/routes";
+import { about, contact, terms } from "@/routes";
 import { suggestions as homeSuggestions } from "@/routes/home";
-import { index as providerServicesIndex } from "@/routes/provider/my/services";
-import { index as providerRequestsIndex } from "@/routes/provider/requests";
 import { index as servicesIndex, show as servicesShow } from "@/routes/services";
-    import { type SharedData } from "@/types";
+import { type SharedData } from "@/types";
+
+const HERO_IMAGES = [
+    "/hero/njar.jpg",
+    "/hero/mason.jpg",
+    "/hero/laptop.jpg",
+    "/hero/coding.jpg",
+];
 
     type Provider = {
         id: number;
@@ -122,8 +119,57 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
         const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
         return (first + last).toUpperCase() || "U";
     }
+
+    type HeroBackgroundSliderProps = {
+        images: string[];
+        intervalMs?: number;
+    };
+
+    function HeroBackgroundSlider({ images, intervalMs = 10000 }: HeroBackgroundSliderProps) {
+        const [currentSlide, setCurrentSlide] = useState(0);
+
+        useEffect(() => {
+            if (images.length <= 1) {
+                return;
+            }
+
+            const interval = window.setInterval(() => {
+                setCurrentSlide((prev) => (prev + 1) % images.length);
+            }, intervalMs);
+
+            return () => window.clearInterval(interval);
+        }, [images, intervalMs]);
+
+        useEffect(() => {
+            images.slice(1).forEach((src) => {
+                const image = new Image();
+                image.src = src;
+            });
+        }, [images]);
+
+        if (images.length === 0) {
+            return null;
+        }
+
+        return (
+            <div className="absolute inset-0 contain-[paint]" aria-hidden="true">
+                {images.map((image, index) => (
+                    <img
+                        key={image}
+                        src={image}
+                        alt=""
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        fetchPriority={index === 0 ? "high" : "low"}
+                        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out will-change-[opacity] motion-reduce:transition-none ${
+                            index === currentSlide ? "opacity-100" : "opacity-0"
+                        }`}
+                    />
+                ))}
+            </div>
+        );
+    }
     export default function Home({
-    canRegister,
     featuredCategories = [],
     topCities = [],
     popularServices = [],
@@ -140,7 +186,6 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     const [query, setQuery] = useState(filters?.q ?? "");
     const [city, setCity] = useState(filters?.city ?? "");
     const [category, setCategory] = useState(filters?.category ?? "");
-    const [openMenu, setOpenMenu] = useState(false);
 
     // Suggestions dropdown
     const [suggestions, setSuggestions] = useState<Suggestions>({
@@ -155,28 +200,7 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     // Loader ref for auto-scrolling categories
     const loaderRef = useRef<HTMLDivElement>(null);
 
-    // Slider state
-    const heroImages = [
-        "/hero/njar.jpg",
-        "/hero/mason.jpg",
-        "/hero/laptop.jpg",
-        "/hero/coding.jpg",
-    ];
-    const [currentSlide, setCurrentSlide] = useState(0);
     const services = popularServices;
-
-    // Auto-rotate slides every 10 seconds
-    useEffect(() => {
-        if (heroImages.length === 0) {
-            return;
-        }
-
-        const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % heroImages.length);
-        }, 10000);
-
-        return () => clearInterval(interval);
-    }, [heroImages.length]);
 
     // OK: keep "clear suggestions" behavior
     const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -260,29 +284,10 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     return (
         <div className="min-h-screen">
         {/* Navbar */}
-         {
-                user === null ? (
-                  <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={null} canRegister={true} /></div>
-                ) : null
-              }
-
+            <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={user} canRegister={true} /></div>
        {/* Hero */}
 <div className="relative overflow-hidden h-screen">
-    {/* Sliding background track */}
-    <div
-        className="absolute inset-0 flex h-full w-full transition-transform duration-700 ease-out"
-        style={{
-            transform: `translateX(-${currentSlide * 100}%)`,
-        }}
-    >
-        {heroImages.map((img) => (
-            <div
-                key={img}
-                className="h-full w-full shrink-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url('${img}')` }}
-            />
-        ))}
-    </div>
+    <HeroBackgroundSlider images={HERO_IMAGES} />
 
   {/* Overlay Gradient */}
     <div className="absolute inset-0 bg-linear-to-b from-black/30 to-black/50"></div>
@@ -472,7 +477,7 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
         <div className="giborder-t border-gray-forground">
             <h1 className="flex justify-center text-xl font-bold mt-10  ">why ProFinder ?</h1>
             <div className="flex items-center">
-               <GlassIcons items={items} className=""
+                <GlassIcons items={items} className=""
                 />
             </div>
         </div>
@@ -550,7 +555,6 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
                 )}
             </div>
         </div>
-       
 
             {/* Footer */}
             <div className="border-t ">

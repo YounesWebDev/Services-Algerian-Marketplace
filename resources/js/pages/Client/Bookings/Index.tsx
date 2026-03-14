@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { BadgeCheck, CircleX, ClipboardList, Clock, ExternalLink, CheckCircle2Icon } from "lucide-react";
+import { BadgeCheck, CircleX, ClipboardList, Clock, ExternalLink, CheckCircle2Icon, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import PaginationLinks from "@/components/pagination-links";
@@ -209,9 +209,10 @@ export default function ClientBookingsIndex() {
                   <div className="mt-3 text-sm text-foreground flex flex-wrap items-center gap-2">
                     {fromService && b.service?.slug ? (
                       <Link
-                        className="font-bold rounded-3xl p-2 border border-gray-200 bg-primary text-foreground transition duration-700 hover:bg-foreground hover:text-background"
+                        className="font-bold flex rounded-3xl p-2 border border-gray-200 bg-primary text-foreground transition duration-700 hover:bg-foreground hover:text-background"
                         href={serviceShow.url(b.service.slug)}
                       >
+                        <Eye className="mx-2" />
                         View service
                       </Link>
                     ) : null}

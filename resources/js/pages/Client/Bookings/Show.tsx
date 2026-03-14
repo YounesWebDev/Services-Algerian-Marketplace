@@ -1,4 +1,5 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
+import { BadgeCheck, CircleX, ClipboardList, Clock, Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import AppLayout from "@/layouts/app-layout";
@@ -7,7 +8,6 @@ import { index as clientBookingsIndex, payment as bookingPayment } from "@/route
 import { create as disputeCreate } from "@/routes/client/bookings/dispute";
 import { confirm as bookingPaymentConfirm } from "@/routes/client/bookings/payment";
 import { show as serviceShow } from "@/routes/services";
-import { BadgeCheck, CircleX, ClipboardList, Clock, Info } from "lucide-react";
 type Provider = { id: number; name: string; avatar_path: string | null };
 type Service = { id: number; title: string; slug: string };
 type RequestItem = { id: number; title: string };
@@ -124,11 +124,9 @@ export default function ClientBookingShow() {
       breadcrumbs={[
         { title: "Dashboard", href: dashboard().url },
         { title: "Bookings", href: clientBookingsIndex().url },
-        { title: `Booking #${booking.id}`, href: clientBookingsIndex().url },
+        { title: "Booking details", href: clientBookingsIndex().url },
       ]}
     >
-      <Head title={`Booking #${booking.id}`} />
-
       <div className="p-6 max-w-3xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -188,7 +186,7 @@ export default function ClientBookingShow() {
                                     </div>
                                   ) : null}
                                 </div>
-                                 <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
+                                <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
                         <span>Total</span>
                         <div className="font-medium p-2 rounded-3xl border border-gray-200 break-words">
                           {booking.total_amount} {booking.currency}

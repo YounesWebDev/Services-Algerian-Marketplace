@@ -28,7 +28,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { about, contact, dashboard } from "@/routes";
+import { about, contact, dashboard, home } from "@/routes";
 import { index as adminCategoriesIndex } from "@/routes/admin/categories";
 import { index as adminDisputesIndex } from "@/routes/admin/disputes";
 import { index as adminPaymentsIndex } from "@/routes/admin/payments";
@@ -137,7 +137,7 @@ export function AppSidebar() {
 
     const mainNavItems = getNavItems(user);
 
-    const logoHref = dashboard();
+    const logoHref = home();
 
     return (
     <Sidebar collapsible="icon" variant="inset">
