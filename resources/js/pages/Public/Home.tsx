@@ -288,7 +288,7 @@ export default function Home({
     return (
         <div className="min-h-screen">
             {/* Navbar */}
-            <div className="absolute top-10 right-0 left-0 z-10 flex max-w-screen items-center">
+            <div className=" top-2 right-0 left-0 z-10 flex max-w-screen items-center fixed justify-center px-6">
                 <Navbar user={user} canRegister={true} />
             </div>
             {/* Hero */}

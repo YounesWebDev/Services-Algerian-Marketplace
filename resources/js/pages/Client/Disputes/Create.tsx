@@ -1,7 +1,7 @@
 import { Head, Link, useForm } from "@inertiajs/react";
+import { BadgeCheck, CircleX, ClipboardList, Clock } from "lucide-react";
 
 import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,6 @@ import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { show as bookingShow } from "@/routes/client/bookings";
 import { store as disputeStore } from "@/routes/client/bookings/dispute";
-import { BadgeCheck, CircleX, ClipboardList, Clock, Info } from "lucide-react";
 type Booking = {
   id: number;
   source: "service" | "request_offer";

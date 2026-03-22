@@ -1,5 +1,16 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { CheckCircle, CircleX, Clock, ExternalLink, Star, StarHalf, TriangleAlert } from "lucide-react";
+import {
+  BookOpenCheck,
+  CheckCircle,
+  CircleX,
+  Clock,
+  ExternalLink,
+  Star,
+  StarHalf,
+  Trash2,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -67,14 +78,12 @@ function Stars({ value }: { value: number }) {
   const empty = 5 - full - (hasHalf ? 1 : 0);
 
   return (
-    <span className="inline-flex items-center gap-1">
+    <span className="inline-flex items-center gap-1 flex-wrap">
       {Array.from({ length: full }).map((_, i) => (
         <Star key={`f-${i}`} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
       ))}
 
-      {hasHalf && (
-        <StarHalf className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-      )}
+      {hasHalf && <StarHalf className="h-4 w-4 fill-yellow-400 text-yellow-400" />}
 
       {Array.from({ length: empty }).map((_, i) => (
         <Star key={`e-${i}`} className="h-4 w-4 text-muted-foreground" />
@@ -109,12 +118,10 @@ export default function ProfileShow() {
     >
       <Head title={`${user.name} - Profile`} />
 
-      <div className="p-6 max-w-3xl space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-
-            {/* âœ… ONLY CHANGE IS HERE */}
-            <div className="relative inline-block">
+      <div className="p-4 sm:p-6  w-full space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="relative inline-block shrink-0">
               <Avatar className="h-14 w-14">
                 <AvatarImage src={avatarUrl} alt={user.name} />
                 <AvatarFallback>{initials(user.name)}</AvatarFallback>
@@ -127,57 +134,57 @@ export default function ProfileShow() {
               ) : null}
             </div>
 
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-semibold">{user.name}</h1>
+                <h1 className="text-lg sm:text-xl font-semibold break-words">{user.name}</h1>
               </div>
 
               {user.email ? (
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <p className="text-sm text-muted-foreground break-all">{user.email}</p>
               ) : null}
             </div>
           </div>
-          
-          
- 
-         <div className="flex items-center justify-center gap-3 ">
-              {user.role === "provider" && viewerRole === "client" ? (
-              <button  >
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full sm:w-auto">
+            {user.role === "provider" && viewerRole === "client" ? (
+              <button className="w-max sm:w-auto">
                 <Link
                   href={reportCreate({
                     query: { type: "provider", id: user.id },
                   }).url}
-                  className=""
+                  className="block"
                 >
-                <div className="flex items-center  rounded-3xl p-2 border border-gray-200 gap-2 text-red-600 transition duration-700 "> <TriangleAlert className="h-5 w-5 " />Report</div>
+                  <div className="flex items-center justify-center rounded-3xl p-2 border border-gray-200 gap-2 text-red-600 transition duration-700 w-full">
+                    <TriangleAlert className="h-5 w-5 shrink-0" />
+                    <span>Report</span>
+                  </div>
                 </Link>
               </button>
             ) : null}
-           <div className="flex items-center rounded-3xl bp-2 border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white  gap-2">
 
-            <button  >
-              <Link href={dashboard().url}>Back</Link>
-            </button>
-
-          </div></div>
-          
+            <div className="flex items-center justify-center rounded-3xl border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white gap-2 w-full sm:w-auto">
+              <button className="w-max sm:w-auto">
+                <Link href={dashboard().url} className="block w-max text-center">
+                  Back
+                </Link>
+              </button>
+            </div>
+          </div>
         </div>
-        
 
-        {/* ---- About Card ---- */}
         <Card className="border border-gray-200 rounded-4xl bg-primary-foreground/30">
           <CardHeader>
             <div className="font-medium">About</div>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="text-sm whitespace-pre-line">
+            <div className="text-sm whitespace-pre-line break-words">
               {profile?.bio ? profile.bio : "No bio yet."}
             </div>
 
             <Separator />
 
             <div className="text-sm text-muted-foreground space-y-2">
-              <div>
+              <div className="break-words">
                 Address:{" "}
                 <span className="text-foreground font-medium">
                   {profile?.address ? profile.address : "--"}
@@ -186,14 +193,14 @@ export default function ProfileShow() {
 
               {user.role === "provider" ? (
                 <>
-                  <div>
+                  <div className="break-words">
                     Company:{" "}
                     <span className="text-foreground font-medium">
                       {profile?.company_name ? profile.company_name : "--"}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Stars value={Number(profile?.rating_avg ?? 0)} />
                     <span className="text-foreground font-medium">
                       {Number(profile?.rating_avg ?? 0).toFixed(2)} (
@@ -213,7 +220,6 @@ export default function ProfileShow() {
           </CardContent>
         </Card>
 
-        {/* ---- Services / Requests (UNCHANGED) ---- */}
         {user.role === "provider" ? (
           <Card className="rounded-3xl">
             <CardHeader>
@@ -224,34 +230,45 @@ export default function ProfileShow() {
                 <div className="text-sm text-muted-foreground">No services yet.</div>
               ) : (
                 services.map((service) => (
-                  <div key={service.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-5">
+                  <div
+                    key={service.id}
+                    className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-4 sm:p-5"
+                  >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="text-xl">{service.title}</div>
+                      <div className="text-base sm:text-xl break-words min-w-0">{service.title}</div>
                       <Link
                         href={serviceShow(service.slug).url}
-                        className=" text-primary hover:text-foreground"
+                        className="text-primary hover:text-foreground shrink-0"
                       >
-                        <ExternalLink className="h-6 w-6" />
+                        <ExternalLink className="h-5 w-5 sm:h-6 sm:w-6" />
                       </Link>
                     </div>
 
-                    <div className="text-sm text-foreground mt-1">
-  <div className="rounded-3xl border border-gray-200 w-max p-2">
-    Status:{" "}
-    {service.status === "approved" ? (
-      <span className="text-primary"><CheckCircle className="h-4 w-4 inline mr-1" />{service.status}</span>
-    ) : service.status === "pending" ? (
-      <span className="text-yellow-600"><Clock className="h-4 w-4 inline mr-1" />{service.status}</span>
-    ) : service.status === "rejected" ? (
-      <span className="text-red-600"><CircleX className="h-4 w-4 inline mr-1" />{service.status}</span>
-    ) : (
-      <span className="text-muted-foreground">{service.status}</span>
-    )}
-  </div>
-</div>
+                    <div className="text-sm text-foreground mt-3">
+                      <div className="rounded-3xl border border-gray-200 w-max sm:w-max p-2 break-words">
+                        Status:{" "}
+                        {service.status === "approved" ? (
+                          <span className="text-primary">
+                            <CheckCircle className="h-4 w-4 inline mr-1" />
+                            {service.status}
+                          </span>
+                        ) : service.status === "pending" ? (
+                          <span className="text-yellow-600">
+                            <Clock className="h-4 w-4 inline mr-1" />
+                            {service.status}
+                          </span>
+                        ) : service.status === "rejected" ? (
+                          <span className="text-red-600">
+                            <CircleX className="h-4 w-4 inline mr-1" />
+                            {service.status}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{service.status}</span>
+                        )}
+                      </div>
+                    </div>
 
-
-                    <div className="text-sm text-muted-foreground p-2 rounded-3xl border border-gray-200 w-max mt-1">
+                    <div className="text-sm text-muted-foreground p-2 rounded-3xl border border-gray-200 w-max sm:w-max mt-2 break-words">
                       Pricing:{" "}
                       <span className="text-foreground">
                         {service.pricing_type}
@@ -273,26 +290,53 @@ export default function ProfileShow() {
                 <div className="text-sm text-muted-foreground">No requests yet.</div>
               ) : (
                 requests.map((request) => (
-                  <div key={request.id} className="rounded-3xl border border-gray-200 p-3">
+                  <div key={request.id} className="rounded-4xl border border-gray-200 p-3">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="font-medium">{request.title}</div>
+                      <div className="font-medium break-words min-w-0">{request.title}</div>
                       <Link
                         href={myRequestShow(request.id).url}
-                        className="text-sm underline"
+                        className="text-sm underline shrink-0"
                       >
-                        <ExternalLink className="h-6 w-6 text-primary transition duration-700 hover:text-foreground" />
+                        <ExternalLink className="h-5 w-5 sm:h-6 sm:w-6 text-primary transition duration-700 hover:text-foreground" />
                       </Link>
                     </div>
 
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Status: <span className="text-foreground">{request.status}</span>
+                    <div className="text-sm text-foreground p-2 rounded-3xl border border-gray-200 w-max sm:w-max mt-2">
+                      <div className="p-1 flex flex-wrap items-center gap-2">
+                        <span>Status</span>
+                        {request.status === "open" ? (
+                          <span className="font-medium rounded-full p-2 border border-gray-200 text-primary inline-flex items-center">
+                            <BookOpenCheck className="h-4 w-4 inline mr-1" />
+                            {request.status}
+                          </span>
+                        ) : request.status === "assigned" ? (
+                          <span className="font-medium rounded-full p-2 border border-gray-200 text-primary inline-flex items-center">
+                            {request.status}
+                          </span>
+                        ) : request.status === "closed" ? (
+                          <span className="font-medium rounded-full p-2 border border-gray-200 text-red-600 inline-flex items-center">
+                            <X className="h-4 w-4 inline mr-1" />
+                            {request.status}
+                          </span>
+                        ) : request.status === "cancelled" ? (
+                          <span className="font-medium rounded-full p-2 border border-gray-200 text-red-600 inline-flex items-center">
+                            <Trash2 className="h-4 w-4 inline mr-1" />
+                            {request.status}
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
 
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Budget:{" "}
-                      <span className="text-foreground">
-                        {request.budget_min ?? "--"} - {request.budget_max ?? "--"} DZD
-                      </span>
+                    <div className="text-sm text-foreground mt-2 p-2 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 rounded-3xl border border-gray-200 w-full sm:w-max">
+                      <span>Budget</span>
+
+                      <div className="text-red-600 font-medium rounded-3xl p-2 border border-gray-200 w-max sm:w-max flex items-center gap-2">
+                        {request.budget_min ?? "--"} DZD
+                      </div>
+
+                      <div className="text-primary font-medium rounded-3xl p-2 border border-gray-200 w-max sm:w-max flex items-center gap-2">
+                        {request.budget_max ?? "--"} DZD
+                      </div>
                     </div>
                   </div>
                 ))

@@ -6,6 +6,7 @@ import {
     House,
     Info,
     Menu,
+    Phone,
     SquareAsterisk,
     Users,
     UsersRound,
@@ -64,9 +65,9 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
     }, [openMenu]);
 
     return (
-        <div className="w-full px-2 pt-4">
-            <div className="mx-auto w-full max-w-6xl rounded-full border border-gray-200 bg-primary-foreground/30 backdrop-blur-sm">
-                <div className="flex items-center justify-between px-6 py-4">
+        <div className="w-full px-1 pt-1">
+            <div className=" w-full  rounded-full border border-gray-200 bg-primary-foreground/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between px-6 py-0">
                 <Link
                     className="transition hover:text-primary"
                     href={homeRoute.url()}
@@ -74,7 +75,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
                     <img
                         src="/favicon-2.png"
                         alt="Pro finder logo"
-                        className="w-auto h-10 object-contain"
+                        className="w-30 h-25 "
                     />
                 </Link>
 
@@ -139,7 +140,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
                             className={desktopLinkClass(contact.url())}
                             href={contact.url()}
                         >
-                            <Info className='mx-2' />
+                           <Phone className='mx-2' />
                             Contact
                         </Link>
                 </div>
