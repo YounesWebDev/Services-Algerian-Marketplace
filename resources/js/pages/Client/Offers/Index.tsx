@@ -210,7 +210,7 @@ export default function ClientOffersIndex() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-auto">
+                    <div className="flex flex-col items-stretch md:items-end gap-2 w-full md:w-max">
                       <span
                         className={`text-xs px-2 py-1 rounded-3xl border border-gray-200 text-center ${
                           o.status === "assigned"
@@ -228,7 +228,7 @@ export default function ClientOffersIndex() {
                           <button
                             type="button"
                             disabled={!canAccept || acceptForm.processing}
-                            className="rounded-3xl bg-primary px-3 py-2 text-sm text-white transition duration-700 hover:bg-foreground hover:text-background hover:shadow-3xl disabled:opacity-50 w-full md:w-auto"
+                            className="rounded-3xl bg-primary px-3 py-2 text-sm text-foreground transition duration-700 hover:bg-foreground hover:text-background hover:shadow-3xl disabled:opacity-50 w-full md:w-max"
                           >
                             {acceptForm.processing ? "Working..." : "Accept"}
                           </button>
@@ -255,7 +255,7 @@ export default function ClientOffersIndex() {
                               type="button"
                               onClick={() => acceptOffer(o.id)}
                               disabled={acceptForm.processing}
-                              className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50 w-full sm:w-auto"
+                              className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50 w-max sm:w-auto"
                             >
                               {acceptForm.processing ? "Processing..." : "Confirm"}
                             </button>

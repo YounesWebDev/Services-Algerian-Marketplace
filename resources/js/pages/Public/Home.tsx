@@ -260,11 +260,11 @@ import { index as servicesIndex, show as servicesShow } from "@/routes/services"
     return (
         <div className="min-h-screen">
         {/* Navbar */}
-         {
-                user === null ? (
+         
+                
                   <div className=" flex max-w-screen items-center absolute top-10 left-0 right-0 z-10"><Navbar user={null} canRegister={true} /></div>
-                ) : null
-              }
+                
+              
 
        {/* Hero */}
 <div className="relative overflow-hidden h-screen">

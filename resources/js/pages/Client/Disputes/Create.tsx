@@ -10,6 +10,7 @@ import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { show as bookingShow } from "@/routes/client/bookings";
 import { store as disputeStore } from "@/routes/client/bookings/dispute";
+import { BadgeCheck, CircleX, ClipboardList, Clock, Info } from "lucide-react";
 type Booking = {
   id: number;
   source: "service" | "request_offer";
@@ -72,37 +73,59 @@ export default function Create({ booking }: { booking: Booking }) {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
+          <button className="rounded-3xl border  border-gray-200 text-red-600 px-2 py-2 hover:text-background transition duration-700 hover:bg-foreground">
             <Link href={bookingShow(booking.id).url}>Back</Link>
-          </Button>
+          </button>
         </div>
 
-        <Card>
+        <Card className="border  border-gray-200 rounded-4xl bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Booking summary</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-2">
             <div className="text-sm">
-              <span className="text-muted-foreground">Title:</span>{" "}
-              <span className="font-medium">{title}</span>
+              
+              <span className="text-xl">{title}</span>
             </div>
 
-            <div className="text-sm">
-              <span className="text-muted-foreground">Status:</span>{" "}
-              <span className="font-medium">{booking.status}</span>
-            </div>
+           <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
+                                             <span>Status</span>{" "}
+                                             {booking.status === "in_progress" ? (
+                                               <div className="font-medium rounded-3xl p-2 border border-gray-200 text-amber-400 flex items-center gap-2">
+                                                 <ClipboardList className="h-4 w-4" /> in progress
+                                               </div>
+                                             ) : booking.status === "confirmed" ? (
+                                               <div className="font-medium rounded-3xl p-2 border border-gray-200 text-primary flex items-center gap-2">
+                                                 <BadgeCheck className="h-4 w-4" />
+                                                 {booking.status}
+                                               </div>
+                                             ) : booking.status === "pending" ? (
+                                               <div className="font-medium rounded-3xl p-2 border border-gray-200 text-amber-400 flex items-center gap-2">
+                                                 <Clock className="h-4 w-4" /> {booking.status}
+                                               </div>
+                                             ) : booking.status === "completed" ? (
+                                               <div className="font-medium rounded-3xl p-2 border border-gray-200 text-primary flex items-center gap-2">
+                                                 <BadgeCheck className="h-4 w-4" />
+                                                 {booking.status}
+                                               </div>
+                                             ) : booking.status === "cancelled" ? (
+                                               <div className="font-medium rounded-3xl p-2 border border-gray-200 text-red-600 flex items-center gap-2">
+                                                 <CircleX className="h-4 w-4" /> {booking.status}
+                                               </div>
+                                             ) : null}
+                                           </div>
 
-            <div className="text-sm">
-              <span className="text-muted-foreground">Total:</span>{" "}
-              <span className="font-medium">
+            <div className="text-sm text-foreground rounded-3xl p-1 border border-gray-200 w-max flex items-center gap-2">
+              <span className="">Total</span>{" "}
+              <span className="font-mediumfont-medium text-foreground rounded-3xl p-2 border border-gray-200 w-max flex items-center">
                 {booking.total_amount} {booking.currency}
               </span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-gray-200 rounded-4xl bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Dispute details</CardTitle>
           </CardHeader>
@@ -117,6 +140,7 @@ export default function Create({ booking }: { booking: Booking }) {
                   onChange={(e) => setData("reason", e.target.value)}
                   placeholder="Example: Provider didn’t show up"
                   required
+                  className="rounded-3xl border border-gray-200"
                 />
                 <InputError message={formErrors.reason} />
               </div>
@@ -129,6 +153,7 @@ export default function Create({ booking }: { booking: Booking }) {
                   onChange={(e) => setData("description", e.target.value)}
                   placeholder="Explain what happened with details..."
                   rows={6}
+                   className="rounded-4xl border border-gray-200"
                 />
                 <InputError message={formErrors.description} />
               </div>
@@ -140,12 +165,14 @@ export default function Create({ booking }: { booking: Booking }) {
               )}
 
               <div className="flex items-center gap-3">
-                <Button disabled={processing}>Submit dispute</Button>
-                <Button variant="outline" type="button" asChild>
+                <button disabled={processing} className="rounded-3xl p-2 border border-gray-200 bg-primary text-primary-foreground hover:text-background transition duration-700 hover:bg-foreground">
+                  Submit dispute
+                </button>
+                <button  type="button" className="rounded-3xl border p-2 border-gray-200 text-foreground hover:text-background transition duration-700 hover:bg-foreground" >
                   <Link href={bookingShow(booking.id).url}>
                     Cancel
                   </Link>
-                </Button>
+                </button>
               </div>
 
               <p className="text-xs text-muted-foreground">

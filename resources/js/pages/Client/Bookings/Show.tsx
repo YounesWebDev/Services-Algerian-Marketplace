@@ -246,18 +246,18 @@ export default function ClientBookingShow() {
 
         {/* Cancel booking */}
         {canCancel ? (
-          <div className="rounded-md border p-4">
-            <div className="font-medium">Cancel booking</div>
+          <div className="rounded-4xl  border border-gray-200  bg-primary-foreground/30 p-4">
+            <div className="font-medium  ">Cancel booking</div>
             <p className="text-sm text-foreground mt-1">
-              You can cancel while the booking is pending or confirmed.
+              You can cance l while the booking is pending or confirmed.
             </p>
             <form onSubmit={submitCancel} className="mt-3">
               <button
                 type="submit"
                 disabled={cancelForm.processing}
-                className="rounded-md bg-red-600 px-4 py-2 text-white text-sm disabled:opacity-60"
+                className=" rounded-4xl border border-gray-200 px-4 py-2 text-red-600 text-sm disabled:opacity-60 transition duration-700 hover:bg-red-600 hover:text-white"
               >
-                {cancelForm.processing ? "Cancelling..." : "Cancel Booking"}
+                {cancelForm.processing ? "Cancelling..." : "Cancel booking"}
               </button>
             </form>
           </div>
@@ -280,21 +280,21 @@ export default function ClientBookingShow() {
         ) : null}
 
         {canDispute && !booking.dispute ? (
-          <div className="rounded-md border p-4">
+          <div className="rounded-4xl  border border-gray-200 bg-primary-foreground/30 p-4">
             <div className="font-medium">Dispute</div>
             <p className="text-sm text-foreground mt-1">
               Open a dispute if there is an issue with this booking.
             </p>
             <div className="mt-3">
-              <Button variant="outline" asChild>
-                <Link href={disputeCreate(booking.id).url}>Open dispute</Link>
-              </Button>
+              <button >
+                <Link href={disputeCreate(booking.id).url} className="rounded-3xl p-2 border border-gray-200 bg-primary transition duration-700 hover:bg-foreground hover:text-background ">Open dispute</Link>
+              </button>
             </div>
           </div>
         ) : null}
 
         {/* Payment status */}
-        <div className="rounded-md border p-4 space-y-2">
+        <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-4 space-y-2">
           <div className="font-medium">Payment</div>
 
           {!booking.payment ? (
@@ -303,18 +303,19 @@ export default function ClientBookingShow() {
             </div>
           ) : (
             <div className="text-sm text-foreground space-y-1">
-              <div>
-                Type: <span className="font-medium">{booking.payment.payment_type}</span> • Status:{" "}
-                <span className="font-medium">{booking.payment.status}</span>
+              <div className="flex items-center rounded-3xl p-1 border border-gray-200 w-max gap-2">
+                Type <div className="font-medium flex items-center rounded-3xl p-2 border border-gray-200">{booking.payment.payment_type}</div> 
               </div>
-              <div>
-                Amount: <span className="font-medium">{booking.payment.amount}</span>{" "}
-                {booking.currency}
+              <div className="text-sm flex items-center rounded-3xl p-1 border border-gray-200 w-max gap-2"> Status{" "}
+                <div className="font-medium flex items-center rounded-3xl p-2 border border-gray-200 w-max gap-2 ">{booking.payment.status}</div></div>
+              <div className="flex items-center rounded-3xl p-1 border border-gray-200 w-max gap-2">
+                Amount <div className="font-medium flex items-center rounded-3xl p-2 border border-gray-200 w-max gap-2">{booking.payment.amount}  {booking.currency}</div>{" "}
+               
               </div>
-              <div>
-                Platform fee: <span className="font-medium">{booking.payment.platform_fee}</span>{" "}
+              <div className="flex items-center rounded-3xl p-2 border border-gray-200 w-max gap-2">
+                Platform fee: <div className="font-medium">{booking.payment.platform_fee}</div>{" "}
                 {booking.currency} • Provider amount:{" "}
-                <span className="font-medium">{booking.payment.provider_amount}</span>{" "}
+                <div className="font-medium">{booking.payment.provider_amount}</div>{" "}
                 {booking.currency}
               </div>
               {booking.payment.paid_at ? (
@@ -334,9 +335,9 @@ export default function ClientBookingShow() {
 
         {/* Choose payment type */}
         {!booking.payment ? (
-          <div className="rounded-md border p-4">
+          <div className="rounded-4xl  border border-gray-200 bg-primary-foreground/30 p-4">
           <div className="font-medium">Choose payment method</div>
-          <p className="text-sm text-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             - Online: fill card form → we send OTP to <b>+000000000</b> (code is always <b>000000</b>). <br />
             - Cash: provider will confirm cash later.
           </p>
@@ -345,7 +346,7 @@ export default function ClientBookingShow() {
             <div>
               <label className="block text-sm font-medium">Payment type</label>
               <select
-                className="mt-1 w-full rounded-md border p-2"
+                className="mt-1 w-full rounded-3xl border border-gray-200 p-2"
                 value={payForm.data.payment_type}
                 onChange={(e) =>
                   payForm.setData(
@@ -364,7 +365,7 @@ export default function ClientBookingShow() {
                 <div>
                   <label className="block text-sm font-medium">Card number</label>
                   <input
-                    className="mt-1 w-full rounded-md border p-2"
+                    className="mt-1 w-full rounded-3xl border border-gray-200 p-2"
                     value={payForm.data.card_number}
                     onChange={(e) => payForm.setData("card_number", e.target.value)}
                     placeholder="Example: 4111111111111111"
@@ -378,7 +379,7 @@ export default function ClientBookingShow() {
                     <label className="block text-sm font-medium">Expiry month</label>
                     <input
                       type="number"
-                      className="mt-1 w-full rounded-md border p-2"
+                      className="mt-1 w-full rounded-3xl border border-gray-200 p-2"
                       value={payForm.data.expiry_month}
                       onChange={(e) => payForm.setData("expiry_month", e.target.value)}
                       placeholder="12"
@@ -391,7 +392,7 @@ export default function ClientBookingShow() {
                     <label className="block text-sm font-medium">Expiry year</label>
                     <input
                       type="number"
-                      className="mt-1 w-full rounded-md border p-2"
+                      className="mt-1 w-full rounded-3xl border border-gray-200 p-2"
                       value={payForm.data.expiry_year}
                       onChange={(e) => payForm.setData("expiry_year", e.target.value)}
                       placeholder="2028"
@@ -403,7 +404,7 @@ export default function ClientBookingShow() {
                   <div>
                     <label className="block text-sm font-medium">CVC</label>
                     <input
-                      className="mt-1 w-full rounded-md border p-2"
+                      className="mt-1 w-full rounded-3xl border border-gray-200 p-2"
                       value={payForm.data.cvc}
                       onChange={(e) => payForm.setData("cvc", e.target.value)}
                       placeholder="123"
@@ -413,7 +414,7 @@ export default function ClientBookingShow() {
                   </div>
                 </div>
 
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   OTP will be sent to: <b>+000000000</b>
                 </div>
               </div>
@@ -434,7 +435,7 @@ export default function ClientBookingShow() {
             <button
               type="submit"
               disabled={!canPay || payForm.processing}
-              className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
+              className="rounded-3xl bg-primary px-4 py-2 text-foreground transiton duration-700 hover:text-background hover:bg-foreground text-sm disabled:opacity-60"
             >
               {payForm.processing ? "Saving..." : "Continue"}
             </button>
@@ -450,9 +451,9 @@ export default function ClientBookingShow() {
 
         {/* OTP confirm section (only if payment exists and is online pending) */}
         {booking.payment && booking.payment.payment_type === "online" && booking.payment.status === "pending" ? (
-          <div className="rounded-md border p-4">
+          <div className="rounded-4xl  border border-gray-200 bg-primary-foreground/30 p-4">
             <div className="font-medium">Confirm online payment (OTP)</div>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Enter code <b>000000</b> to confirm.
             </p>
 
@@ -460,7 +461,7 @@ export default function ClientBookingShow() {
               <div className="flex-1">
                 <label className="block text-sm font-medium">OTP</label>
                 <input
-                  className="mt-1 w-full rounded-md border p-2"
+                  className="mt-1 w-full rounded-3xl border border-gray-200  p-2"
                   value={otpForm.data.otp}
                   onChange={(e) => otpForm.setData("otp", e.target.value)}
                   placeholder="000000"
@@ -473,7 +474,7 @@ export default function ClientBookingShow() {
               <button
                 type="submit"
                 disabled={otpForm.processing}
-                className="rounded-md bg-black px-4 py-2 text-white text-sm disabled:opacity-60"
+                className="rounded-3xl bg-primary px-4 py-2 text-foreground transiton duration-700 hover:text-background hover:bg-foreground text-sm disabled:opacity-60"
               >
                 {otpForm.processing ? "Confirming..." : "Confirm Payment"}
               </button>

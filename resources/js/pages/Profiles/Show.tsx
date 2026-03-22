@@ -264,7 +264,7 @@ export default function ProfileShow() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
+          <Card className="rounded-4xl p-4 border border-gray-200 bg-primary-foreground/30">
             <CardHeader>
               <div className="font-medium">Requests</div>
             </CardHeader>
@@ -273,14 +273,14 @@ export default function ProfileShow() {
                 <div className="text-sm text-muted-foreground">No requests yet.</div>
               ) : (
                 requests.map((request) => (
-                  <div key={request.id} className="rounded-md border p-3">
+                  <div key={request.id} className="rounded-3xl border border-gray-200 p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="font-medium">{request.title}</div>
                       <Link
                         href={myRequestShow(request.id).url}
                         className="text-sm underline"
                       >
-                        View
+                        <ExternalLink className="h-6 w-6 text-primary transition duration-700 hover:text-foreground" />
                       </Link>
                     </div>
 
