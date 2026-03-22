@@ -1,18 +1,19 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
+    BookUser,
     Flag,
     GitPullRequest,
     House,
     Info,
     Menu,
     SquareAsterisk,
+    Users,
     UsersRound,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { about, dashboard, home as homeRoute, login, register } from '@/routes';
+import { about, contact, dashboard, home as homeRoute, login, register } from '@/routes';
 import { index as providerServicesIndex } from '@/routes/provider/my/services';
 import { index as providerRequestsIndex } from '@/routes/provider/requests';
 import { index as servicesIndex } from '@/routes/services';
@@ -25,182 +26,251 @@ type NavbarProps = {
 
 export default function Navbar({ user, canRegister }: NavbarProps) {
     const [openMenu, setOpenMenu] = useState(false);
+    const { url: currentUrl } = usePage();
+
+    const isActive = (href: string) =>
+        currentUrl === href || currentUrl.startsWith(`${href}/`);
+
+    const desktopLinkClass = (href: string) =>
+        `p-1 transition flex hover:text-primary ${
+            isActive(href) ? 'text-primary font-semibold border-b-2 border-primary pb-1' : ''
+        }`;
+    const closeMenu = () => setOpenMenu(false);
+    const mobileLinkClass = (href: string) =>
+        `flex items-center gap-2 p-1 transition hover:text-primary ${
+            isActive(href) ? 'text-primary font-semibold border-b-2 border-primary pb-1' : ''
+        }`;
+
+    useEffect(() => {
+        if (!openMenu) {
+            return;
+        }
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                closeMenu();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [openMenu]);
 
     return (
-        <div className="fixed z-30 mx-2 mt-5 w-full rounded-full border border-gray-200 bg-primary-foreground/30 backdrop-blur-sm">
-            <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="w-full px-2 pt-4">
+            <div className="mx-auto w-full max-w-6xl rounded-full border border-gray-200 bg-primary-foreground/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between px-6 py-4">
                 <Link
                     className="transition hover:text-primary"
                     href={homeRoute.url()}
                 >
-                    <div className="text-xl font-bold">PROfinder</div>
+                    <img
+                        src="/favicon-2.png"
+                        alt="Pro finder logo"
+                        className="w-auto h-10 object-contain"
+                    />
                 </Link>
 
                 <div className="hidden justify-between gap-15 md:flex">
                     <Link
-                        className="p-1 transition hover:text-primary"
+                        className={desktopLinkClass(homeRoute.url())}
                         href={homeRoute.url()}
                     >
+                        <House className='mx-2' />
                         Home
                     </Link>
                     {user?.role === 'provider' ? (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass(providerRequestsIndex.url())}
                             href={providerRequestsIndex.url()}
                         >
+                            <GitPullRequest className='mx-2' />
                             Requests
                         </Link>
                     ) : user?.role === 'admin' ? (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass('/admin/reports')}
                             href="/admin/reports"
                         >
+                            <Flag className='mx-2' />
                             Reports
                         </Link>
                     ) : null}
                     {user?.role === 'provider' ? (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass(providerServicesIndex.url())}
                             href={providerServicesIndex.url()}
                         >
+                            <BookUser className='mx-2' />
                             My Services
                         </Link>
                     ) : user?.role === 'admin' ? (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass('/admin/users')}
                             href="/admin/users"
                         >
+                            <Users className='mx-2' />
                             Users
                         </Link>
                     ) : (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass(servicesIndex.url())}
                             href={servicesIndex.url()}
                         >
+                            <SquareAsterisk className='mx-2' />
                             Services
                         </Link>
                     )}
-                    {!user && (
                         <Link
-                            className="p-1 transition hover:text-primary"
+                            className={desktopLinkClass(about.url())}
                             href={about.url()}
                         >
+                            <Info className='mx-2' />
                             About
                         </Link>
-                    )}
+                        <Link
+                            className={desktopLinkClass(contact.url())}
+                            href={contact.url()}
+                        >
+                            <Info className='mx-2' />
+                            Contact
+                        </Link>
                 </div>
 
-                <div>
+                <div className="relative md:hidden">
                     <button
                         onClick={() => setOpenMenu(!openMenu)}
+                        aria-expanded={openMenu}
+                        aria-label="Toggle navigation menu"
                         type="button"
+                        className="rounded-full p-1 transition"
                     >
                         {openMenu ? (
                             <X
                                 size={28}
-                                className="text-black md:hidden dark:text-white"
+                                className="text-foreground transition-transform duration-200"
                             />
                         ) : (
                             <Menu
                                 size={28}
-                                className="text-black md:hidden dark:text-white"
+                                className="text-foreground transition-transform duration-200"
                             />
                         )}
                     </button>
 
-                    {openMenu && (
-                        <div className="flex flex-col">
-                            <div className="absolute top-18 right-4 z-40 flex w-[75%] flex-col gap-10 rounded-l-3xl border border-gray-200 bg-black p-5 text-white md:hidden">
-                                {user ? (
-                                    <Link
-                                        href={dashboard().url}
-                                        className="inline-block rounded-full border border-[#19140035] px-5 py-1.5 font-bold text-white duration-700 hover:bg-white hover:text-black"
-                                    >
-                                        <p className="font-bold text-white">
-                                            Dashboard
-                                        </p>
-                                    </Link>
-                                ) : (
-                                    <div className="flex justify-center gap-3">
-                                        <Link
-                                            href={login().url}
-                                            className="flex items-center justify-center rounded-3xl border border-gray-200 bg-white/30 p-2 py-1.5 text-sm leading-normal font-bold text-foreground backdrop-blur-sm hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-                                        >
-                                            <p className="font-bold">Log in</p>
-                                        </Link>
-                                        {canRegister && (
-                                            <Link
-                                                href={register().url}
-                                                className="inline-block w-max rounded-3xl border border-gray-200 bg-primary  p-2 text-sm leading-normal font-bold text-white transition-all hover:border-[#1915014a] hover:backdrop-blur-sm dark:hover:border-[#62605b]"
-                                            >
-                                                <p className="font-bold">
-                                                    Register
-                                                </p>
-                                            </Link>
-                                        )}
-                                    </div>
-                                )}
-
+                    <div
+                        className={`fixed top-24 right-4 z-40 flex w-[min(22rem,calc(100vw-2rem))] origin-top-right flex-col gap-3 rounded-4xl border border-gray-200 bg-primary-foreground/95 p-4 backdrop-blur-xl transition-all text-black duration-250 ease-out ${
+                            openMenu
+                                ? 'translate-y-0 scale-100 opacity-100'
+                                : 'pointer-events-none -translate-y-3 scale-95 opacity-0'
+                        }`}
+                    >
+                        {user ? (
+                            <Link
+                                href={dashboard().url}
+                                onClick={closeMenu}
+                                className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-1.5 font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground"
+                            >
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <div className="flex justify-center gap-3">
                                 <Link
-                                    className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                    href={homeRoute.url()}
+                                    href={login().url}
+                                    onClick={closeMenu}
+                                    className="flex items-center justify-center rounded-3xl border border-gray-200 px-4 py-1.5 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary hover:text-primary-foreground"
                                 >
-                                    <House /> Home
+                                    Log in
                                 </Link>
-
-                                {user?.role === 'provider' ? (
+                                {canRegister && (
                                     <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                        href={providerRequestsIndex.url()}
+                                        href={register().url}
+                                        onClick={closeMenu}
+                                        className="inline-flex items-center justify-center rounded-3xl border border-gray-200 bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:bg-foreground hover:text-background"
                                     >
-                                        <GitPullRequest /> Requests
-                                    </Link>
-                                ) : user?.role === 'admin' ? (
-                                    <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                        href="/admin/reports"
-                                    >
-                                        <Flag /> Reports
-                                    </Link>
-                                ) : null}
-
-                                {user?.role === 'provider' ? (
-                                    <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                        href={providerServicesIndex.url()}
-                                    >
-                                        <SquareAsterisk /> My Services
-                                    </Link>
-                                ) : user?.role === 'admin' ? (
-                                    <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                        href="/admin/users"
-                                    >
-                                        <UsersRound /> Users
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm"
-                                        href={servicesIndex.url()}
-                                    >
-                                        <SquareAsterisk /> Services
-                                    </Link>
-                                )}
-
-                                {!user && (
-                                    <Link
-                                        className="flex items-center justify-center gap-3 rounded-3xl border border-gray-200 bg-white/30 p-2 backdrop-blur-sm transition"
-                                        href={about.url()}
-                                    >
-                                        <Info /> About
+                                        Register
                                     </Link>
                                 )}
                             </div>
-                        </div>
-                    )}
+                        )}
+
+                        <Link
+                            className={mobileLinkClass(homeRoute.url())}
+                            href={homeRoute.url()}
+                            onClick={closeMenu}
+                        >
+                            <House /> Home
+                        </Link>
+
+                        {user?.role === 'provider' ? (
+                            <Link
+                                className={mobileLinkClass(providerRequestsIndex.url())}
+                                href={providerRequestsIndex.url()}
+                                onClick={closeMenu}
+                            >
+                                <GitPullRequest /> Requests
+                            </Link>
+                        ) : user?.role === 'admin' ? (
+                            <Link
+                                className={mobileLinkClass('/admin/reports')}
+                                href="/admin/reports"
+                                onClick={closeMenu}
+                            >
+                                <Flag /> Reports
+                            </Link>
+                        ) : null}
+
+                        {user?.role === 'provider' ? (
+                            <Link
+                                className={mobileLinkClass(providerServicesIndex.url())}
+                                href={providerServicesIndex.url()}
+                                onClick={closeMenu}
+                            >
+                                <SquareAsterisk /> My Services
+                            </Link>
+                        ) : user?.role === 'admin' ? (
+                            <Link
+                                className={mobileLinkClass('/admin/users')}
+                                href="/admin/users"
+                                onClick={closeMenu}
+                            >
+                                <UsersRound /> Users
+                            </Link>
+                        ) : (
+                            <Link
+                                className={mobileLinkClass(servicesIndex.url())}
+                                href={servicesIndex.url()}
+                                onClick={closeMenu}
+                            >
+                                <SquareAsterisk /> Services
+                            </Link>
+                        )}
+
+                        <Link
+                            className={mobileLinkClass(about.url())}
+                            href={about.url()}
+                            onClick={closeMenu}
+                        >
+                            <Info /> About
+                        </Link>
+                        <Link
+                            className={mobileLinkClass(contact.url())}
+                            href={contact.url()}
+                            onClick={closeMenu}
+                        >
+                            <Info /> Contact
+                        </Link>
+                    </div>
                 </div>
 
-                <div className="hidden justify-between gap-3 text-sm md:flex">
+                    <div className="hidden justify-between gap-3 text-sm md:flex">
                     {user ? (
                         <Link
                             href={dashboard().url}
@@ -226,6 +296,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
                             )}
                         </>
                     )}
+                    </div>
                 </div>
             </div>
         </div>

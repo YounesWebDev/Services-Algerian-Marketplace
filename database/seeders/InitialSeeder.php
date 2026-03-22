@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Chat;
 use App\Models\City;
 use App\Models\Dispute;
-use App\Models\FeeSetting;
 use App\Models\Message;
 use App\Models\Offer;
 use App\Models\Payment;
@@ -103,15 +102,7 @@ class InitialSeeder extends Seeder
         );
 
         // ----------------------------
-        // 2) Fee setting
-        // ----------------------------
-        FeeSetting::updateOrCreate(
-            ['active' => true],
-            ['commission_rate' => 0.0700, 'fixed_fee' => null]
-        );
-
-        // ----------------------------
-        // 3) Cities (58 Wilayas)
+        // 2) Cities (58 Wilayas)
         // ----------------------------
         $wilayas = [
             ['01', 'Adrar'], ['02', 'Chlef'], ['03', 'Laghouat'], ['04', 'Oum El Bouaghi'],
@@ -561,8 +552,7 @@ class InitialSeeder extends Seeder
         // ----------------------------
         // 12) Payments (pending + paid) with your fake OTP metadata
         // ----------------------------
-        $fee = FeeSetting::where('active', true)->first();
-        $commissionRate = $fee ? (float) $fee->commission_rate : 0.07;
+        $commissionRate = 0.07;
 
         foreach ($createdBookings as $i => $booking) {
             $amount = (float) $booking->total_amount;

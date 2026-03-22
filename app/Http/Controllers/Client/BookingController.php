@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\FeeSetting;
 use App\Models\Payment;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -13,6 +12,10 @@ use Inertia\Inertia;
 
 class BookingController extends Controller
 {
+    private const PLATFORM_COMMISSION_RATE = 0.07;
+
+    private const PLATFORM_COMMISSION_PERCENT = '7';
+
     public function index(Request $request)
     {
         $user = $request->user();
@@ -63,15 +66,12 @@ class BookingController extends Controller
             'payment:id,booking_id,status,payment_type,amount,platform_fee,provider_amount,paid_at,metadata',
         ]);
 
-        // fee settings for showing calculated values
-        $fee = FeeSetting::query()->where('active', 1)->latest()->first();
-
         return Inertia::render('Client/Bookings/Show', [
             'booking' => $booking,
-            'fee' => $fee ? [
-                'commission_rate' => (string) $fee->commission_rate,
-                'fixed_fee' => $fee->fixed_fee !== null ? (string) $fee->fixed_fee : null,
-            ] : null,
+            'fee' => [
+                'commission_rate' => self::PLATFORM_COMMISSION_PERCENT,
+                'fixed_fee' => null,
+            ],
         ]);
     }
 
@@ -156,12 +156,8 @@ class BookingController extends Controller
             }
         }
 
-        $fee = FeeSetting::query()->where('active', 1)->latest()->first();
-        $commission = $fee ? (float) $fee->commission_rate : 0.0;
-        $fixed = $fee && $fee->fixed_fee !== null ? (float) $fee->fixed_fee : 0.0;
-
         $amount = (float) $booking->total_amount;
-        $platformFee = round(($amount * $commission) + $fixed, 2);
+        $platformFee = round($amount * self::PLATFORM_COMMISSION_RATE, 2);
         if ($platformFee < 0) {
             $platformFee = 0;
         }

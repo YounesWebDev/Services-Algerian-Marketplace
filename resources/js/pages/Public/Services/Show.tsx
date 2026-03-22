@@ -277,7 +277,7 @@ export default function Show({ service }: { service: Service }) {
         {!user ? (
           <button >
             <Link href={login()}
-                          className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"          >
+                          className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary hover:text-background hover:shadow-xl"          >
 
              <MessageCircle/> Contact 
             </Link>
@@ -285,13 +285,13 @@ export default function Show({ service }: { service: Service }) {
         ) : user.role !== "client" ? (
           <button
             disabled
-              className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"          >
+              className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary hover:text-background hover:shadow-xl"          >
                <MessageCircle/>  Contact 
          </button>
         ) : (
           <button
             onClick={contactProvider}
-            className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
+            className="flex items-center gap-2 rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary hover:text-background hover:shadow-xl"
           >
            <MessageCircle/> Contact 
           </button>
@@ -306,7 +306,7 @@ export default function Show({ service }: { service: Service }) {
                 : servicesIndex.url(),
             )
           }
-          className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
+          className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary hover:text-background hover:shadow-xl"
         >
          <Search/> Browse 
         </button>
@@ -317,7 +317,7 @@ export default function Show({ service }: { service: Service }) {
               href={reportCreate({
                 query: { type: "service", id: service.id },
               }).url}
-                        className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary-foreground hover:text-background hover:shadow-xl"
+                        className="flex items-center gap-2  rounded-4xl  bg-primary-foreground/30 border border-gray-200  p-2 transition duration-700  hover:bg-primary hover:text-background hover:shadow-xl"
 
             >
              <Flag/> Report
