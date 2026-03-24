@@ -1,9 +1,8 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from '@/routes';
 import {
-  index as providerServicesIndex,
   store as providerServicesStore,
 } from "@/routes/provider/my/services";
 
@@ -42,11 +41,13 @@ export default function ProviderServicesCreate(props: {
       <div className="p-6 max-w-2xl space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-primary">Create Service</h1>
-          <Link href={providerServicesIndex.url()}>
-            <div className="bg-foreground text-background border border-gray-200 rounded-3xl p-2 px-3 transition duration-700 hover:bg-red-600">
-              Back
-            </div>
-          </Link>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="bg-foreground text-background border border-gray-200 rounded-3xl p-2 px-3 transition duration-700 hover:bg-red-600"
+          >
+            Back
+          </button>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
@@ -293,3 +294,4 @@ export default function ProviderServicesCreate(props: {
     </AppLayout>
   );
 }
+

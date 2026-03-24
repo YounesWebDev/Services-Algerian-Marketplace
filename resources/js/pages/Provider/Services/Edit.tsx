@@ -1,11 +1,11 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
-    index as providerServicesIndex,
+
     update as providerServicesUpdate,
 } from '@/routes/provider/my/services';
 
@@ -207,11 +207,13 @@ export default function ProviderServicesEdit(props: {
                     <h1 className="text-2xl font-bold text-primary">
                         Edit Service
                     </h1>
-                    <Link href={providerServicesIndex.url()}>
-                        <div className="rounded-3xl border border-gray-200 bg-foreground p-2 px-3 text-background transition duration-700 hover:bg-red-600">
-                            Back
-                        </div>
-                    </Link>
+                    <button
+                        type="button"
+                        onClick={() => window.history.back()}
+                        className="rounded-3xl border border-gray-200 bg-foreground p-2 px-3 text-background transition duration-700 hover:bg-red-600"
+                    >
+                        Back
+                    </button>
                 </div>
 
                 <form onSubmit={submit} className="space-y-4">
@@ -630,3 +632,5 @@ export default function ProviderServicesEdit(props: {
         </AppLayout>
     );
 }
+
+

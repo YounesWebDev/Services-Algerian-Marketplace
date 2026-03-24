@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,8 +59,8 @@ export default function Show({
             </p>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={reportsIndex().url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 
@@ -114,3 +114,4 @@ export default function Show({
     </AppLayout>
   );
 }
+

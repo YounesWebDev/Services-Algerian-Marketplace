@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import {
   Briefcase,
   CircleCheckBig,
@@ -16,7 +16,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from '@/routes';
 import {
-  index as providerBookingsIndex,
+
   status as bookingStatusUpdate,
 } from "@/routes/provider/bookings";
 import { confirm as confirmCashPayment } from "@/routes/provider/bookings/cash";
@@ -279,12 +279,13 @@ export default function ProviderBookingShow() {
             <p className="text-sm text-foreground">Booking details</p>
           </div>
 
-          <Link
-            href={providerBookingsIndex.url()}
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="text-sm rounded-3xl text-red-600 bg-primary-foreground/30 px-3 py-2 border border-gray-200 hover:bg-red-600 hover:text-white transition duration-700"
           >
             Back
-          </Link>
+          </button>
         </div>
         {showAlert ? (
           <div className="fixed bottom-6 right-6 z-50">
@@ -471,3 +472,5 @@ export default function ProviderBookingShow() {
     </AppLayout>
   );
 }
+
+

@@ -72,8 +72,12 @@ export default function Create({ booking }: { booking: Booking }) {
             </p>
           </div>
 
-          <button className="rounded-3xl border  border-gray-200 text-red-600 px-2 py-2 hover:text-background transition duration-700 hover:bg-foreground">
-            <Link href={bookingShow(booking.id).url}>Back</Link>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-3xl border  border-gray-200 text-red-600 px-2 py-2 hover:text-background transition duration-700 hover:bg-foreground"
+          >
+            Back
           </button>
         </div>
 

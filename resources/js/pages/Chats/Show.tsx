@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -11,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
 import { dashboard } from '@/routes';
-import { index as myChatsIndex } from '@/routes/my/chats';
 import { store as myChatMessagesStore } from '@/routes/my/chats/messages';
 import { show as presenceShow } from '@/routes/presence';
 import { SharedData } from '@/types';
@@ -498,10 +497,13 @@ export default function ChatsShow() {
                                 </div>
                             </div>
 
-                            <Button variant="outline" size="sm" asChild>
-                                <Link href={myChatsIndex.url()}>
-                                    Back
-                                </Link>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.history.back()}
+                            >
+                                Back
                             </Button>
                         </div>
                     </CardHeader>
@@ -673,3 +675,5 @@ export default function ChatsShow() {
         </AppLayout>
     );
 }
+
+

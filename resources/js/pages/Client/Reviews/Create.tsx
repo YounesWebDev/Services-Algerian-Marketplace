@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
@@ -71,8 +71,8 @@ export default function Create({ booking }: { booking: Booking }) {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={bookingShow(booking.id).url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 
@@ -185,3 +185,4 @@ export default function Create({ booking }: { booking: Booking }) {
     </AppLayout>
   );
 }
+

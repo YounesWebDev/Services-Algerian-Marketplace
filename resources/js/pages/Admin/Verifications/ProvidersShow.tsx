@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -97,8 +97,8 @@ export default function ProvidersVerificationsShow() {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={providersIndex().url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 
@@ -223,3 +223,4 @@ export default function ProvidersVerificationsShow() {
     </AppLayout>
   );
 }
+

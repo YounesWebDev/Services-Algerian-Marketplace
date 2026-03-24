@@ -1,4 +1,4 @@
-﻿import { Head, Link } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import { BadgeCheck } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,9 +80,13 @@ export default function ProviderPayoutShow({ payout }: Props) {
             </div>
           </div>
 
-          <Link href={providerPayoutsIndex().url}>
-            <button className="rounded-3xl border border-gray-200 text-red-600  p-2 transition duration-700 hover:text-white hover:bg-red-600">Back</button>
-          </Link>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-3xl border border-gray-200 text-red-600  p-2 transition duration-700 hover:text-white hover:bg-red-600"
+          >
+            Back
+          </button>
         </div>
 
         <Card className="rounded-3xl border border-gray-200 bg-primary-foreground/30">
@@ -147,3 +151,4 @@ export default function ProviderPayoutShow({ payout }: Props) {
     </AppLayout>
   );
 }
+

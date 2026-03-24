@@ -162,13 +162,13 @@ export default function ProfileShow() {
               </button>
             ) : null}
 
-            <div className="flex items-center justify-center rounded-3xl border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white gap-2 w-full sm:w-auto">
-              <button className="w-max sm:w-auto">
-                <Link href={dashboard().url} className="block w-max text-center">
-                  Back
-                </Link>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="flex items-center justify-center rounded-3xl border border-gray-200 text-red-600 py-2 px-3 transition duration-700 hover:bg-red-600 hover:text-white gap-2 w-full sm:w-auto"
+            >
+              Back
+            </button>
           </div>
         </div>
 

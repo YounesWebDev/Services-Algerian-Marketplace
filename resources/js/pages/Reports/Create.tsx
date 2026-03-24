@@ -61,8 +61,12 @@ export default function Create({ target }: { target: Target }) {
             </p>
           </div>
 
-          <button className="rounded-3xl px-3 py-2 text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground">
-            <Link href={dashboard().url}>Back</Link>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-3xl px-3 py-2 text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground"
+          >
+            Back
           </button>
         </div>
 

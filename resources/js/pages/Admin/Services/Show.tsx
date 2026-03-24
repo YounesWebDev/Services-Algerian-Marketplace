@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
@@ -141,8 +141,8 @@ export default function AdminServicesShow() {
             </p>
           </div>
 
-          <Button asChild variant="outline">
-            <Link href={adminServicesIndex().url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 
@@ -318,3 +318,4 @@ export default function AdminServicesShow() {
     </AppLayout>
   );
 }
+

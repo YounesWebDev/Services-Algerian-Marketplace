@@ -1,4 +1,4 @@
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Clock, MapPin } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     contact as providerRequestsContact,
-    index as providerRequestsIndex,
+
 } from '@/routes/provider/requests';
 import { store as providerRequestsOffersStore } from '@/routes/provider/requests/offers';
 
@@ -86,12 +86,13 @@ export default function ProviderRequestsShow() {
             <div className="max-w-3xl space-y-4 rounded-4xl bg-primary-foreground/30 p-6">
                 <div className="flex items-center justify-between">
                     <h1 className="text-xl font-semibold">{r.title}</h1>
-                    <Link
-                        href={providerRequestsIndex.url()}
+                    <button
+                        type="button"
+                        onClick={() => window.history.back()}
                         className="rounded-3xl border border-gray-200 px-3 py-2 text-sm text-red-600 transition duration-700 hover:bg-red-600 hover:text-white"
                     >
                         Back
-                    </Link>
+                    </button>
                 </div>
 
                 {/* Flash success */}
@@ -430,3 +431,5 @@ function MarketplacePhotoSlider({
         </div>
     );
 }
+
+

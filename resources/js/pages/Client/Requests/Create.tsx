@@ -1,6 +1,6 @@
 "use client";
 
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import {
   CheckCircle2Icon,
   UploadCloudIcon,
@@ -171,11 +171,12 @@ export default function Create({ categories, cities }: Props) {
           <h1 className="text-2xl font-bold">Create Request</h1>
 
           <Button
+            type="button"
             variant="outline"
-            asChild
+            onClick={() => window.history.back()}
             className="rounded-4xl border-gray-200 text-red-600 transition duration-700 hover:bg-foreground hover:text-background"
           >
-            <Link href={myRequestsIndex().url}>Back</Link>
+            Back
           </Button>
         </div>
 
@@ -397,3 +398,4 @@ export default function Create({ categories, cities }: Props) {
     </AppLayout>
   );
 }
+

@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -129,8 +129,8 @@ export default function AdminRequestsShow() {
             </p>
           </div>
 
-          <Button asChild variant="outline">
-            <Link href={adminRequestsIndex().url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 
@@ -346,3 +346,4 @@ export default function AdminRequestsShow() {
     </AppLayout>
   );
 }
+

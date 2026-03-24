@@ -186,8 +186,8 @@ export default function PaymentsShow({ payment }: { payment: Payment }) {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline">
-                <Link href={adminPaymentsIndex().url}>Back</Link>
+              <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                Back
               </Button>
             </div>
 

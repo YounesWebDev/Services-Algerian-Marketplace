@@ -97,8 +97,12 @@ export default function ProvidersIndex() {
             <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
           </div>
 
-          <button className="rounded-3xl py-2 text-red-600 border border-gray-200 transition duration-700 hover:bg-red-600 hover:text-white px-3">
-            <Link href={dashboard().url}>Back</Link>
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="rounded-3xl py-2 text-red-600 border border-gray-200 transition duration-700 hover:bg-red-600 hover:text-white px-3"
+          >
+            Back
           </button>
         </div>
 

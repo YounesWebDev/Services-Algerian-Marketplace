@@ -111,8 +111,8 @@ export default function AdminUsersShow() {
             <p className="text-sm text-muted-foreground">Manage user status and see quick stats.</p>
           </div>
 
-          <Button asChild variant="outline">
-            <Link href={adminUsersIndex().url}>Back to users</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back to users
           </Button>
         </div>
 

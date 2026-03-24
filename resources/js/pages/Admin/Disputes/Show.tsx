@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
 import { Badge } from "@/components/ui/badge";
@@ -72,8 +72,8 @@ export default function Show({ dispute }: { dispute: Dispute }) {
             </p>
           </div>
 
-          <Button variant="outline" asChild>
-            <Link href={disputesIndex().url}>Back</Link>
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+            Back
           </Button>
         </div>
 

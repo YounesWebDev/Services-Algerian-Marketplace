@@ -1,4 +1,4 @@
-﻿import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -220,8 +220,8 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                       <Button disabled={processing} type="submit">
                         Mark Sent
                       </Button>
-                      <Button asChild variant="outline">
-                        <Link href={adminPayoutsIndex().url}>Back</Link>
+                      <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                        Back
                       </Button>
                     </div>
                   </form>
@@ -231,8 +231,8 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
 
             {!canMarkSent && (
               <div className="flex gap-2">
-                <Button asChild variant="outline">
-                  <Link href={adminPayoutsIndex().url}>Back</Link>
+                <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                  Back
                 </Button>
               </div>
             )}
@@ -242,3 +242,4 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
     </AppLayout>
   );
 }
+

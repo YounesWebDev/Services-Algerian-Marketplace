@@ -134,9 +134,13 @@ export default function ClientBookingShow() {
             <p className="text-2xl text-primary text-foredround">{title}</p>
           </div>
 
-          <Link href={clientBookingsIndex.url()} className="text-sm rounded-3xl px-3 py-2 border border-gray-200 text-red-600 text-bold transition duration-700 hover:bg-foreground">
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="text-sm rounded-3xl px-3 py-2 border border-gray-200 text-red-600 text-bold transition duration-700 hover:bg-foreground"
+          >
             Back
-          </Link>
+          </button>
         </div>
 
         {/* Flash + errors */}

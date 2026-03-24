@@ -77,6 +77,7 @@ export default function ClientRequestShow() {
   const sortedMedia = (job.media ?? []).slice().sort((a, b) => a.position - b.position);
 
   const [active, setActive] = useState(0);
+  const [openAcceptDialogOfferId, setOpenAcceptDialogOfferId] = useState<number | null>(null);
 
   const validImages = sortedMedia.filter((m) => publicImagePath(m.path));
   const cover =
@@ -87,6 +88,8 @@ export default function ClientRequestShow() {
   const acceptForm = useForm({});
 
   function acceptOffer(offerId: number) {
+    setOpenAcceptDialogOfferId(null);
+
     acceptForm.post(clientOffersAccept.url(offerId), {
       preserveScroll: true,
     });
@@ -179,12 +182,13 @@ export default function ClientRequestShow() {
             </div>
           </div>
 
-          <Link
-            href={myRequestsIndex.url()}
+          <button
+            type="button"
+            onClick={() => window.history.back()}
             className="text-sm px-3 py-2 rounded-3xl text-red-600 border border-gray-200 transition duration-700 hover:text-background hover:bg-foreground hover:shadow-2xl "
           >
             Back
-          </Link>
+          </button>
         </div>
 
         {flash?.success ? (
@@ -304,7 +308,12 @@ export default function ClientRequestShow() {
                            <MessageCircle/> 
                           </button>
 
-                          <Dialog>
+                          <Dialog
+                            open={openAcceptDialogOfferId === o.id}
+                            onOpenChange={(isOpen) => {
+                              setOpenAcceptDialogOfferId(isOpen ? o.id : null);
+                            }}
+                          >
                             <DialogTrigger asChild>
                               <button
                                 type="button"
@@ -326,6 +335,7 @@ export default function ClientRequestShow() {
                                 <DialogClose asChild>
                                   <button
                                     type="button"
+                                    onClick={() => setOpenAcceptDialogOfferId(null)}
                                     className="rounded-3xl border border-gray-200 px-3 py-2 text-sm"
                                   >
                                     Cancel
