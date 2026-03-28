@@ -57,7 +57,8 @@ export default function Create({ target }: { target: Target }) {
           <div>
             <h1 className="text-xl font-semibold">Report</h1>
             <p className="text-sm text-muted-foreground">
-              Report inappropriate content or suspicious behavior.
+              Report inappropriate content or suspicious behavior for this{' '}
+              {typeLabel.toLowerCase()}.
             </p>
           </div>
 
@@ -70,25 +71,7 @@ export default function Create({ target }: { target: Target }) {
           </button>
         </div>
 
-        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
-          <CardHeader>
-            <CardTitle>Target</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm">
-            <div>
-              <span className="text-muted-foreground">Type:</span>{" "}
-              <span className="font-medium">{typeLabel}</span>
-            </div>
-            <div className="truncate">
-              <span className="text-muted-foreground">Title:</span>{" "}
-              <span className="font-medium">{target.title}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">ID:</span>{" "}
-              <span className="font-medium">#{target.id}</span>
-            </div>
-          </CardContent>
-        </Card>
+     
 
         <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
@@ -124,10 +107,7 @@ export default function Create({ target }: { target: Target }) {
                   rows={6}
                 />
                 <InputError message={formErrors.description} />
-                <p className="text-xs text-muted-foreground">
-                  Note: description is optional. (If you didnâ€™t add a DB column,
-                  it wonâ€™t be stored yet.)
-                </p>
+                
               </div>
 
               {formErrors.report && (

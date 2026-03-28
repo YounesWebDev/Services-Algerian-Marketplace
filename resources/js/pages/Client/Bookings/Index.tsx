@@ -137,7 +137,17 @@ export default function ClientBookingsIndex() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="space-y-2 min-w-0">
-                      <div className="text-lg sm:text-2xl break-words">{title}</div>
+                      <div className="text-lg sm:text-2xl break-words flex justify-between items-center">
+                        {title} 
+                        <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                      <Link
+                        href={clientBookingsShow.url(b.id)}
+                        className=" text-primary transition duration-700  hover:text-primary text-sm p-2 sm:hidden  "
+                      >
+                        <ExternalLink className="h-5 w-5  " />
+                      </Link>
+                    </div>
+                      </div>
 
                       <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-fit max-w-full flex flex-wrap items-center gap-2">
                         <span>Status</span>{" "}
@@ -196,10 +206,10 @@ export default function ClientBookingsIndex() {
                       </div>
                     </div>
 
-                    <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
+                    <div className="hidden sm:flex flex-col items-center gap-2 shrink-0">
                       <Link
                         href={clientBookingsShow.url(b.id)}
-                        className="rounded-3xl text-primary transition duration-700 hover:bg-foreground hover:text-background text-sm p-2"
+                        className="rounded-3xl text-foreground transition duration-700 hover: hover:text-primary text-sm p-2"
                       >
                         <ExternalLink className="h-5 w-5" />
                       </Link>
@@ -218,7 +228,7 @@ export default function ClientBookingsIndex() {
                     ) : null}
 
                     {!fromService ? (
-                      <span className="text-foreground">(Created from request offer)</span>
+                      <span className="text-foreground">Created from request offer</span>
                     ) : null}
                   </div>
                 </div>

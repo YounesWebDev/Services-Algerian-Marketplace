@@ -118,7 +118,7 @@ export default function ProfileShow() {
     >
       <Head title={`${user.name} - Profile`} />
 
-      <div className="p-4 sm:p-6  w-full space-y-4">
+      <div className="p-4 sm:p-6  w-full space-y-4 relative">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3 min-w-0">
             <div className="relative inline-block shrink-0">
@@ -245,7 +245,7 @@ export default function ProfileShow() {
                     </div>
 
                     <div className="text-sm text-foreground mt-3">
-                      <div className="rounded-3xl border border-gray-200 w-max sm:w-max p-2 break-words">
+                      <div className="rounded-3xl border border-gray-200 w-max sm:w-max p-1 break-words">
                         Status:{" "}
                         {service.status === "approved" ? (
                           <span className="text-primary">
@@ -301,9 +301,9 @@ export default function ProfileShow() {
                       </Link>
                     </div>
 
-                    <div className="text-sm text-foreground p-2 rounded-3xl border border-gray-200 w-max sm:w-max mt-2">
+                    <div className="text-sm text-foreground p-1 rounded-3xl border border-gray-200 w-max sm:w-max mt-2">
                       <div className="p-1 flex flex-wrap items-center gap-2">
-                        <span>Status</span>
+                        <div>Status</div>
                         {request.status === "open" ? (
                           <span className="font-medium rounded-full p-2 border border-gray-200 text-primary inline-flex items-center">
                             <BookOpenCheck className="h-4 w-4 inline mr-1" />

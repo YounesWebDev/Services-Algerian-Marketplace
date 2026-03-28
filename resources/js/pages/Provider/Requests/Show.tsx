@@ -1,12 +1,12 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { Clock, MapPin } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { CheckCircle2Icon, ChevronLeft, ChevronRight, Clock, MapPin, OctagonAlert } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     contact as providerRequestsContact,
-
 } from '@/routes/provider/requests';
 import { store as providerRequestsOffersStore } from '@/routes/provider/requests/offers';
 
@@ -20,7 +20,7 @@ type Media = {
     type: string;
     position: number;
 };
-
+type AlertVariant = 'success' | 'error' | 'info';
 type RequestItem = {
     id: number;
     title: string;
@@ -37,8 +37,14 @@ type RequestItem = {
 };
 
 const publicImagePath = (path?: string | null) => {
-    if (!path) return '';
-    if (path.startsWith('http') || path.startsWith('/')) return path;
+    if (!path) {
+        return '';
+    }
+
+    if (path.startsWith('http') || path.startsWith('/')) {
+        return path;
+    }
+
     return `/storage/${path}`;
 };
 
@@ -50,10 +56,7 @@ export default function ProviderRequestsShow() {
         flash?: { success?: string };
     }>();
     const { props } = page;
-    const flashSuccess =
-        (typeof page.flash === 'object' && page.flash !== null
-            ? (page.flash as Record<string, unknown>).success
-            : null) ?? props.flash?.success;
+    const { errors, flash } = props;
 
     const r = props.request;
 
@@ -68,6 +71,24 @@ export default function ProviderRequestsShow() {
         estimated_days: '',
     });
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [animate, setAnimate] = useState(false);
+    const [alertContent, setAlertContent] = useState<{
+        title: string;
+        description: string;
+        variant: AlertVariant;
+    }>({ title: '', description: '', variant: 'success' });
+
+    const hideTimer = useRef<number | null>(null);
+    const removeTimer = useRef<number | null>(null);
+
+    function clearTimers() {
+        if (hideTimer.current !== null) window.clearTimeout(hideTimer.current);
+        if (removeTimer.current !== null) window.clearTimeout(removeTimer.current);
+        hideTimer.current = null;
+        removeTimer.current = null;
+    }
+
     function submit(e: React.FormEvent) {
         e.preventDefault();
         form.post(providerRequestsOffersStore.url(r.id), {
@@ -79,9 +100,95 @@ export default function ProviderRequestsShow() {
         router.post(providerRequestsContact.url(r.id));
     }
 
+    function pushAlert(
+        variant: AlertVariant,
+        titleText: string,
+        descText: string,
+    ) {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        clearTimers();
+
+        setAlertContent({ variant, title: titleText, description: descText });
+        setShowAlert(true);
+
+        window.setTimeout(() => setAnimate(true), 10);
+
+        hideTimer.current = window.setTimeout(() => {
+            setAnimate(false);
+            removeTimer.current = window.setTimeout(
+                () => setShowAlert(false),
+                300,
+            );
+        }, 8000);
+    }
+
+    useEffect(() => {
+        return () => {
+            if (typeof window !== 'undefined') {
+                clearTimers();
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (flash?.success) {
+            pushAlert('success', 'Success', flash.success);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flash?.success]);
+
+    useEffect(() => {
+        if (errors?.payment) {
+            pushAlert('error', 'Payment error', errors.payment);
+        } else if (errors?.status) {
+            pushAlert('error', 'Status error', errors.status);
+        } else if (errors?.offer) {
+            pushAlert('error', 'Offer error', errors.offer);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [errors?.offer, errors?.payment, errors?.status]);
+
+    const alertIcon =
+        alertContent.variant === 'error' ? (
+            <OctagonAlert className="text-red-600" />
+        ) : (
+            <CheckCircle2Icon className="text-primary" />
+        );
+
+    const alertTitleClass =
+        alertContent.variant === 'error' ? 'text-red-600' : 'text-primary';
+
+    const alertBgClass =
+        alertContent.variant === 'error' ? 'bg-red-500/10' : 'bg-primary/5';
+
     return (
         <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
             <Head title={r.title} />
+
+            {showAlert ? (
+                <div className="fixed right-6 bottom-6 z-50">
+                    <Alert
+                        className={[
+                            alertBgClass,
+                            'w-[92vw] shadow-2xl backdrop-blur-sm transition-all duration-300 sm:w-96',
+                            animate
+                                ? 'translate-y-0 opacity-100'
+                                : 'translate-y-2 opacity-0',
+                        ].join(' ')}
+                    >
+                        {alertIcon}
+                        <AlertTitle className={alertTitleClass}>
+                            {alertContent.title}
+                        </AlertTitle>
+                        <AlertDescription className="text-foreground">
+                            {alertContent.description}
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            ) : null}
 
             <div className="max-w-3xl space-y-4 rounded-4xl bg-primary-foreground/30 p-6">
                 <div className="flex items-center justify-between">
@@ -94,20 +201,6 @@ export default function ProviderRequestsShow() {
                         Back
                     </button>
                 </div>
-
-                {/* Flash success */}
-                {flashSuccess ? (
-                    <div className="rounded-md border bg-green-50 p-3 text-sm">
-                        {String(flashSuccess)}
-                    </div>
-                ) : null}
-
-                {/* Server errors (general) */}
-                {props.errors?.offer ? (
-                    <div className="rounded-md border bg-red-50 p-3 text-sm text-red-700">
-                        {props.errors.offer}
-                    </div>
-                ) : null}
 
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -373,7 +466,7 @@ function MarketplacePhotoSlider({
                     }`}
                     aria-label="Previous photo"
                 >
-                    â€¹
+                    <ChevronLeft/>
                 </button>
 
                 {/* Next */}
@@ -388,7 +481,7 @@ function MarketplacePhotoSlider({
                     }`}
                     aria-label="Next photo"
                 >
-                    â€º
+                    <ChevronRight/>
                 </button>
             </div>
 
@@ -431,5 +524,3 @@ function MarketplacePhotoSlider({
         </div>
     );
 }
-
-
