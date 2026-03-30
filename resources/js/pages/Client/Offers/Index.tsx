@@ -254,7 +254,7 @@ className="rounded-3xl bg-primary-foreground/30 border border-gray-200 p-3 sm:p-
 {o.status}
 </span>
 
-{o.status === "sent" && (
+{canAccept && (
 
 <Dialog
 
@@ -268,7 +268,7 @@ setOpenAcceptDialogOfferId(isOpen ? o.id : null)
 <DialogTrigger asChild >
 
 <button
-disabled={!canAccept || acceptForm.processing}
+disabled={acceptForm.processing}
 className="rounded-3xl bg-primary px-3 py-2 text-sm w-full md:w-max transition duration-700 hover:bg-foreground hover:text-background disabled:opacity-50 disabled:hover:bg-primary"
 >
 Accept

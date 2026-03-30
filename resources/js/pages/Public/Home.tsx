@@ -545,7 +545,6 @@ export default function Home({
                                 }}
                                 className="m-5 flex h-70 flex-col overflow-hidden rounded-3xl border bg-primary-foreground/30 text-left transition-all duration-300 hover:bg-primary-foreground/40 hover:shadow-xl"
                             >
-                                {/* cover Image only if exists */}
                                 {cover ? (
                                     <div className="h-44 w-full overflow-hidden rounded-t-3xl">
                                         <img
@@ -555,7 +554,11 @@ export default function Home({
                                             loading="lazy"
                                         />
                                     </div>
-                                ) : null}
+                                ) : (
+                                    <div className="flex h-44 w-full items-center justify-center rounded-t-3xl border-b text-sm text-gray-500">
+                                        No photos.
+                                    </div>
+                                )}
 
                                 {/* content */}
                                 <div className="p-4">

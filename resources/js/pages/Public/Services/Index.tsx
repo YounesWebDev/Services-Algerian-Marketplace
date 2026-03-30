@@ -212,17 +212,20 @@ export default function Index({ services, categories, cities, filters }: Props) 
                 hover:shadow-xl transition-all duration-300 bg-primary-foreground/30 
                 hover:bg-primary-foreground/40 text-foreground"
             >
-              {/* cover Image only if exists */}
               {cover ? (
                 <div className="w-full h-44 overflow-hidden rounded-t-4xl">
                   <img
                     src={cover}
                     alt={s.title}
-                    className="block w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    className="block w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                     loading="lazy"
                   />
                 </div>
-              ) : null}
+              ) : (
+                <div className="flex h-44 w-full items-center justify-center rounded-t-4xl border-b text-sm text-gray-500">
+                  No photos.
+                </div>
+              )}
 
               {/* content */}
               <div className="flex flex-col flex-1 p-4 gap-3 w-full">

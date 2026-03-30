@@ -9,7 +9,6 @@ import {
   StarHalf,
   Trash2,
   TriangleAlert,
-  X,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -311,11 +310,6 @@ export default function ProfileShow() {
                           </span>
                         ) : request.status === "assigned" ? (
                           <span className="font-medium rounded-full p-2 border border-gray-200 text-primary inline-flex items-center">
-                            {request.status}
-                          </span>
-                        ) : request.status === "closed" ? (
-                          <span className="font-medium rounded-full p-2 border border-gray-200 text-red-600 inline-flex items-center">
-                            <X className="h-4 w-4 inline mr-1" />
                             {request.status}
                           </span>
                         ) : request.status === "cancelled" ? (

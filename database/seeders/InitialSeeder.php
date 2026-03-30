@@ -312,11 +312,11 @@ class InitialSeeder extends Seeder
         $requestSeeds = [
             ['Need a plumber urgently', 'open'],
             ['Looking for home deep cleaning', 'open'],
-            ['Need electrician for new lights', 'in_discussion'],
+            ['Need electrician for new lights', 'open'],
             ['AC maintenance before summer', 'assigned'],
             ['Need a web landing page quickly', 'open'],
             ['Painting my apartment (2 rooms)', 'open'],
-            ['Fix my phone screen today', 'closed'],
+            ['Fix my phone screen today', 'cancelled'],
             ['Install CCTV for small shop', 'open'],
             ['Garden cleanup this weekend', 'cancelled'],
             ['Need car diagnostics', 'open'],
@@ -374,16 +374,19 @@ class InitialSeeder extends Seeder
         // sent|assigned|rejected
         // ----------------------------
         $createdOffers = [];
-        $offerStatusPool = ['sent', 'rejected', 'assigned'];
 
         foreach ($createdRequests as $i => $req) {
             // create 2 offers per request (provider1 + provider2)
             for ($k = 0; $k < 2; $k++) {
                 $provider = $providers[$k];
 
-                $status = $req->status === 'open'
-                    ? 'sent'
-                    : $offerStatusPool[($i + $k) % count($offerStatusPool)];
+                if ($req->status === 'open') {
+                    $status = 'sent';
+                } elseif ($req->status === 'assigned') {
+                    $status = $k === 0 ? 'assigned' : 'rejected';
+                } else {
+                    $status = 'rejected';
+                }
 
                 $offer = Offer::updateOrCreate(
                     [

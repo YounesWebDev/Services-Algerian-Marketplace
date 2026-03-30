@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     contact as providerRequestsContact,
+    index as providerRequestsIndex,
 } from '@/routes/provider/requests';
 import { store as providerRequestsOffersStore } from '@/routes/provider/requests/offers';
 
@@ -165,7 +166,13 @@ export default function ProviderRequestsShow() {
         alertContent.variant === 'error' ? 'bg-red-500/10' : 'bg-primary/5';
 
     return (
-        <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
+        <AppLayout
+            breadcrumbs={[
+                { title: 'Dashboard', href: dashboard().url },
+                { title: 'Requests', href: providerRequestsIndex().url },
+                { title: r.title, href: providerRequestsIndex().url },
+            ]}
+        >
             <Head title={r.title} />
 
             {showAlert ? (

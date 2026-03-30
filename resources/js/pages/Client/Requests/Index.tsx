@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { BookOpenCheck, Clock, ExternalLink, MapPin, Plus, Trash2, X } from "lucide-react";
+import { BookOpenCheck, Clock, ExternalLink, MapPin, Plus, Trash2 } from "lucide-react";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -172,7 +172,7 @@ export default function ClientRequestsIndex() {
             All
           </Link>
 
-          {["open", "assigned", "closed", "cancelled"].map((s) => (
+          {["open", "assigned", "cancelled"].map((s) => (
             <Link
               key={s}
               href={myRequestsIndex.url({ query: { status: s } })}
@@ -219,11 +219,6 @@ export default function ClientRequestsIndex() {
                       </span>
                     ) : r.status === "assigned" ? (
                       <span className="font-medium rounded-full p-2 border border-gray-200  text-primary">
-                        {r.status}
-                      </span>
-                    ) : r.status === "closed" ? (
-                      <span className="font-medium rounded-full p-2 border border-gray-200  text-red-600">
-                        <X className="h-4 w-4 inline mr-1" />
                         {r.status}
                       </span>
                     ) : r.status === "cancelled" ? (

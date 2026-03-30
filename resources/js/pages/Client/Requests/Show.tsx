@@ -99,7 +99,8 @@ export default function ClientRequestShow() {
     router.post(clientOffersContact.url(offerId));
   }
 
-  const canAccept = job.status === "open";
+  const requestStatus = job.status.trim().toLowerCase();
+  const canAccept = requestStatus === "open";
 
   return (
     <AppLayout
@@ -129,7 +130,7 @@ export default function ClientRequestShow() {
                     <span className="rounded-full border border-gray-200 p-2 font-medium text-primary">
                       {job.status}
                     </span>
-                  ) : job.status === "closed" || job.status === "cancelled" ? (
+                  ) : job.status === "cancelled" ? (
                     <span className="rounded-full border border-gray-200 p-2 font-medium text-red-600">
                       <Trash2 className="mr-1 inline h-4 w-4" />
                       {job.status}
@@ -248,7 +249,8 @@ export default function ClientRequestShow() {
           ) : (
             <div className="space-y-3">
               {offers.map((o) => {
-                const canAcceptThis = canAccept && o.status === "sent";
+                const offerStatus = o.status.trim().toLowerCase();
+                const canAcceptThis = canAccept && offerStatus === "sent";
 
                 return (
                   <div key={o.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-3">
@@ -308,51 +310,53 @@ export default function ClientRequestShow() {
                            <MessageCircle/> 
                           </button>
 
-                          <Dialog
-                            open={openAcceptDialogOfferId === o.id}
-                            onOpenChange={(isOpen) => {
-                              setOpenAcceptDialogOfferId(isOpen ? o.id : null);
-                            }}
-                          >
-                            <DialogTrigger asChild>
-                              <button
-                                type="button"
-                                disabled={!canAcceptThis || acceptForm.processing}
-                                className="rounded-4xl bg-primary px-3 py-2 text-sm text-foreground transition duration-700 hover:bg-foreground hover:text-background disabled:hidden disabled:opacity-60 flex items-center gap-1 "
-                              >
-                                {acceptForm.processing ? "Working..." : "Accept"}
-                              </button>
-                            </DialogTrigger>
-
-                            <DialogContent>
-                              <DialogTitle>Accept this offer?</DialogTitle>
-                              <DialogDescription>
-                                This will create a booking and automatically reject the other offers
-                                for this request.
-                              </DialogDescription>
-
-                              <DialogFooter>
-                                <DialogClose asChild>
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenAcceptDialogOfferId(null)}
-                                    className="rounded-3xl border border-gray-200 px-3 py-2 text-sm"
-                                  >
-                                    Cancel
-                                  </button>
-                                </DialogClose>
-
+                          {canAcceptThis ? (
+                            <Dialog
+                              open={openAcceptDialogOfferId === o.id}
+                              onOpenChange={(isOpen) => {
+                                setOpenAcceptDialogOfferId(isOpen ? o.id : null);
+                              }}
+                            >
+                              <DialogTrigger asChild>
                                 <button
                                   type="button"
-                                  onClick={() => acceptOffer(o.id)}
                                   disabled={acceptForm.processing}
-                                  className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50"
+                                  className="rounded-4xl bg-primary px-3 py-2 text-sm text-foreground transition duration-700 hover:bg-foreground hover:text-background disabled:opacity-60 flex items-center gap-1"
                                 >
-                                  {acceptForm.processing ? "Processing..." : "Confirm"}
+                                  {acceptForm.processing ? "Working..." : "Accept"}
                                 </button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                              </DialogTrigger>
+
+                              <DialogContent>
+                                <DialogTitle>Accept this offer?</DialogTitle>
+                                <DialogDescription>
+                                  This will create a booking and automatically reject the other offers
+                                  for this request.
+                                </DialogDescription>
+
+                                <DialogFooter>
+                                  <DialogClose asChild>
+                                    <button
+                                      type="button"
+                                      onClick={() => setOpenAcceptDialogOfferId(null)}
+                                      className="rounded-3xl border border-gray-200 px-3 py-2 text-sm"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </DialogClose>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => acceptOffer(o.id)}
+                                    disabled={acceptForm.processing}
+                                    className="rounded-3xl bg-primary px-3 py-2 text-sm text-white disabled:opacity-50"
+                                  >
+                                    {acceptForm.processing ? "Processing..." : "Confirm"}
+                                  </button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          ) : null}
                         </div>
                       </div>
 

@@ -11,58 +11,59 @@ use Inertia\Inertia;
 
 class RequestsController extends Controller
 {
-    public function index(Request $request){
-        $q = (string) $request->query('q' , '');
-        $status = (string) $request->query('status' , '');
-        $city = (string) $request->query('city' , '');
-        $category = (string) $request->query('category' , '');
+    public function index(Request $request)
+    {
+        $q = (string) $request->query('q', '');
+        $status = (string) $request->query('status', '');
+        $city = (string) $request->query('city', '');
+        $category = (string) $request->query('category', '');
 
         $query = JobRequest::query()
-                    ->with([
-                        'category:id,name,slug',
-                        'city:id,name',
-                        'client:id,name,email,avatar_path,status,role',
-                        'media:id,request_id,path,type,position',
-                    ])
-                    ->withCount('offers')
-                    ->latest();
+            ->with([
+                'category:id,name,slug',
+                'city:id,name',
+                'client:id,name,email,avatar_path,status,role',
+                'media:id,request_id,path,type,position',
+            ])
+            ->withCount('offers')
+            ->latest();
 
-        if($q !== ''){
-            $query->where(function ($w) use ($q){
-                $w->where('title' ,'like' , "%{$q}%")
-                ->orWhere('description' , 'like' , "%{$q}%")
-                ->orWhereHas('client', function ($c) use ($q){
-                    $c->where('name', 'like', "%{$q}%")
-                        ->orWhere('email', 'like', "%{$q}%");
-                });
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $w->where('title', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhereHas('client', function ($c) use ($q) {
+                        $c->where('name', 'like', "%{$q}%")
+                            ->orWhere('email', 'like', "%{$q}%");
+                    });
             });
         }
 
-        if($status !== ''){
-            $query->where('status' , $status);
+        if ($status !== '') {
+            $query->where('status', $status);
         }
 
-        if($city !== '' && is_numeric($city)){
-            $query->where('city_id' , (int) $city);
+        if ($city !== '' && is_numeric($city)) {
+            $query->where('city_id', (int) $city);
         }
 
-        if($category !== ''){
-            if(is_numeric($city)){
-                $query->where('city_id' , (int) $city);
-            }else{
-                $categoryId = Category::where('slug' ,$category)->value('id');
-                if($categoryId){
-                    $query->where('category_id' , $categoryId);
+        if ($category !== '') {
+            if (is_numeric($city)) {
+                $query->where('city_id', (int) $city);
+            } else {
+                $categoryId = Category::where('slug', $category)->value('id');
+                if ($categoryId) {
+                    $query->where('category_id', $categoryId);
                 }
             }
         }
 
         $requests = $query->paginate(12)->withQueryString();
 
-        $categories = Category::orderBy('name')->get(['id' , 'name' ,'slug']);
-        $cities = City::orderBy('name')->get(['id' ,'name']);
+        $categories = Category::orderBy('name')->get(['id', 'name', 'slug']);
+        $cities = City::orderBy('name')->get(['id', 'name']);
 
-        return Inertia::render('Admin/Requests/Index' ,[
+        return Inertia::render('Admin/Requests/Index', [
             'requests' => $requests,
             'categories' => $categories,
             'cities' => $cities,
@@ -75,7 +76,8 @@ class RequestsController extends Controller
         ]);
     }
 
-    public function show(JobRequest $requestModel){
+    public function show(JobRequest $requestModel)
+    {
         $requestModel->load([
             'category:id,name,slug',
             'city:id,name',
@@ -85,25 +87,27 @@ class RequestsController extends Controller
             'offers.provider:id,name,email,avatar_path,status,role',
         ]);
 
-        return Inertia::render('Admin/Requests/Show',[
+        return Inertia::render('Admin/Requests/Show', [
             'request' => $requestModel,
         ]);
     }
 
-    public function close(Request $request, JobRequest $requestModel){
-        if(in_array($requestModel->status , ['closed' ,'cancelled'] , true)){
+    public function close(Request $request, JobRequest $requestModel)
+    {
+        if ($requestModel->status === 'cancelled') {
             return back();
         }
 
         $requestModel->update([
-            'status' => 'closed',
+            'status' => 'cancelled',
         ]);
 
-        return back()->with('success' ,'Request closed');
+        return back()->with('success', 'Request cancelled');
     }
 
-    public function reopen(Request $request , JobRequest $requestModel){
-        if(!in_array($requestModel->status , ['closed' ,'cancelled'] , true)){
+    public function reopen(Request $request, JobRequest $requestModel)
+    {
+        if ($requestModel->status !== 'cancelled') {
             return back();
         }
 
@@ -111,6 +115,6 @@ class RequestsController extends Controller
             'status' => 'open',
         ]);
 
-        return back()->with('success' , 'Request reopened successfully');
+        return back()->with('success', 'Request reopened successfully');
     }
 }

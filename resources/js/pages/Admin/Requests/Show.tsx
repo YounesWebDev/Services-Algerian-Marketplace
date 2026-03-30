@@ -98,9 +98,9 @@ export default function AdminRequestsShow() {
   const mediaSorted = (request.media ?? []).slice().sort((a, b) => a.position - b.position);
   const offers = request.offers ?? [];
 
-  const isClosed = request.status === "closed" || request.status === "cancelled";
-  const canClose = !isClosed && request.status !== "assigned";
-  const canReopen = isClosed;
+  const isCancelled = request.status === "cancelled";
+  const canCancel = !isCancelled && request.status !== "assigned";
+  const canReopen = isCancelled;
 
   const closeNow = () => {
     form.post(adminRequestsClose(request.id).url, { preserveScroll: true });
@@ -125,7 +125,7 @@ export default function AdminRequestsShow() {
           <div>
             <h1 className="text-2xl font-semibold">Request details</h1>
             <p className="text-sm text-muted-foreground">
-              Review content and offers. Close requests if they violate rules or should be stopped.
+              Review content and offers. Cancel requests if they violate rules or should be stopped.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ export default function AdminRequestsShow() {
                       ? "success"
                       : request.status === "assigned"
                       ? "warning"
-                      : request.status === "closed" || request.status === "cancelled"
+                      : request.status === "cancelled"
                       ? "danger"
                       : "muted"
                   }
@@ -235,9 +235,9 @@ export default function AdminRequestsShow() {
                   type="button"
                   onClick={closeNow}
                   variant="destructive"
-                  disabled={form.processing || !canClose}
+                  disabled={form.processing || !canCancel}
                 >
-                  Close request
+                  Cancel request
                 </Button>
 
                 <Button

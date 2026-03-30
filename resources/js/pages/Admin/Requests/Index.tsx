@@ -40,7 +40,7 @@ type RequestRow = {
   id: number;
   title: string;
   description: string;
-  status: string; // open/assigned/closed/cancelled...
+  status: string; // open/assigned/cancelled...
   budget_min?: number | string | null;
   budget_max?: number | string | null;
   urgency?: string | null;
@@ -126,7 +126,7 @@ export default function AdminRequestsIndex() {
         <div>
           <h1 className="text-2xl font-semibold">Requests management</h1>
           <p className="text-sm text-muted-foreground">
-            Moderate client requests: review details, offers count, and close/reopen when needed.
+            Moderate client requests: review details, offers count, and cancel or reopen when needed.
           </p>
         </div>
 
@@ -158,9 +158,7 @@ export default function AdminRequestsIndex() {
                     <SelectContent>
                       <SelectItem value="__all">All</SelectItem>
                       <SelectItem value="open">open</SelectItem>
-                      <SelectItem value="in_discussion">in_discussion</SelectItem>
                       <SelectItem value="assigned">assigned</SelectItem>
-                      <SelectItem value="closed">closed</SelectItem>
                       <SelectItem value="cancelled">cancelled</SelectItem>
                     </SelectContent>
                   </Select>
@@ -260,7 +258,7 @@ export default function AdminRequestsIndex() {
                         ? "success"
                         : r.status === "assigned"
                         ? "warning"
-                        : r.status === "closed" || r.status === "cancelled"
+                        : r.status === "cancelled"
                         ? "danger"
                         : "muted";
 
