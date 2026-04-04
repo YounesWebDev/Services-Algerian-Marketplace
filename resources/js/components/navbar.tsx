@@ -75,7 +75,7 @@ export default function Navbar({ user, canRegister }: NavbarProps) {
                     <img
                         src="/favicon-2.png"
                         alt="Pro finder logo"
-                        className="w-30 h-25 "
+                        className="w-25 h-20 "
                     />
                 </Link>
 

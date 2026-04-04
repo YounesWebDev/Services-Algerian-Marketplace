@@ -7,7 +7,6 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     contact as providerRequestsContact,
-    index as providerRequestsIndex,
 } from '@/routes/provider/requests';
 import { store as providerRequestsOffersStore } from '@/routes/provider/requests/offers';
 
@@ -166,13 +165,7 @@ export default function ProviderRequestsShow() {
         alertContent.variant === 'error' ? 'bg-red-500/10' : 'bg-primary/5';
 
     return (
-        <AppLayout
-            breadcrumbs={[
-                { title: 'Dashboard', href: dashboard().url },
-                { title: 'Requests', href: providerRequestsIndex().url },
-                { title: r.title, href: providerRequestsIndex().url },
-            ]}
-        >
+        <AppLayout breadcrumbs={[{ title: "Dashboard", href: dashboard().url }]}>
             <Head title={r.title} />
 
             {showAlert ? (
@@ -199,7 +192,7 @@ export default function ProviderRequestsShow() {
 
             <div className="max-w-3xl space-y-4 rounded-4xl bg-primary-foreground/30 p-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-semibold">{r.title}</h1>
+                    <h1 className="text-2xl font-semibold">{r.title}</h1>
                     <button
                         type="button"
                         onClick={() => window.history.back()}
@@ -212,9 +205,7 @@ export default function ProviderRequestsShow() {
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
-                            <div className="text-xl font-bold break-words sm:text-2xl">
-                                {r.title}
-                            </div>
+                           
 
                             <div className="mt-2 flex w-full flex-wrap items-center gap-2 rounded-3xl border border-gray-200 p-1 text-sm text-foreground sm:w-max">
                                 <span className="break-words">
