@@ -21,6 +21,7 @@ import {
   index as adminServicesIndex,
   show as adminServicesShow,
 } from "@/routes/admin/services";
+import { ExternalLink } from "lucide-react";
 
 type ServiceMedia = {
   id: number;
@@ -103,7 +104,7 @@ function Badge({
   }, [variant]);
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -131,21 +132,21 @@ export default function AdminServicesIndex() {
         </div>
 
         {/* Filters */}
-        <Card>
+        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
-            <CardTitle className="text-base">Filters</CardTitle>
+            <CardTitle className="text-base ">Filters</CardTitle>
           </CardHeader>
           <CardContent>
             <form method="get" action={adminServicesIndex().url} className="space-y-4">
               <div className="grid gap-4 md:grid-cols-5">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="q">Search</Label>
-                  <Input id="q" name="q" placeholder="Title or slug..." defaultValue={filters.q ?? ""} />
+                  <Input id="q" name="q" placeholder="Title or slug..." defaultValue={filters.q ?? ""} className="rounded-3xl border border-gray-200" />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Status</Label>
-                  <input type="hidden" name="status" value={filters.status ?? ""} />
+                  <input type="hidden" name="status" value={filters.status ?? ""} className="rounded-3xl border border-gray-200" />
                   <Select
                     defaultValue={filters.status ?? ""}
                     onValueChange={(v) => {
@@ -212,14 +213,15 @@ export default function AdminServicesIndex() {
               </div>
 
               <div className="flex items-end gap-2 md:col-span-5">
-                  <Button type="submit">Apply</Button>
-                  <Button
+                  <button type="submit" className="rounded-3xl px-3 py-2 border border-gray-200 bg-primary transition duration-700 hover:bg-foreground hover:text-background hover:sadow-xl">Apply</button>
+                  <button
+                  className="px-3 py-2 rounded-3xl border border-gray-200 transition duration-700 hover:bg-foreground hover:text-background hover:shadow-xl"
                     type="button"
-                    variant="outline"
+                    
                     onClick={() => (window.location.href = adminServicesIndex().url)}
                   >
                     Reset
-                  </Button>
+                  </button>
 
                   <div className="ml-auto text-sm text-muted-foreground">
                     Total: <span className="font-medium text-foreground">{services.total}</span>
@@ -230,7 +232,7 @@ export default function AdminServicesIndex() {
         </Card>
 
         {/* List */}
-        <div className="rounded-lg border bg-card overflow-hidden">
+        <div className="rounded-4xl  border bg-primary-foreground/30 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-muted/50">
@@ -313,9 +315,9 @@ export default function AdminServicesIndex() {
                         </td>
 
                         <td className="px-4 py-3 text-right">
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={adminServicesShow(s.id).url}>View</Link>
-                          </Button>
+                          <button  className="rounded-3xl px-3 py-2 border transition duration-700 border-gray-200 hover:bg-foreground  hover:shadow-xl">
+                            <Link href={adminServicesShow(s.id).url} className="flex items-center text-primary transition duration-700 hover:text-background   gap-2">View <ExternalLink/></Link>
+                          </button>
                         </td>
                       </tr>
                     );

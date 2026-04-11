@@ -81,7 +81,7 @@ function Badge({
       : "bg-blue-100 text-blue-800 border-blue-200";
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl  border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -141,9 +141,9 @@ export default function AdminServicesShow() {
             </p>
           </div>
 
-          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+          <button type="button" className="rounded-3xl px-3 py-2 border border-gray-200 text-red-600 transition duration-700 hover:bg-red-600 hover:text-white" onClick={() => window.history.back()}>
             Back
-          </Button>
+          </button>
         </div>
 
         {flash?.success ? (
@@ -160,7 +160,7 @@ export default function AdminServicesShow() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main info */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 rounded-4xl border border-gray-200 bg-primary-foreground/30">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-3">
                 <span className="truncate">{service.title}</span>
@@ -174,18 +174,18 @@ export default function AdminServicesShow() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border p-3">
-                  <div className="text-xs text-muted-foreground">Pricing type</div>
+                <div className="rounded-3xl border border-gray-200 p-3">
+                  <div className="text-xs text-foreground">Pricing type</div>
                   <div className="font-medium">{service.pricing_type}</div>
                 </div>
 
-                <div className="rounded-lg border p-3">
-                  <div className="text-xs text-muted-foreground">Payment type</div>
+                <div className="rounded-3xl border border-gray-200 p-3">
+                  <div className="text-xs text-foreground">Payment type</div>
                   <div className="font-medium">{service.payment_type}</div>
                 </div>
 
-                <div className="rounded-lg border p-3">
-                  <div className="text-xs text-muted-foreground">Base price</div>
+                <div className="rounded-3xl border border-gray-200 p-3">
+                  <div className="text-xs text-foreground">Base price</div>
                   <div className="font-medium">
                     {service.base_price === null || service.base_price === undefined || service.base_price === ""
                       ? "—"
@@ -194,8 +194,8 @@ export default function AdminServicesShow() {
                 </div>
               </div>
 
-              <div className="rounded-lg border p-3">
-                <div className="text-xs text-muted-foreground mb-1">Category / City</div>
+              <div className="rounded-3xl border border-gray-200 p-3">
+                <div className="text-xs text-foreground mb-1">Category / City</div>
                 <div className="font-medium">
                   {service.category?.name} • {service.city?.name}
                 </div>
@@ -203,36 +203,55 @@ export default function AdminServicesShow() {
 
               <div className="space-y-2">
                 <div className="text-sm font-medium">Description</div>
-                <div className="rounded-lg border p-3 text-sm whitespace-pre-wrap">
+                <div className="rounded-3xl border border-gray-200 p-3 text-sm whitespace-pre-wrap">
                   {service.description}
                 </div>
               </div>
 
               {/* Media */}
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Media</div>
+              <div className="space-y-3">
+  <div className="flex items-center justify-between">
+    <div className="text-sm font-semibold">Media</div>
+    {mediaSorted.length > 0 ? (
+      <div className="text-xs text-muted-foreground">
+        {mediaSorted.length} photo{mediaSorted.length > 1 ? "s" : ""}
+      </div>
+    ) : null}
+  </div>
 
-                {mediaSorted.length === 0 ? (
-                  <div className="text-sm text-muted-foreground">No images.</div>
-                ) : (
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {mediaSorted.map((m) => {
-                      const url = publicImagePath(m.path);
-                      return (
-                        <div key={m.id} className="rounded-lg overflow-hidden border bg-muted">
-                          {url ? (
-                            <img src={url} alt="service media" className="w-full h-40 object-cover" />
-                          ) : (
-                            <div className="w-full h-40 flex items-center justify-center text-xs text-muted-foreground">
-                              Invalid path
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+  {mediaSorted.length === 0 ? (
+    <div className="rounded-2xl border bg-muted/40 p-6 text-sm text-muted-foreground">
+      No images.
+    </div>
+  ) : (
+    <div className="relative">
+      <div className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2">
+        {mediaSorted.map((m) => {
+          const url = publicImagePath(m.path);
+
+          return (
+            <div
+              key={m.id}
+              className="min-w-[85%] sm:min-w-[60%] md:min-w-[45%] lg:min-w-[38%] snap-start overflow-hidden rounded-3xl border border-gray-200 bg-muted shrink-0"
+            >
+              {url ? (
+                <img
+                  src={url}
+                  alt="service media"
+                  className="w-full h-56 sm:h-64 md:h-72 object-cover transition duration-300 hover:scale-[1.02]"
+                />
+              ) : (
+                <div className="w-full h-56 sm:h-64 md:h-72 flex items-center justify-center text-xs text-muted-foreground">
+                  Invalid path
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  )}
+</div>
 
               {/* Actions */}
               <div className="border-t pt-4 flex flex-wrap gap-2 items-center">

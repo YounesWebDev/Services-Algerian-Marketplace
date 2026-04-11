@@ -70,7 +70,7 @@ function Badge({
       : "bg-blue-100 text-blue-800 border-blue-200";
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -111,9 +111,9 @@ export default function AdminUsersShow() {
             <p className="text-sm text-muted-foreground">Manage user status and see quick stats.</p>
           </div>
 
-          <Button type="button" variant="outline" onClick={() => window.history.back()}>
-            Back to users
-          </Button>
+          <button type="button" className="px-3 py-2 rounded-3xl text-red-600 border border-gray-200 transition duration-700 hover:text-white hover:bg-red-600 hover:shadow-2xl" onClick={() => window.history.back()}>
+            Back 
+          </button>
         </div>
 
         {/* Flash success */}
@@ -125,7 +125,7 @@ export default function AdminUsersShow() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left: user card */}
-          <Card className="lg:col-span-1">
+          <Card className="lg:col-span-1 rounded-4xl border border-gray-200 bg-primary-foreground/30">
             <CardHeader>
               <CardTitle>User</CardTitle>
             </CardHeader>
@@ -165,22 +165,25 @@ export default function AdminUsersShow() {
                 <div className="text-sm font-medium">Actions</div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button
+                  <button
+                  className="rounded-3xl border border-gray-200 px-3 py-2 bg-primary transition duration-700 hover:bg-foreground hover:text-background hover:shadow-2xl"
                     type="button"
                     onClick={() => setStatus("active")}
                     disabled={form.processing || user.status === "active"}
                   >
                     Set Active
-                  </Button>
+                  </button>
 
-                  <Button
+                  <button
+                                    className="rounded-3xl border  border-gray-200 text-red-600 px-3 py-2  transition duration-700 hover:bg-red-600 hover:text-white hover:shadow-2xl"
+
                     type="button"
-                    variant="destructive"
+                    
                     onClick={() => setStatus("inactive")}
                     disabled={form.processing || user.status === "inactive"}
                   >
                     Set Inactive
-                  </Button>
+                  </button>
                 </div>
 
                 <InputError message={form.errors.status} />
@@ -190,15 +193,15 @@ export default function AdminUsersShow() {
 
           {/* Right: stats + provider verification */}
           <div className="lg:col-span-2 space-y-6">
-            <Card>
+            <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
               <CardHeader>
                 <CardTitle>Quick stats</CardTitle>
               </CardHeader>
               <CardContent>
                 {user.role === "provider" ? (
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div className="rounded-lg border p-4">
-                      <div className="text-sm text-muted-foreground">Services</div>
+                    <div className="rounded-3xl border border-gray-200 p-4 bg-primary-foreground/10">
+                      <div className="text-sm text-foreground">Services</div>
                       <Link
                         href={adminServicesIndex({ query: { q: user.name } }).url}
                         className="text-2xl font-semibold underline"
@@ -207,12 +210,12 @@ export default function AdminUsersShow() {
                       </Link>
                     </div>
 
-                    <div className="rounded-lg border p-4">
-                      <div className="text-sm text-muted-foreground">Bookings (as provider)</div>
+                    <div className="rounded-3xl border border-gray-200 p-4 bg-primary-foreground/10">
+                      <div className="text-sm text-foreground">Bookings (as provider)</div>
                       <div className="text-2xl font-semibold">{stats.bookingsAsProviderCount}</div>
                     </div>
 
-                    <div className="rounded-lg border p-4">
+                    <div className="rounded-3xl border border-gray-200 p-4 bg-primary-foreground/10">
                       <div className="text-sm text-muted-foreground">Reports made</div>
                       <div className="text-2xl font-semibold">{stats.reportsMadeCount}</div>
                     </div>
@@ -229,12 +232,12 @@ export default function AdminUsersShow() {
                       </Link>
                     </div>
 
-                    <div className="rounded-lg border p-4">
+                    <div className="rounded-3xl border border-gray-200 p-4 bg-primary-foreground/10">
                       <div className="text-sm text-muted-foreground">Bookings (as client)</div>
                       <div className="text-2xl font-semibold">{stats.bookingsAsClientCount}</div>
                     </div>
 
-                    <div className="rounded-lg border p-4">
+                    <div className="rounded-3xl border border-gray-200 p-4 bg-primary-foreground/10">
                       <div className="text-sm text-muted-foreground">Reports made</div>
                       <div className="text-2xl font-semibold">{stats.reportsMadeCount}</div>
                     </div>
@@ -244,7 +247,7 @@ export default function AdminUsersShow() {
             </Card>
 
             {user.role === "provider" && (
-              <Card>
+              <Card className="rounded-3xl bg-primary-foreground/30 border border-gray-200">
                 <CardHeader>
                   <CardTitle>Provider verification</CardTitle>
                 </CardHeader>

@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { dashboard } from "@/routes";
 // Wayfinder (adjust import if your generated routes path differs)
 import { index as adminUsersIndex, show as adminUsersShow } from "@/routes/admin/users";
+import { ExternalLink, Search } from "lucide-react";
 
 type UserRow = {
   id: number;
@@ -79,7 +80,7 @@ function Badge({
   }, [variant]);
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -107,19 +108,19 @@ export default function AdminUsersIndex() {
         </div>
 
         {/* Filters */}
-        <form method="get" action={adminUsersIndex().url} className="rounded-lg border bg-card p-4 space-y-4">
+        <form method="get" action={adminUsersIndex().url} className="rounded-4xl  border border-gray-200  bg-primary-foreground/30  p-4 space-y-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="q">Search</Label>
-              <Input id="q" name="q" placeholder="Name or email..." defaultValue={filters.q ?? ""} />
+              <Input id="q" name="q" placeholder="Name or email..." defaultValue={filters.q ?? ""} className="rounded-3xl border border-gray-200" />
               <InputError message={props.errors?.q} />
             </div>
 
             <div className="space-y-2">
               <Label>Role</Label>
               {/* Shadcn Select doesn't submit a value automatically, so we keep a hidden input */}
-              <input type="hidden" name="role" value={filters.role ?? ""} />
-              <Select
+              <input className="rounded-3xl" type="hidden" name="role" value={filters.role ?? ""}  />
+              <Select 
                 defaultValue={filters.role ?? ""}
                 onValueChange={(v) => {
                   const input = document.querySelector<HTMLInputElement>('input[name="role"]');
@@ -160,17 +161,18 @@ export default function AdminUsersIndex() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button type="submit">Apply</Button>
+            <button type="submit" className="flex items-center rounded-3xl border border-gray-200 py-2 px-3 bg-primary transition duration-700 hover:bg-foreground hover:text-background">Search<Search/></button>
 
-            <Button
+            <button
               type="button"
-              variant="outline"
+             
               onClick={() => {
                 window.location.href = adminUsersIndex().url;
               }}
+              className="rounded-3xl border border-gray-200 px-3 py-2 transition duration-700 hover:bg-foreground hover:text-background hover:shadow-2xl"
             >
               Reset
-            </Button>
+            </button>
 
             <div className="ml-auto text-sm text-muted-foreground">
               Total: <span className="font-medium text-foreground">{users.total}</span>
@@ -179,7 +181,7 @@ export default function AdminUsersIndex() {
         </form>
 
         {/* Table */}
-        <div className="rounded-lg border bg-card overflow-hidden">
+        <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead className="bg-muted/50">
@@ -203,7 +205,7 @@ export default function AdminUsersIndex() {
                   users.data.map((u) => {
                     const avatar = publicImagePath(u.avatar_path);
                     return (
-                      <tr key={u.id} className="border-t">
+                      <tr key={u.id} className="border-t border-gray-200">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-full overflow-hidden border bg-muted shrink-0">
@@ -223,7 +225,7 @@ export default function AdminUsersIndex() {
                         </td>
 
                         <td className="px-4 py-3">
-                          <Badge variant={u.role === "admin" ? "default" : u.role === "provider" ? "success" : "muted"}>
+                          <Badge variant={u.role === "admin" ? "default" : u.role === "provider" ? "success" : "muted"} >
                             {u.role}
                           </Badge>
                         </td>
@@ -237,9 +239,9 @@ export default function AdminUsersIndex() {
                         </td>
 
                         <td className="px-4 py-3 text-right">
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={adminUsersShow(u.id).url}>View</Link>
-                          </Button>
+                          <button  className="rounded-3xl px-3 py-2 border border-gray-200 text-primary transition duration-700 hover:bg-primary hover:text-foreground hover:shadow-2xl ">
+                            <Link href={adminUsersShow(u.id).url} className="flex items-center gap-2">View <ExternalLink/> </Link>
+                          </button>
                         </td>
                       </tr>
                     );
@@ -251,7 +253,7 @@ export default function AdminUsersIndex() {
 
           {/* Pagination */}
           {users.links?.length > 1 && (
-            <div className="border-t p-3">
+            <div className="border-t  p-3">
               <PaginationLinks links={users.links} />
             </div>
           )}
