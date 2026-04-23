@@ -71,7 +71,7 @@ export default function Password() {
                                         ref={currentPasswordInput}
                                         name="current_password"
                                         type="password"
-                                        className="mt-1 block w-full"
+                                        className="mt-1 block w-full rounded-3xl border border-gray-200 bg-primary-foreground/30"
                                         autoComplete="current-password"
                                         placeholder="Current password"
                                     />
@@ -91,7 +91,7 @@ export default function Password() {
                                         ref={passwordInput}
                                         name="password"
                                         type="password"
-                                        className="mt-1 block w-full"
+                                        className="mt-1 block w-full rounded-3xl border border-gray-200 bg-primary-foreground/30"
                                         autoComplete="new-password"
                                         placeholder="New password"
                                     />
@@ -108,7 +108,7 @@ export default function Password() {
                                         id="password_confirmation"
                                         name="password_confirmation"
                                         type="password"
-                                        className="mt-1 block w-full"
+                                        className="mt-1 block w-full rounded-3xl border border-gray-200 bg-primary-foreground/30"
                                         autoComplete="new-password"
                                         placeholder="Confirm password"
                                     />
@@ -120,6 +120,7 @@ export default function Password() {
 
                                 <div className="flex items-center gap-4">
                                     <Button
+                                    className='rounded-3xl border border-gray-200 transition duration-700  hover:text-background hover:bg-foreground'
                                         disabled={processing}
                                         data-test="update-password-button"
                                     >

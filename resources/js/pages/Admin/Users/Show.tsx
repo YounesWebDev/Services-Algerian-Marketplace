@@ -1,7 +1,6 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
 import { cn } from "@/lib/utils";

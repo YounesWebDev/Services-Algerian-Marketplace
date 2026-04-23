@@ -261,7 +261,7 @@ export default function ChatsIndex() {
                                 }}
                                 className="block"
                             >
-                                <Card className="gap-0 py-0 transition-colors hover:bg-accent/30">
+                                <Card className="gap-0 py-0 transition-colors hover:bg-accent/30 rounded-4xl border border-gray-200 bg-primary-foreground/30">
                                     <CardContent className="flex items-center justify-between gap-3 p-4">
                                         <div className="flex min-w-0 items-start gap-3">
                                             <Avatar className="h-10 w-10 border">

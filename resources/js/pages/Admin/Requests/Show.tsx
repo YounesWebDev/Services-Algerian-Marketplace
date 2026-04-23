@@ -83,7 +83,7 @@ function Badge({
       : "bg-blue-100 text-blue-800 border-blue-200";
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl  border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -129,9 +129,9 @@ export default function AdminRequestsShow() {
             </p>
           </div>
 
-          <Button type="button" variant="outline" onClick={() => window.history.back()}>
+          <button type="button"  onClick={() => window.history.back()} className="rounded-3xl border border-gray-200 px-3 py-2 text-red-600 transition duration-700 hover:bg-red-600 hover:text-white">
             Back
-          </Button>
+          </button>
         </div>
 
         {flash?.success ? (
@@ -148,7 +148,7 @@ export default function AdminRequestsShow() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 rounded-4xl border border-gray-200 bg-primary-foreground/30">
             <CardHeader>
               <CardTitle className="flex items-center justify-between gap-3">
                 <span className="truncate">{request.title}</span>
@@ -169,7 +169,7 @@ export default function AdminRequestsShow() {
             </CardHeader>
 
             <CardContent className="space-y-5">
-              <div className="rounded-lg border p-3 text-sm">
+              <div className="rounded-3xl  border border-gray-200 p-3 text-sm">
                 <div className="text-xs text-muted-foreground mb-1">Category / City</div>
                 <div className="font-medium">
                   {request.category?.name} • {request.city?.name}
@@ -177,7 +177,7 @@ export default function AdminRequestsShow() {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border p-3">
+                <div className="rounded-3xl  border border-gray-200 p-3">
                   <div className="text-xs text-muted-foreground">Budget</div>
                   <div className="font-medium">
                     {request.budget_min || request.budget_max
@@ -186,12 +186,12 @@ export default function AdminRequestsShow() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-3">
+                <div className="rounded-3xl  border border-gray-200 p-3">
                   <div className="text-xs text-muted-foreground">Urgency</div>
                   <div className="font-medium">{request.urgency ?? "—"}</div>
                 </div>
 
-                <div className="rounded-lg border p-3">
+                <div className="rounded-3xl  border border-gray-200 p-3">
                   <div className="text-xs text-muted-foreground">Offers</div>
                   <div className="font-medium">{offers.length}</div>
                 </div>
@@ -199,7 +199,7 @@ export default function AdminRequestsShow() {
 
               <div className="space-y-2">
                 <div className="text-sm font-medium">Description</div>
-                <div className="rounded-lg border p-3 text-sm whitespace-pre-wrap">
+                <div className="rounded-3xl  border border-gray-200  p-3 text-sm whitespace-pre-wrap">
                   {request.description}
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function AdminRequestsShow() {
                     {mediaSorted.map((m) => {
                       const url = publicImagePath(m.path);
                       return (
-                        <div key={m.id} className="rounded-lg overflow-hidden border bg-muted">
+                        <div key={m.id} className="rounded-3xl  border border-gray-200 overflow-hidden bg-muted">
                           {url ? (
                             <img src={url} alt="request media" className="w-full h-40 object-cover" />
                           ) : (
@@ -231,7 +231,7 @@ export default function AdminRequestsShow() {
 
               {/* Admin actions */}
               <div className="border-t pt-4 flex flex-wrap items-center gap-2">
-                <Button
+                <Button className="rounded-3xl border border-gray-200"
                   type="button"
                   onClick={closeNow}
                   variant="destructive"
@@ -241,6 +241,7 @@ export default function AdminRequestsShow() {
                 </Button>
 
                 <Button
+                  className="rounded-3xl border border-gray-200"
                   type="button"
                   onClick={reopenNow}
                   variant="outline"
@@ -259,7 +260,7 @@ export default function AdminRequestsShow() {
           </Card>
 
           {/* Client */}
-          <Card className="lg:col-span-1">
+          <Card className="lg:col-span-1 rounded-4xl border border-gray-200 bg-primary-foreground/30">
             <CardHeader>
               <CardTitle>Client</CardTitle>
             </CardHeader>
@@ -299,7 +300,7 @@ export default function AdminRequestsShow() {
         </div>
 
         {/* Offers list */}
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Offers</CardTitle>
           </CardHeader>

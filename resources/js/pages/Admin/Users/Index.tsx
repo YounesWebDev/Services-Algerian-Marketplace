@@ -1,9 +1,9 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { ExternalLink, Search } from "lucide-react";
 import { useMemo } from "react";
 
 import InputError from "@/components/input-error";
 import PaginationLinks from "@/components/pagination-links";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 import { dashboard } from "@/routes";
 // Wayfinder (adjust import if your generated routes path differs)
 import { index as adminUsersIndex, show as adminUsersShow } from "@/routes/admin/users";
-import { ExternalLink, Search } from "lucide-react";
 
 type UserRow = {
   id: number;
@@ -262,4 +261,3 @@ export default function AdminUsersIndex() {
     </AppLayout>
   );
 }
-

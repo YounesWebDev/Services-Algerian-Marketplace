@@ -1,4 +1,5 @@
 import { Head, Link, router } from "@inertiajs/react";
+import { ExternalLink, Search } from "lucide-react";
 import * as React from "react";
 
 import PaginationLinks from "@/components/pagination-links";
@@ -117,7 +118,7 @@ export default function PaymentsIndex({ payments, filters }: Props) {
       <Head title="Payments (Management)" />
 
       <div className="space-y-6">
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Payments Management</CardTitle>
           </CardHeader>
@@ -131,6 +132,7 @@ export default function PaymentsIndex({ payments, filters }: Props) {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="client/provider name or email..."
+                  className="rounded-3xl border "
                 />
               </div>
 
@@ -138,7 +140,7 @@ export default function PaymentsIndex({ payments, filters }: Props) {
                 <Label htmlFor="status">Status</Label>
                 <select
                   id="status"
-                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                  className="h-10 rounded-3xl border bg-background px-3 text-sm"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
@@ -154,7 +156,7 @@ export default function PaymentsIndex({ payments, filters }: Props) {
                 <Label htmlFor="type">Type</Label>
                 <select
                   id="type"
-                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                  className="h-10 rounded-3xl border bg-background px-3 text-sm"
                   value={type}
                   onChange={(e) => setType(e.target.value)}
                 >
@@ -165,8 +167,8 @@ export default function PaymentsIndex({ payments, filters }: Props) {
               </div>
 
               <div className="flex items-end gap-2">
-                <Button type="submit">Apply</Button>
-                <Button type="button" variant="outline" onClick={resetFilters}>
+                <Button type="submit" className="rounded-3xl text-foreground border border-gray-200 transition duration-700 hover:bg-foreground hover:text-background">Search <Search/> </Button>
+                <Button type="button" variant="outline" onClick={resetFilters} className="rounded-3xl border border-gray-200 bg-primary-foreground/1">
                   Reset
                 </Button>
               </div>
@@ -180,7 +182,7 @@ export default function PaymentsIndex({ payments, filters }: Props) {
           </CardHeader>
 
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-4xl border border-gray-200 bg-primary-foreground/30">
               <table className="min-w-full text-sm">
                 <thead className="bg-muted/50">
                   <tr className="text-left">
@@ -225,9 +227,11 @@ export default function PaymentsIndex({ payments, filters }: Props) {
                         </td>
                         <td className="px-4 py-3">{money(p.platform_fee)}</td>
                         <td className="px-4 py-3">{money(p.provider_amount)}</td>
-                        <td className="px-4 py-3 text-right">
-                          <Button asChild size="sm" variant="secondary">
-                            <Link href={adminPaymentsShow(p.id).url}>Open</Link>
+                        <td className="px-4 py-3 text-right" >
+                          <Button asChild size="sm" variant="secondary" className="rounded-3xl border border-gray-200 text-primary flex items-center gap-2 transition duration-700 hover:bg-primary hover:text-background">
+                            <Link href={adminPaymentsShow(p.id).url} className="rounded-3xl border border-gray-200 text-primary flex items-center gap-2">
+                              Open <ExternalLink/>
+                            </Link>
                           </Button>
                         </td>
                       </tr>

@@ -93,7 +93,7 @@ export default function PaymentsShow({ payment }: { payment: Payment }) {
       <Head title={`Payment #${payment.id}`} />
 
       <div className="space-y-6">
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader className="flex flex-row items-center justify-between gap-4">
             <CardTitle>Payment #{payment.id}</CardTitle>
 
@@ -105,26 +105,26 @@ export default function PaymentsShow({ payment }: { payment: Payment }) {
 
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-md border p-3">
+              <div className="rounded-3xl  border border-gray-200 p-3">
                 <div className="text-xs text-muted-foreground">Amount</div>
                 <div className="text-lg font-semibold">
                   {money(payment.amount)} {booking?.currency ?? "DZD"}
                 </div>
               </div>
 
-              <div className="rounded-md border p-3">
+              <div className="rounded-3xl  border border-gray-200 p-3">
                 <div className="text-xs text-muted-foreground">Platform fee</div>
                 <div className="text-lg font-semibold">{money(payment.platform_fee)}</div>
               </div>
 
-              <div className="rounded-md border p-3">
+              <div className="rounded-3xl  border border-gray-200 p-3">
                 <div className="text-xs text-muted-foreground">Provider amount</div>
                 <div className="text-lg font-semibold">{money(payment.provider_amount)}</div>
               </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-md border p-4">
+              <div className="rounded-3xl  border border-gray-200 p-4">
                 <div className="mb-2 text-sm font-semibold">Booking</div>
                 <div className="text-sm">
                   <div>
@@ -160,7 +160,7 @@ export default function PaymentsShow({ payment }: { payment: Payment }) {
                 </div>
               </div>
 
-              <div className="rounded-md border p-4">
+              <div className="rounded-3xl  border border-gray-200 p-4">
                 <div className="mb-2 text-sm font-semibold">People</div>
                 <div className="space-y-2 text-sm">
                   <div>
@@ -178,15 +178,9 @@ export default function PaymentsShow({ payment }: { payment: Payment }) {
               </div>
             </div>
 
-            <div className="rounded-md border p-4">
-              <div className="mb-2 text-sm font-semibold">Metadata</div>
-              <pre className="max-h-64 overflow-auto rounded-md bg-muted p-3 text-xs">
-{JSON.stringify(payment.metadata ?? {}, null, 2)}
-              </pre>
-            </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="outline" onClick={() => window.history.back()}>
+              <Button type="button" variant="outline" onClick={() => window.history.back()} className="rounded-3xl border border-gray-200 text-red-600 transition duration-700 hover:bg-red-600 hover:text-white">
                 Back
               </Button>
             </div>

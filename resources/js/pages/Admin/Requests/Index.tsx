@@ -1,8 +1,8 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import { ExternalLink, Search } from "lucide-react";
 import { useMemo } from "react";
 
 import PaginationLinks from "@/components/pagination-links";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,7 +103,7 @@ function Badge({
   }, [variant]);
 
   return (
-    <span className={cn("inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium", cls)}>
+    <span className={cn("inline-flex items-center rounded-3xl  border border-gray-200 px-2 py-0.5 text-xs font-medium", cls)}>
       {children}
     </span>
   );
@@ -130,7 +130,7 @@ export default function AdminRequestsIndex() {
           </p>
         </div>
 
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle className="text-base">Filters</CardTitle>
           </CardHeader>
@@ -139,7 +139,7 @@ export default function AdminRequestsIndex() {
               <div className="grid gap-4 md:grid-cols-6">
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="q">Search</Label>
-                  <Input id="q" name="q" placeholder="Title or description..." defaultValue={filters.q ?? ""} />
+                  <Input id="q" name="q" placeholder="Title or description..." defaultValue={filters.q ?? ""} className="rounded-3xl border border-gray-200" />
                 </div>
 
                 <div className="space-y-2">
@@ -215,10 +215,12 @@ export default function AdminRequestsIndex() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button type="submit">Apply</Button>
-                <Button type="button" variant="outline" onClick={() => (window.location.href = adminRequestsIndex().url)}>
+                <button type="submit" className="rounded-3xl px-3 py-2 border border-gray-200 bg-primary transition duration-700 hover:bg-foreground hover:text-background flex items-center gap-2">
+                  Search <Search/>
+                </button>
+                <button type="button"  onClick={() => (window.location.href = adminRequestsIndex().url)} className="rounded-3xl px-3 py-2 border border-gray-200  transition duration-700 hover:bg-foreground hover:text-background">
                   Reset
-                </Button>
+                </button>
 
                 <div className="ml-auto text-sm text-muted-foreground">
                   Total: <span className="font-medium text-foreground">{requests.total}</span>
@@ -228,9 +230,9 @@ export default function AdminRequestsIndex() {
           </CardContent>
         </Card>
 
-        <div className="rounded-lg border bg-card overflow-hidden">
+        <div className="rounded-4xl border border-gray-200 bg-card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm  rounded-4xl bg-primary-foreground/30 ">
               <thead className="bg-muted/50">
                 <tr className="text-left">
                   <th className="px-4 py-3 font-medium">Request</th>
@@ -307,9 +309,11 @@ export default function AdminRequestsIndex() {
                         </td>
 
                         <td className="px-4 py-3 text-right">
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={adminRequestsShow(r.id).url}>View</Link>
-                          </Button>
+                          <button className="rounded-3xl border border-gray-200 text-primary px-3 py-2 gap-2 transition duration-700 hover:bg-primary hover:text-foreground hover:shadow-2xl flex items-center">
+                            <Link href={adminRequestsShow(r.id).url} className="flex items-center gap-2">
+                              View <ExternalLink />
+                            </Link>
+                          </button>
                         </td>
                       </tr>
                     );
@@ -329,5 +333,4 @@ export default function AdminRequestsIndex() {
     </AppLayout>
   );
 }
-
 

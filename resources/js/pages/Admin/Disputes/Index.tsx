@@ -62,7 +62,7 @@ export default function Index({
           </div>
         </div>
 
-        <Card>
+        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
             <CardTitle>List</CardTitle>
           </CardHeader>

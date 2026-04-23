@@ -1,4 +1,5 @@
 import { Head, Link, router } from "@inertiajs/react";
+import { ExternalLink, Search } from "lucide-react";
 import * as React from "react";
 
 import PaginationLinks from "@/components/pagination-links";
@@ -92,7 +93,7 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
       <Head title="Payouts (Management)" />
 
       <div className="space-y-6">
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Payouts Management</CardTitle>
           </CardHeader>
@@ -106,6 +107,7 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="provider name or email..."
+                  className="rounded-3xl border border-gray-200"
                 />
               </div>
 
@@ -113,7 +115,7 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
                 <Label htmlFor="status">Status</Label>
                 <select
                   id="status"
-                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                  className="h-10 rounded-3xl border bg-background px-3 text-sm"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
@@ -124,8 +126,8 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
               </div>
 
               <div className="flex items-end gap-2">
-                <Button type="submit">Apply</Button>
-                <Button type="button" variant="outline" onClick={resetFilters}>
+                <Button type="submit" className="rounded-3xl border border-gray-200 flex transition duration-700 hover:text-background hover:bg-foreground">search <Search/></Button>
+                <Button type="button" variant="outline" onClick={resetFilters} className="rounded-3xl border border-gray-200 bg-primary-foreground/1 transition duration-700 hover:text-background hover:bg-foreground">
                   Reset
                 </Button>
               </div>
@@ -133,7 +135,7 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader>
             <CardTitle>Payouts</CardTitle>
           </CardHeader>
@@ -149,7 +151,7 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
                     <th className="px-4 py-3 font-medium">Amount</th>
                     <th className="px-4 py-3 font-medium">Method</th>
                     <th className="px-4 py-3 font-medium">Sent at</th>
-                    <th className="px-4 py-3 font-medium text-right">Open</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -171,8 +173,8 @@ export default function PayoutsIndex({ payouts, filters }: Props) {
                         <td className="px-4 py-3">{p.method ?? "-"}</td>
                         <td className="px-4 py-3">{p.sent_at ?? "-"}</td>
                         <td className="px-4 py-3 text-right">
-                          <Button asChild size="sm" variant="secondary">
-                            <Link href={adminPayoutsShow(p.id).url}>Open</Link>
+                          <Button asChild size="sm" variant="secondary" className="rounded-3xl border border-gray-200 text-primary flex items-center transition duration-700 hover:text-background hover:bg-foreground" >
+                            <Link href={adminPayoutsShow(p.id).url} className="rounded-3xl border border-gray-200 text-primary flex items-center transition duration-700 hover:text-background hover:bg-foreground gap-2 ">Open <ExternalLink/> </Link>
                           </Button>
                         </td>
                       </tr>

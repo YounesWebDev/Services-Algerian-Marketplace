@@ -97,7 +97,7 @@ export default function ProvidersVerificationsIndex() {
           <div />
         </div>
 
-        <Card>
+        <Card className="rounded-4xl bg-primary-foreground/30 border border-gray-200">
           <CardHeader>
             <div className="font-medium">Filters</div>
           </CardHeader>
@@ -106,6 +106,7 @@ export default function ProvidersVerificationsIndex() {
               <div className="grid gap-2">
                 <Label htmlFor="q">Search (name/email)</Label>
                 <Input
+                className="rounded-3xl border border-gray-200"
                   id="q"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
@@ -120,7 +121,7 @@ export default function ProvidersVerificationsIndex() {
                 <Label htmlFor="status">Status</Label>
                 <select
                   id="status"
-                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                  className="h-10 rounded-3xl border bg-background px-3 text-sm"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
@@ -131,7 +132,7 @@ export default function ProvidersVerificationsIndex() {
               </div>
 
               <div className="flex items-end">
-                <Button onClick={applyFilters} className="w-full">
+                <Button onClick={applyFilters} className="w-full rounded-3xl border border-gray-200 transition duration-700  hover:text-background hover:bg-foreground">
                   Apply
                 </Button>
               </div>
@@ -151,7 +152,7 @@ export default function ProvidersVerificationsIndex() {
               const avatar = publicImagePath(v.provider.avatar_path);
 
               return (
-                <Card key={v.id}>
+                <Card key={v.id} className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
                   <CardContent className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
                       <Avatar className="h-10 w-10">

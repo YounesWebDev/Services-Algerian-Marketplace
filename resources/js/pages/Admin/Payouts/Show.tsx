@@ -98,7 +98,7 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
       <Head title={`Payout #${payout.id}`} />
 
       <div className="space-y-6">
-        <Card>
+        <Card className="rounded-4xl border border-gray-200 bg-primary-foreground/30">
           <CardHeader className="flex flex-row items-center justify-between gap-4">
             <CardTitle>Payout #{payout.id}</CardTitle>
             <Badge variant={statusVariant(payout.status)}>{payout.status}</Badge>
@@ -106,7 +106,7 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
 
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-md border p-4">
+              <div className="rounded-3xl border border-gray-200 p-4">
                 <div className="text-xs text-muted-foreground">Amount</div>
                 <div className="text-lg font-semibold">{money(payout.amount)} DZD</div>
 
@@ -119,7 +119,7 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                 </div>
               </div>
 
-              <div className="rounded-md border p-4">
+              <div className="rounded-3xl border border-gray-200 p-4">
                 <div className="mb-2 text-sm font-semibold">Provider</div>
                 <div className="text-sm">
                   <div className="font-medium">{provider?.name ?? "-"}</div>
@@ -127,29 +127,27 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                 </div>
 
                 <div className="mt-3">
-                  <div className="text-xs text-muted-foreground">Metadata</div>
-                  <pre className="mt-2 max-h-56 overflow-auto rounded-md bg-muted p-3 text-xs">
-                    {JSON.stringify(payout.metadata ?? {}, null, 2)}
-                  </pre>
+                 
+                
+                    
+                  
                 </div>
               </div>
             </div>
 
             {canMarkSent && (
-              <Card>
+              <Card className="rounded-4xl border border-gray-200 bg-primary-foregound/30">
                 <CardHeader>
                   <CardTitle className="text-base">Mark payout as sent</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={markSent} className="grid gap-4 md:grid-cols-2">
-                    {errors.payout && (
-                      <div className="md:col-span-2 text-sm text-destructive">{errors.payout}</div>
-                    )}
+                  
                     <div className="grid gap-2">
                       <Label htmlFor="method">Method</Label>
                       <select
                         id="method"
-                        className="h-10 rounded-md border bg-background px-3 text-sm"
+                        className="h-10 rounded-3xl border border-gray-200 bg-background px-3 text-sm"
                         value={data.method}
                         onChange={(e) => setData("method", e.target.value)}
                       >
@@ -206,6 +204,7 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                     <div className="grid gap-2">
                       <Label htmlFor="reference">Reference (optional)</Label>
                       <Input
+                      className="rounded-3xl border border-gray-200"
                         id="reference"
                         value={data.reference}
                         onChange={(e) => setData("reference", e.target.value)}
@@ -217,10 +216,10 @@ export default function PayoutsShow({ payout }: { payout: Payout }) {
                     </div>
 
                     <div className="flex gap-2 md:col-span-2">
-                      <Button disabled={processing} type="submit">
+                      <Button disabled={processing} type="submit" className="rounded-3xl border border-gray-200 transition duration-700 hover:bg-foreground hover:text-background ">
                         Mark Sent
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                      <Button type="button" variant="outline" onClick={() => window.history.back()} className="rounded-3xl border bg-primary-foreground/1 text-red-600 border-gray-200 transition duration-700 hover:bg-red-600 hover:text-white ">
                         Back
                       </Button>
                     </div>

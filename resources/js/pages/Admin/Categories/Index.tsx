@@ -93,7 +93,7 @@ export default function Index({ categories, parents }: Props) {
         )}
 
         {/* form */}
-        <div className="rounded-lg border p-4 space-y-3">
+        <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">
               {editingId === null ? "Add Category" : "Edit Category"}
@@ -114,7 +114,7 @@ export default function Index({ categories, parents }: Props) {
             <div className="md:col-span-1">
               <label className="text-sm">Name</label>
               <input
-                className="mt-1 w-full rounded-md border px-3 py-2"
+                className="mt-1 w-full rounded-3xl   border border-gray-200 px-3 py-2"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Example: Cleaning"
@@ -127,7 +127,7 @@ export default function Index({ categories, parents }: Props) {
             <div className="md:col-span-1">
               <label className="text-sm">Parent (optional)</label>
               <select
-                className="mt-1 w-full rounded-md border px-3 py-2"
+                className="mt-1 w-full rounded-3xl border border-gray-200  px-3 py-2"
                 value={parentId}
                 onChange={(e) => setParentId(e.target.value)}
               >
@@ -150,7 +150,7 @@ export default function Index({ categories, parents }: Props) {
             </div>
 
             <div className="md:col-span-1 flex items-end gap-2">
-              <button className="w-full rounded-md border px-4 py-2 transition duration-700 hover:bg-primary ">
+              <button className="w-full rounded-3xl border border-gray-200 bg-primary text-foreground px-4 py-2 transition duration-700 hover:bg-foreground hover:text-background  ">
                 {editingId === null ? "Create" : "Update"}
               </button>
             </div>
@@ -158,7 +158,7 @@ export default function Index({ categories, parents }: Props) {
         </div>
 
         {/* table */}
-        <div className="rounded-lg border overflow-hidden">
+        <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left">
