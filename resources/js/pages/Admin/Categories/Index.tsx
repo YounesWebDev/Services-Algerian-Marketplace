@@ -2,6 +2,7 @@ import { Head, router, usePage } from "@inertiajs/react";
 import { Pencil, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
+import InertiaFlashAlert from "@/components/inertia-flash-alert";
 import AppLayout from "@/layouts/app-layout";
 import { dashboard } from "@/routes";
 import { index as adminCategoriesIndex } from "@/routes/admin/categories";
@@ -81,16 +82,17 @@ export default function Index({ categories, parents }: Props) {
       ]}
     >
       <Head title="Categories" />
+      <InertiaFlashAlert message={flash?.success} title="Success" />
+      <InertiaFlashAlert
+        message={flash?.error}
+        title="Action blocked"
+        variant="error"
+      />
 
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Categories</h1>
         </div>
-
-        {/* success message */}
-        {flash?.success && (
-          <div className="rounded-md border p-3 text-sm">{flash.success}</div>
-        )}
 
         {/* form */}
         <div className="rounded-4xl border border-gray-200 bg-primary-foreground/30 p-4 space-y-3">

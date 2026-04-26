@@ -1,5 +1,6 @@
 import { Head, useForm, usePage } from "@inertiajs/react";
 
+import InertiaFlashAlert from "@/components/inertia-flash-alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
@@ -119,6 +120,12 @@ export default function AdminRequestsShow() {
       ]}
     >
       <Head title={`Request: ${request.title}`} />
+      <InertiaFlashAlert message={flash?.success} title="Success" />
+      <InertiaFlashAlert
+        message={errors?.request}
+        title="Action blocked"
+        variant="error"
+      />
 
       <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -133,18 +140,6 @@ export default function AdminRequestsShow() {
             Back
           </button>
         </div>
-
-        {flash?.success ? (
-          <div className="rounded-md border bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {flash.success}
-          </div>
-        ) : null}
-
-        {errors?.request ? (
-          <div className="rounded-md border bg-rose-50 px-4 py-3 text-sm text-rose-800">
-            {errors.request}
-          </div>
-        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main */}
@@ -347,4 +342,3 @@ export default function AdminRequestsShow() {
     </AppLayout>
   );
 }
-

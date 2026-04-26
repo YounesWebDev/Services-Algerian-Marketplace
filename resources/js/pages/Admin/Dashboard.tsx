@@ -1,9 +1,11 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
+import InertiaFlashAlert from '@/components/inertia-flash-alert';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
+import type { SharedData } from '@/types';
 
 type Verification = {
     id: number;
@@ -105,6 +107,19 @@ export default function Dashboard({
 }: {
     actionRequired: ActionRequired;
 }) {
+    const { flash } = usePage<
+        SharedData & {
+            flash?: {
+                success?:
+                    | string
+                    | { title?: string; reason?: string; description?: string };
+                error?:
+                    | string
+                    | { title?: string; reason?: string; description?: string };
+            };
+        }
+    >().props;
+
     const stats = {
         verifications: actionRequired.verifications.length,
         reports: actionRequired.reports.length,
@@ -144,6 +159,12 @@ export default function Dashboard({
             breadcrumbs={[{ title: 'Admin Dashboard', href: dashboard().url }]}
         >
             <Head title="Admin Dashboard" />
+            <InertiaFlashAlert message={flash?.success} title="Success" />
+            <InertiaFlashAlert
+                message={flash?.error}
+                title="Action blocked"
+                variant="error"
+            />
 
             <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
                 <div>

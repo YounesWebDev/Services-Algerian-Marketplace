@@ -1,5 +1,6 @@
 import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
+import InertiaFlashAlert from "@/components/inertia-flash-alert";
 import InputError from "@/components/input-error";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AppLayout from "@/layouts/app-layout";
@@ -101,6 +102,7 @@ export default function AdminUsersShow() {
       ]}
     >
       <Head title={`User: ${user.name}`} />
+      <InertiaFlashAlert message={flash?.success} title="Success" />
 
       <div className="space-y-6">
         {/* Top bar */}
@@ -114,13 +116,6 @@ export default function AdminUsersShow() {
             Back 
           </button>
         </div>
-
-        {/* Flash success */}
-        {flash?.success ? (
-          <div className="rounded-md border bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {flash.success}
-          </div>
-        ) : null}
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Left: user card */}

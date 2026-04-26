@@ -1,5 +1,6 @@
 import { Head, useForm, usePage } from "@inertiajs/react";
 
+import InertiaFlashAlert from "@/components/inertia-flash-alert";
 import InputError from "@/components/input-error";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -87,6 +88,12 @@ export default function ProvidersVerificationsShow() {
       ]}
     >
       <Head title="Provider verification" />
+      <InertiaFlashAlert message={flash} title="Success" />
+      <InertiaFlashAlert
+        message={props.errors?.status}
+        title="Action blocked"
+        variant="error"
+      />
 
       <div className="p-6 max-w-4xl space-y-4">
         <div className="flex items-start justify-between gap-4">
@@ -101,20 +108,6 @@ export default function ProvidersVerificationsShow() {
             Back
           </Button>
         </div>
-
-        {flash ? (
-          <Alert>
-            <AlertTitle>Success</AlertTitle>
-            <AlertDescription>{flash}</AlertDescription>
-          </Alert>
-        ) : null}
-
-        {props.errors?.status ? (
-          <Alert variant="destructive">
-            <AlertTitle>Action blocked</AlertTitle>
-            <AlertDescription>{props.errors.status}</AlertDescription>
-          </Alert>
-        ) : null}
 
         <Card>
           <CardHeader>
@@ -223,4 +216,3 @@ export default function ProvidersVerificationsShow() {
     </AppLayout>
   );
 }
-
