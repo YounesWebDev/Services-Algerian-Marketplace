@@ -18,27 +18,14 @@ export default function Contact() {
             <div className="mx-auto max-w-3xl px-6 pb-12 pt-5 space-y-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Contact Us</h1>
-                    <div className="flex gap-3">
-                        <Link
-                            href={homeRoute.url()}
-                            className="rounded-full border px-4 py-2 text-sm hover:bg-muted transition"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            href={servicesIndex.url()}
-                            className="rounded-full border px-4 py-2 text-sm hover:bg-muted transition"
-                        >
-                            Services
-                        </Link>
-                    </div>
+                   
                 </div>
 
                 <p className="text-sm text-muted-foreground">
                     Need help with an account, booking, or payment issue? Use the details below.
                 </p>
 
-                <div className="space-y-4 rounded-2xl border p-5">
+                <div className="space-y-4 bg-primary-foreground/30  rounded-4xl border border-gray-200 shadow -xl p-5">
                     <div>
                         <p className="text-xs uppercase tracking-wide text-muted-foreground">Email</p>
                         <p className="font-medium">support@profinder.local</p>
