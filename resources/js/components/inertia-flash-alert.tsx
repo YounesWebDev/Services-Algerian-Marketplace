@@ -78,13 +78,13 @@ export default function InertiaFlashAlert({
     }, []);
 
     useEffect(() => {
-    if (!content || typeof window === 'undefined') {
-        const t = window.setTimeout(() => {
-            setAnimate(false);
-            setShowAlert(false);
-        }, 0);
-        return () => window.clearTimeout(t);
-    }
+        if (!content || typeof window === 'undefined') {
+            const t = window.setTimeout(() => {
+                setAnimate(false);
+                setShowAlert(false);
+            }, 0);
+            return () => window.clearTimeout(t);
+        }
 
         if (hideTimer.current !== null) {
             window.clearTimeout(hideTimer.current);
@@ -94,18 +94,20 @@ export default function InertiaFlashAlert({
             window.clearTimeout(removeTimer.current);
         }
 
-        setShowAlert(true);
-        setAnimate(false);
-
-        window.setTimeout(() => setAnimate(true), 10);
-
-        hideTimer.current = window.setTimeout(() => {
+        const t = window.setTimeout(() => {
+            setShowAlert(true);
             setAnimate(false);
-            removeTimer.current = window.setTimeout(
-                () => setShowAlert(false),
-                300,
-            );
-        }, duration);
+            window.setTimeout(() => setAnimate(true), 10);
+            hideTimer.current = window.setTimeout(() => {
+                setAnimate(false);
+                removeTimer.current = window.setTimeout(
+                    () => setShowAlert(false),
+                    300,
+                );
+            }, duration);
+        }, 0);
+
+        return () => window.clearTimeout(t);
     }, [content, duration]);
 
     if (!showAlert || !content) {
