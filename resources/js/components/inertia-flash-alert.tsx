@@ -1,6 +1,7 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle2Icon, OctagonAlert } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type FlashMessage =
     | string
@@ -77,11 +78,13 @@ export default function InertiaFlashAlert({
     }, []);
 
     useEffect(() => {
-        if (!content || typeof window === 'undefined') {
+    if (!content || typeof window === 'undefined') {
+        const t = window.setTimeout(() => {
             setAnimate(false);
             setShowAlert(false);
-            return;
-        }
+        }, 0);
+        return () => window.clearTimeout(t);
+    }
 
         if (hideTimer.current !== null) {
             window.clearTimeout(hideTimer.current);

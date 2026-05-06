@@ -1,8 +1,6 @@
-import { Link, usePage } from "@inertiajs/react";
+import { usePage } from "@inertiajs/react";
 
 import Navbar from "@/components/navbar";
-import { home as homeRoute } from "@/routes";
-import { index as servicesIndex } from "@/routes/services";
 import { type SharedData } from "@/types";
 
 export default function Contact() {

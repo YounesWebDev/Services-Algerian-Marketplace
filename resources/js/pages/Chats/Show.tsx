@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
 import { dashboard } from '@/routes';
+import {index as myChatsIndex } from '@/routes/my/chats';
 import { store as myChatMessagesStore } from '@/routes/my/chats/messages';
 import { show as presenceShow } from '@/routes/presence';
 import { SharedData } from '@/types';
