@@ -1,20 +1,28 @@
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+    ChangeEvent,
+    FormEvent,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { getSocketId, leaveChannel, listenPrivate } from '@/lib/echo';
 import { dashboard } from '@/routes';
-import {index as myChatsIndex } from '@/routes/my/chats';
+import { index as myChatsIndex } from '@/routes/my/chats';
 import { store as myChatMessagesStore } from '@/routes/my/chats/messages';
 import { show as presenceShow } from '@/routes/presence';
 import { SharedData } from '@/types';
+
+import { Check, MoreHorizontal, Pencil, Send, Trash2, X } from 'lucide-react';
 
 type ChatData = {
     id: number;
@@ -110,20 +118,6 @@ function formatOfflineSince(seconds: number | null): string {
     return `Offline since ${Math.floor(seconds / 86400)}d`;
 }
 
-function formatLastSeen(isoDate: string | null): string {
-    if (!isoDate) {
-        return 'Last seen unknown';
-    }
-
-    const date = new Date(isoDate);
-
-    if (Number.isNaN(date.getTime())) {
-        return 'Last seen unknown';
-    }
-
-    return `Last seen ${date.toLocaleString()}`;
-}
-
 function formatSeenAt(isoDate: string | null | undefined): string {
     if (!isoDate) {
         return 'Seen';
@@ -135,7 +129,10 @@ function formatSeenAt(isoDate: string | null | undefined): string {
         return 'Seen';
     }
 
-    return `Seen at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    return `Seen at ${date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+    })}`;
 }
 
 function formatAttachmentSize(sizeBytes: number | null): string {
@@ -160,28 +157,55 @@ function isImageAttachment(attachment: MessageAttachment): boolean {
     }
 
     const fileName = (attachment.original_name ?? '').toLowerCase();
-    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'];
+
+    const imageExtensions = [
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.gif',
+        '.webp',
+        '.bmp',
+        '.svg',
+    ];
 
     return imageExtensions.some((extension) => fileName.endsWith(extension));
 }
 
 export default function ChatsShow() {
-    const { props } = usePage<{ chat: ChatData; messages: MessageRow[] } & SharedData>();
+    const { props } = usePage<
+        { chat: ChatData; messages: MessageRow[] } & SharedData
+    >();
+
     const chat = props.chat;
     const me = props.auth.user;
+
     const otherUserId = chat.other_user?.id ?? null;
 
-    // Local state so we can append realtime messages.
-    const [messages, setMessages] = useState<MessageRow[]>(props.messages ?? []);
+    const [messages, setMessages] = useState<MessageRow[]>(
+        props.messages ?? [],
+    );
+
     const [presenceInfo, setPresenceInfo] = useState<PresenceInfo | null>(null);
+
     const [body, setBody] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [bodyError, setBodyError] = useState<string | null>(null);
     const [sending, setSending] = useState(false);
+
+    const [editingMessageId, setEditingMessageId] = useState<number | null>(
+        null,
+    );
+
+    const [editingBody, setEditingBody] = useState('');
+
+    const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
+
     const maxUploadSizeBytes = 10 * 1024 * 1024;
+
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const channelName = useMemo(() => `private-chat.${chat.id}`, [chat.id]);
+
     const boxRef = useRef<HTMLDivElement | null>(null);
 
     function getXsrfToken(): string | null {
@@ -200,13 +224,112 @@ export default function ChatsShow() {
         return null;
     }
 
-    async function submit(e: React.FormEvent) {
-        e.preventDefault();
+    async function updateMessage(messageId: number) {
+        const cleanBody = editingBody.trim();
+
+        if (!cleanBody) {
+            return;
+        }
+
+        try {
+            const xsrfToken = getXsrfToken();
+
+            const response = await fetch(`/my/chats/messages/${messageId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken ?? '',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    body: cleanBody,
+                }),
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            setMessages((prev) =>
+                prev.map((message) =>
+                    message.id === messageId
+                        ? {
+                              ...message,
+                              body: cleanBody,
+                          }
+                        : message,
+                ),
+            );
+
+            setEditingMessageId(null);
+            setEditingBody('');
+        } catch {
+            //
+        }
+    }
+
+    function deleteForMe(messageId: number) {
+        setMessages((prev) =>
+            prev.filter((message) => message.id !== messageId),
+        );
+    }
+
+    async function deleteForEveryone(messageId: number) {
+        try {
+            const xsrfToken = getXsrfToken();
+
+            const response = await fetch(`/my/chats/messages/${messageId}`, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-XSRF-TOKEN': xsrfToken ?? '',
+                },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            setMessages((prev) =>
+                prev.filter((message) => message.id !== messageId),
+            );
+        } catch {
+            //
+        }
+    }
+
+    function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+        const files = Array.from(event.target.files ?? []);
+        const tooLargeFiles = files.filter(
+            (file) => file.size > maxUploadSizeBytes,
+        );
+
+        if (tooLargeFiles.length > 0) {
+            setBodyError(
+                'Some files are larger than 10MB. Please choose smaller files.',
+            );
+            setSelectedFiles([]);
+            event.currentTarget.value = '';
+
+            return;
+        }
+
+        setBodyError(null);
+        setSelectedFiles(files);
+    }
+
+    async function submit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
 
         const cleanBody = body.trim();
 
         if (!cleanBody && selectedFiles.length === 0) {
             setBodyError('Write a message or attach at least one file.');
+
             return;
         }
 
@@ -214,6 +337,7 @@ export default function ChatsShow() {
 
         if (!xsrfToken) {
             setBodyError('Security token is missing. Please refresh the page.');
+
             return;
         }
 
@@ -221,7 +345,6 @@ export default function ChatsShow() {
         setSending(true);
         setBody('');
 
-        // Optimistic message so sender sees it instantly.
         const optimisticId = -Date.now();
         const optimisticMessage: MessageRow = {
             id: optimisticId,
@@ -269,10 +392,13 @@ export default function ChatsShow() {
             });
 
             if (response.status === 419) {
-                setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+                setMessages((prev) =>
+                    prev.filter((message) => message.id !== optimisticId),
+                );
                 setBodyError('Session expired. Refreshing page...');
                 setBody(cleanBody);
                 window.location.reload();
+
                 return;
             }
 
@@ -280,33 +406,46 @@ export default function ChatsShow() {
                 const payload = (await response.json()) as {
                     errors?: Record<string, string[] | undefined>;
                 };
-                setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
                 const errors = payload.errors ?? {};
-                const firstAttachmentError = Object.entries(errors).find(([key, value]) =>
-                    key.startsWith('attachments.') && Array.isArray(value) && value.length > 0,
+                const firstAttachmentError = Object.entries(errors).find(
+                    ([key, value]) =>
+                        key.startsWith('attachments.') &&
+                        Array.isArray(value) &&
+                        value.length > 0,
                 )?.[1]?.[0];
-                const uploadError = firstAttachmentError ?? errors.attachments?.[0];
+                const uploadError =
+                    firstAttachmentError ?? errors.attachments?.[0];
+
+                setMessages((prev) =>
+                    prev.filter((message) => message.id !== optimisticId),
+                );
 
                 if (uploadError?.toLowerCase().includes('failed to upload')) {
-                    setBodyError('Upload failed. Please try a smaller file or retry.');
+                    setBodyError(
+                        'Upload failed. Please try a smaller file or retry.',
+                    );
                     setBody(cleanBody);
 
                     return;
                 }
 
                 setBodyError(
-                    errors.body?.[0]
-                        ?? uploadError
-                        ?? 'Message is invalid.',
+                    errors.body?.[0] ?? uploadError ?? 'Message is invalid.',
                 );
                 setBody(cleanBody);
+
                 return;
             }
 
             if (!response.ok) {
-                setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
-                setBodyError(`Could not send message (HTTP ${response.status}).`);
+                setMessages((prev) =>
+                    prev.filter((message) => message.id !== optimisticId),
+                );
+                setBodyError(
+                    `Could not send message (HTTP ${response.status}).`,
+                );
                 setBody(cleanBody);
+
                 return;
             }
 
@@ -314,9 +453,15 @@ export default function ChatsShow() {
 
             if (payload.message) {
                 setMessages((prev) => {
-                    const withoutOptimistic = prev.filter((message) => message.id !== optimisticId);
+                    const withoutOptimistic = prev.filter(
+                        (message) => message.id !== optimisticId,
+                    );
 
-                    if (withoutOptimistic.some((message) => message.id === payload.message!.id)) {
+                    if (
+                        withoutOptimistic.some(
+                            (message) => message.id === payload.message!.id,
+                        )
+                    ) {
                         return withoutOptimistic;
                     }
 
@@ -324,12 +469,15 @@ export default function ChatsShow() {
                 });
 
                 setSelectedFiles([]);
+
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
             }
         } catch {
-            setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+            setMessages((prev) =>
+                prev.filter((message) => message.id !== optimisticId),
+            );
             setBodyError('Network error. Please try again.');
             setBody(cleanBody);
         } finally {
@@ -337,24 +485,19 @@ export default function ChatsShow() {
         }
     }
 
-    // Listen to realtime events for this chat.
     useEffect(() => {
         listenPrivate(channelName, '.MessageSent', (data) => {
             const eventData = data as MessageSentData;
 
-            // Guard: only accept events for current chat.
             if (eventData.chat_id !== chat.id) {
                 return;
             }
 
-            // Avoid duplicate append (if same message already exists).
             setMessages((prev) => {
-                if (prev.some((m) => m.id === eventData.id)) {
+                if (prev.some((message) => message.id === eventData.id)) {
                     return prev;
                 }
 
-                // If this tab already has an optimistic copy of my own message,
-                // replace it instead of appending a duplicate.
                 if (eventData.sender_id === me.id) {
                     const optimisticIndex = prev.findIndex(
                         (message) =>
@@ -374,8 +517,6 @@ export default function ChatsShow() {
                 return [...prev, eventData];
             });
 
-            // If a new message comes from the other user while this chat is open,
-            // hit current URL once so backend marks it as seen and broadcasts MessageSeen.
             if (eventData.sender_id !== me.id) {
                 void fetch(window.location.href, {
                     headers: {
@@ -389,7 +530,6 @@ export default function ChatsShow() {
         listenPrivate(channelName, '.MessageSeen', (data) => {
             const eventData = data as MessageSeenData;
 
-            // Update read_at for all messages marked as seen.
             setMessages((prev) =>
                 prev.map((message) =>
                     eventData.message_ids.includes(message.id)
@@ -399,17 +539,17 @@ export default function ChatsShow() {
             );
         });
 
-        // Cleanup when leaving this page.
         return () => {
             leaveChannel(channelName);
         };
     }, [channelName, chat.id, me.id]);
 
-    // Poll the other user's presence every 30 seconds.
     useEffect(() => {
         if (!otherUserId) {
             return;
         }
+
+        let isActive = true;
 
         const loadPresence = async () => {
             try {
@@ -425,9 +565,12 @@ export default function ChatsShow() {
                 }
 
                 const data = (await response.json()) as PresenceInfo;
-                setPresenceInfo(data);
+
+                if (isActive) {
+                    setPresenceInfo(data);
+                }
             } catch {
-                // Ignore transient network issues.
+                //
             }
         };
 
@@ -438,11 +581,11 @@ export default function ChatsShow() {
         }, 30_000);
 
         return () => {
+            isActive = false;
             window.clearInterval(intervalId);
         };
     }, [otherUserId]);
 
-    // Always scroll to bottom when messages change.
     useEffect(() => {
         if (boxRef.current) {
             boxRef.current.scrollTop = boxRef.current.scrollHeight;
@@ -454,133 +597,279 @@ export default function ChatsShow() {
             breadcrumbs={[
                 { title: 'Dashboard', href: dashboard().url },
                 { title: 'My Chats', href: myChatsIndex.url() },
-                { title: chat.other_user?.name ?? `Chat #${chat.id}`, href: '#' },
+                {
+                    title: chat.other_user?.name ?? `Chat #${chat.id}`,
+                    href: '#',
+                },
             ]}
         >
             <Head title={`Chat #${chat.id}`} />
 
-            <div className="max-w-3xl space-y-4 p-6">
-                <Card>
-                    <CardHeader className="space-y-0">
-                        <div className="flex items-start justify-between gap-3">
-                            <div className="flex min-w-0 items-center gap-3">
-                                <Avatar className="h-10 w-10 border">
-                                    <AvatarImage
-                                        src={toStorageUrl(chat.other_user?.avatar_path ?? null)}
-                                        alt={chat.other_user?.name ?? 'Unknown User'}
-                                    />
-                                    <AvatarFallback>
-                                        {getInitial(chat.other_user?.name)}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="min-w-0">
-                                    <CardTitle className="text-xl">
-                                        Chat with {chat.other_user?.name ?? 'Unknown User'}
-                                    </CardTitle>
-                                    {presenceInfo ? (
-                                        presenceInfo.is_online ? (
-                                            <div className="mt-1">
-                                                <Badge
-                                                    variant="secondary"
-                                                    className="gap-1 text-green-700"
-                                                >
-                                                    <span className="h-2 w-2 rounded-full bg-green-500" />
-                                                    <span>Online</span>
-                                                </Badge>
-                                            </div>
-                                        ) : (
-                                            <div className="mt-1 space-y-0.5 text-sm text-muted-foreground">
-                                                <div>{formatOfflineSince(presenceInfo.offline_for_seconds)}</div>
-                                                <div>{formatLastSeen(presenceInfo.last_seen_at)}</div>
-                                            </div>
-                                        )
-                                    ) : null}
+            <div className="flex h-[calc(100vh-70px)] flex-col bg-background">
+                <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
+                    <div className="flex items-center justify-between px-4 py-3 md:px-6">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <Avatar className="h-11 w-11 border">
+                                <AvatarImage
+                                    src={toStorageUrl(
+                                        chat.other_user?.avatar_path ?? null,
+                                    )}
+                                />
+                                <AvatarFallback>
+                                    {getInitial(chat.other_user?.name)}
+                                </AvatarFallback>
+                            </Avatar>
+
+                            <div className="min-w-0">
+                                <div className="truncate text-sm font-semibold md:text-base">
+                                    {chat.other_user?.name}
                                 </div>
+
+                                {presenceInfo?.is_online ? (
+                                    <div className="flex items-center gap-1 text-xs text-green-600">
+                                        <span className="h-2 w-2 rounded-full bg-green-500" />
+                                        Online
+                                    </div>
+                                ) : (
+                                    <div className="text-xs text-muted-foreground">
+                                        {formatOfflineSince(
+                                            presenceInfo?.offline_for_seconds ??
+                                                null,
+                                        )}
+                                    </div>
+                                )}
                             </div>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.history.back()}
-                            >
-                                Back
-                            </Button>
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div
-                            ref={boxRef}
-                            className="h-100 space-y-3 overflow-y-auto rounded-lg border p-4"
-                        >
-                            {messages.length === 0 ? (
-                                <div className="text-sm text-muted-foreground">No messages yet.</div>
-                            ) : (
-                                messages.map((message) => {
-                                    const isMine = message.sender_id === me.id;
+                    </div>
+                </div>
 
-                                    return (
-                                        <div
-                                            key={message.id}
-                                            className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                                        >
-                                            <div
-                                                className={
-                                                    isMine
-                                                        ? 'max-w-[80%] rounded-lg border border-primary/20 bg-primary p-3 text-primary-foreground'
-                                                        : 'max-w-[80%] rounded-lg border bg-card p-3'
-                                                }
-                                            >
-                                                <div
-                                                    className={
-                                                        isMine
-                                                            ? 'mb-1 text-xs text-primary-foreground/80'
-                                                            : 'mb-1 text-xs text-muted-foreground'
+                <div
+                    ref={boxRef}
+                    className="flex-1 space-y-4 overflow-y-auto px-3 py-4 md:px-6"
+                >
+                    {messages.map((message) => {
+                        const isMine = message.sender_id === me.id;
+
+                        return (
+                            <div
+                                key={message.id}
+                                className={`flex items-end gap-2 ${
+                                    isMine ? 'justify-end' : 'justify-start'
+                                }`}
+                            >
+                                {!isMine && (
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage
+                                            src={toStorageUrl(
+                                                message.sender_avatar_path ??
+                                                    null,
+                                            )}
+                                        />
+                                        <AvatarFallback>
+                                            {getInitial(message.sender_name)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                )}
+
+                                <div className="max-w-[85%] md:max-w-[70%]">
+                                    <div className="relative">
+                                        {isMine && (
+                                            <div className="absolute -top-1 right-0 z-30">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setMenuOpenId(
+                                                            menuOpenId ===
+                                                                message.id
+                                                                ? null
+                                                                : message.id,
+                                                        )
                                                     }
+                                                    className="rounded-full p-1 opacity-70 transition hover:bg-black/10 hover:opacity-100"
                                                 >
-                                                    {message.sender_name ?? 'Unknown'}
-                                                </div>
-                                                <div className="wrap-break-words text-sm whitespace-pre-wrap">
-                                                    {message.body !== '' ? message.body : null}
-                                                </div>
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </button>
 
-                                                {message.attachments && message.attachments.length > 0 ? (
-                                                    <div className="mt-2 space-y-1">
-                                                        {message.attachments.map((attachment) => {
-                                                            const sizeLabel = formatAttachmentSize(
-                                                                attachment.size_bytes,
-                                                            );
-                                                            const title = attachment.original_name ?? 'Attachment';
+                                                {menuOpenId === message.id && (
+                                                    <div className="absolute right-0 mt-2 w-52 rounded-2xl border bg-background p-1 shadow-2xl">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setEditingMessageId(
+                                                                    message.id,
+                                                                );
 
-                                                            if (!attachment.path) {
+                                                                setEditingBody(
+                                                                    message.body,
+                                                                );
+
+                                                                setMenuOpenId(
+                                                                    null,
+                                                                );
+                                                            }}
+                                                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-muted"
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                            Edit
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                deleteForMe(
+                                                                    message.id,
+                                                                );
+
+                                                                setMenuOpenId(
+                                                                    null,
+                                                                );
+                                                            }}
+                                                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-muted"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Delete for me
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                deleteForEveryone(
+                                                                    message.id,
+                                                                );
+
+                                                                setMenuOpenId(
+                                                                    null,
+                                                                );
+                                                            }}
+                                                            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-500 hover:bg-muted"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Delete for everyone
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div
+                                            className={`rounded-3xl px-4 py-2 shadow-sm ${
+                                                isMine
+                                                    ? 'rounded-br-md bg-primary text-primary-foreground'
+                                                    : 'rounded-bl-md border bg-muted'
+                                            }`}
+                                        >
+                                            {editingMessageId === message.id ? (
+                                                <div className="space-y-2">
+                                                    <Textarea
+                                                        value={editingBody}
+                                                        onChange={(e) =>
+                                                            setEditingBody(
+                                                                e.target.value,
+                                                            )
+                                                        }
+                                                    />
+
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            type="button"
+                                                            variant="ghost"
+                                                            onClick={() => {
+                                                                setEditingMessageId(
+                                                                    null,
+                                                                );
+
+                                                                setEditingBody(
+                                                                    '',
+                                                                );
+                                                            }}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+
+                                                        <Button
+                                                            size="sm"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                updateMessage(
+                                                                    message.id,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Check className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm break-words whitespace-pre-wrap">
+                                                    {message.body}
+                                                </div>
+                                            )}
+
+                                            {message.attachments &&
+                                            message.attachments.length > 0 ? (
+                                                <div className="mt-2 space-y-1">
+                                                    {message.attachments.map(
+                                                        (attachment) => {
+                                                            const sizeLabel =
+                                                                formatAttachmentSize(
+                                                                    attachment.size_bytes,
+                                                                );
+                                                            const title =
+                                                                attachment.original_name ??
+                                                                'Attachment';
+
+                                                            if (
+                                                                !attachment.path
+                                                            ) {
                                                                 return (
                                                                     <div
-                                                                        key={attachment.id}
+                                                                        key={
+                                                                            attachment.id
+                                                                        }
                                                                         className="text-xs underline"
                                                                     >
                                                                         {title}
-                                                                        {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                        {sizeLabel
+                                                                            ? ` (${sizeLabel})`
+                                                                            : ''}
                                                                     </div>
                                                                 );
                                                             }
 
-                                                            if (isImageAttachment(attachment)) {
+                                                            if (
+                                                                isImageAttachment(
+                                                                    attachment,
+                                                                )
+                                                            ) {
                                                                 return (
                                                                     <a
-                                                                        key={attachment.id}
-                                                                        href={toStorageUrl(attachment.path)}
+                                                                        key={
+                                                                            attachment.id
+                                                                        }
+                                                                        href={toStorageUrl(
+                                                                            attachment.path,
+                                                                        )}
                                                                         target="_blank"
                                                                         rel="noreferrer"
                                                                         className="block"
                                                                     >
                                                                         <img
-                                                                            src={toStorageUrl(attachment.path)}
-                                                                            alt={title}
+                                                                            src={toStorageUrl(
+                                                                                attachment.path,
+                                                                            )}
+                                                                            alt={
+                                                                                title
+                                                                            }
                                                                             className="max-h-52 w-auto rounded-md border"
                                                                         />
                                                                         <div className="mt-1 text-xs underline">
-                                                                            {title}
-                                                                            {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                            {
+                                                                                title
+                                                                            }
+                                                                            {sizeLabel
+                                                                                ? ` (${sizeLabel})`
+                                                                                : ''}
                                                                         </div>
                                                                     </a>
                                                                 );
@@ -588,93 +877,109 @@ export default function ChatsShow() {
 
                                                             return (
                                                                 <a
-                                                                    key={attachment.id}
-                                                                    href={toStorageUrl(attachment.path)}
+                                                                    key={
+                                                                        attachment.id
+                                                                    }
+                                                                    href={toStorageUrl(
+                                                                        attachment.path,
+                                                                    )}
                                                                     target="_blank"
                                                                     rel="noreferrer"
                                                                     className="block text-xs underline"
                                                                 >
                                                                     {title}
-                                                                    {sizeLabel ? ` (${sizeLabel})` : ''}
+                                                                    {sizeLabel
+                                                                        ? ` (${sizeLabel})`
+                                                                        : ''}
                                                                 </a>
                                                             );
-                                                        })}
-                                                    </div>
-                                                ) : null}
-
-                                                {isMine && message.read_at ? (
-                                                    <div className="mt-2 text-[11px] text-primary-foreground/80">
-                                                        {formatSeenAt(message.read_at)}
-                                                    </div>
-                                                ) : null}
-                                            </div>
+                                                        },
+                                                    )}
+                                                </div>
+                                            ) : null}
                                         </div>
-                                    );
-                                })
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                                    </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base">Send message</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={submit} className="space-y-3">
+                                    <div
+                                        className={`mt-1 px-2 text-[11px] text-muted-foreground ${
+                                            isMine ? 'text-right' : 'text-left'
+                                        }`}
+                                    >
+                                        {message.created_at
+                                            ? new Date(
+                                                  message.created_at,
+                                              ).toLocaleTimeString([], {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                              })
+                                            : ''}
+
+                                        {isMine && message.read_at
+                                            ? ` - ${formatSeenAt(
+                                                  message.read_at,
+                                              )}`
+                                            : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="border-t bg-background p-3 md:p-4">
+                    <form
+                        onSubmit={submit}
+                        className="mx-auto flex max-w-5xl flex-col gap-3"
+                    >
+                        {selectedFiles.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                                {selectedFiles.map((file) => (
+                                    <Badge
+                                        key={file.name}
+                                        variant="secondary"
+                                        className="rounded-full px-3 py-1"
+                                    >
+                                        {file.name}
+                                    </Badge>
+                                ))}
+                            </div>
+                        ) : null}
+
+                        {bodyError ? (
+                            <Alert variant="destructive">
+                                <AlertDescription>{bodyError}</AlertDescription>
+                            </Alert>
+                        ) : null}
+
+                        <div className="flex items-end gap-2">
                             <Textarea
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
-                                rows={3}
-                                placeholder="Type your message..."
+                                rows={1}
+                                placeholder="Type a message..."
+                                className="max-h-40 min-h-[48px] flex-1 resize-none rounded-3xl border border-gray-200 bg-primary-foreground/30 px-4 py-3"
                             />
+
                             <Input
                                 ref={fileInputRef}
                                 type="file"
                                 multiple
                                 accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.svg,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar,.7z"
-                                onChange={(event) => {
-                                    const files = Array.from(event.target.files ?? []);
-                                    const tooLargeFiles = files.filter((file) =>
-                                        file.size > maxUploadSizeBytes,
-                                    );
-
-                                    if (tooLargeFiles.length > 0) {
-                                        setBodyError(
-                                            'Some files are larger than 10MB. Please choose smaller files.',
-                                        );
-                                        setSelectedFiles([]);
-                                        event.currentTarget.value = '';
-
-                                        return;
-                                    }
-
-                                    setBodyError(null);
-                                    setSelectedFiles(files);
-                                }}
+                                onChange={handleFileChange}
+                                className="max-w-[140px] rounded-full border border-gray-200 bg-primary-foreground/30 px-4"
                             />
-                            {selectedFiles.length > 0 ? (
-                                <div className="text-xs text-muted-foreground">
-                                    {selectedFiles.map((file) => file.name).join(', ')}
-                                </div>
-                            ) : null}
-                            {bodyError ? (
-                                <Alert variant="destructive">
-                                    <AlertDescription>{bodyError}</AlertDescription>
-                                </Alert>
-                            ) : null}
 
-                            <div className="flex justify-end">
-                                <Button type="submit" disabled={sending}>
-                                    {sending ? 'Sending...' : 'Send'}
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                            <Button
+                                type="submit"
+                                disabled={sending}
+                                className="rounded-full p-3"
+                            >
+                                <Send className="h-7 w-7" />
+                            </Button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </AppLayout>
     );
 }
-
-
